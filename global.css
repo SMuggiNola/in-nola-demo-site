@@ -1,0 +1,150 @@
+/* =========================================
+   GLOBAL THEME — IN-NOLA Demo
+========================================= */
+:root {
+  --gold: #d4af37;
+  --gold-light: #ffe8a8;
+  --parchment: #f3ecd8;
+
+  --deep-green: #0c2e1a;
+  --mid-green: #174d31;
+
+  --radius: 12px;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Background + Typography */
+body {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--gold-light);
+  background: radial-gradient(circle, #0f3a23 0%, #0a1f13 90%);
+  min-height: 100vh;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Kells watermark */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url('./assets/kells/book_of_kells_1.jpg') center/cover no-repeat;
+  opacity: 0.38; /* stronger image */
+  mix-blend-mode: normal; /* no darkening/multiplying */
+  filter: brightness(0.92) contrast(1.1) saturate(1.25);
+  z-index: -1;
+}
+
+
+
+/* Headings */
+h1, h2 {
+  font-family: 'Cinzel Decorative', serif;
+  text-shadow:
+    0 0 12px rgba(255,215,100,0.5),
+    0 0 24px rgba(200,155,60,0.35);
+}
+
+h1 {
+  color: #000;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 3.2rem;
+
+  text-shadow:
+    0 0 10px rgba(255,215,100,1),
+    0 0 25px rgba(230,190,60,0.9),
+    0 0 45px rgba(200,155,40,0.75),
+    0 0 60px rgba(160,120,30,0.5);
+}
+
+
+h2 {
+  font-size: 1.55rem;
+  color: var(--gold);
+  margin-bottom: 1.4rem;
+}
+
+/* Paragraphs */
+p {
+  font-size: 1.2rem;
+  max-width: 720px;
+  margin: 0 auto 2rem;
+  color: var(--gold-light);
+  line-height: 1.65;
+}
+
+/* Button grid */
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 2rem;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  background: rgba(23, 77, 49, 0.78); /* translucent emerald */
+  backdrop-filter: blur(2px);         /* optional but beautiful */
+  
+  padding: 0.9rem 1.8rem;
+  border-radius: var(--radius);
+  
+  color: var(--gold-light);           /* stays solid */
+  font-weight: 600;
+  text-decoration: none;
+
+  transition: 0.2s ease;
+  border: 1px solid rgba(212,175,55,0.4);
+}
+
+
+.btn:hover {
+  background: #1d6241;
+  transform: translateY(-2px);
+}
+
+.site-footer {
+  margin-top: 4rem;
+  padding: 1.5rem 1rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.4);
+  background: rgba(0, 0, 0, 0.35);
+  font-family: 'Cormorant Garamond', serif;
+  color: #f5eedb;
+}
+
+.footer-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem; /* space between elements */
+  flex-wrap: wrap; /* keeps it neat on small screens */
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.footer-line a {
+  text-decoration: none;
+  font-weight: 600;
+  color: #d4af37;
+}
+
+.footer-line a:hover {
+  text-decoration: underline;
+}
+
+.name-gaelic {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}

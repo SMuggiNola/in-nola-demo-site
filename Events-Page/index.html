@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upcoming Events • Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../global.css">
+
+  <style>
+    /* Override background for this page */
+    body::before {
+      background: url('../assets/kells/book_of_kells_2.jpg') center/cover no-repeat;
+      opacity: 0.32;
+      filter: brightness(0.85) contrast(1.15) saturate(1.15);
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+    }
+
+    /* Accordion structure */
+    .event-card {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(10, 60, 35, 0.82);
+      border: 1px solid rgba(212,175,55,0.5);
+      border-radius: 1.4rem;
+      margin: 1rem auto;
+      overflow: hidden;
+      backdrop-filter: blur(2px);
+      cursor: pointer;
+    }
+
+    .event-header {
+      padding: 1.2rem 1.4rem;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .event-header:hover {
+      background: rgba(23,77,49,0.5);
+    }
+
+    .event-body {
+      display: none;
+      padding: 1.2rem 1.6rem 2rem;
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      line-height: 1.6;
+    }
+
+    .event-body img {
+      width: 100%;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .event-card.open .event-body {
+      display: block;
+    }
+
+    /* More info button */
+    .more-btn {
+      display: inline-block;
+      margin-top: 1.2rem;
+      padding: 0.7rem 1.4rem;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #0b6631;
+      font-weight: 600;
+      text-decoration: none;
+      border: 2px solid #0b6631;
+      transition: 0.2s ease;
+    }
+
+    .more-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+  </style>
+</head>
+
+<body id="events">
+
+  <h1>Upcoming Events</h1>
+
+  <!-- ⭐ First Event: Holiday Party -->
+<div class="event-card" onclick="this.classList.toggle('open')">
+
+  <div class="event-header">
+    <span>
+      <strong>Irish Network – NOLA’s</strong><br>
+      “There's An Irish Pub Everywhere”<br>
+      1st Annual Holiday Party
+    </span>
+    <span>+</span>
+  </div>
+
+  <div class="event-body">
+
+    <p><strong>Date:</strong> Tuesday, December 16th — 6pm</p>
+    <p><strong>Location:</strong> Ember Indian Cuisine — 5606 Canal Blvd</p>
+
+    <p><strong>Details:</strong>  
+      Potluck dinner, cash bar, and a warm holiday evening celebrating Irish culture in New Orleans.
+    </p>
+
+    <p>
+      Join us for our first annual IN-NOLA Holiday Party —   
+      Bring a dish, bring a friend, bring good cheer.
+    </p>
+
+    <a href="#" class="more-btn">More Information</a>
+
+  </div>
+
+</div>
+
+
+  <!-- Add more event cards here later -->
+
+  <footer class="site-footer">
+    <p class="footer-line">
+      Page assembled by <span class="name-gaelic">Se&aacute;n Muggivan</span> • 
+      Contact: <a href="mailto:muggs@muggsofdatasci.net">muggs@muggsofdatasci.net</a>
+    </p>
+  </footer>
+
+  <script>
+    // Toggle +/- icon
+    document.querySelectorAll('.event-card').forEach(card => {
+      card.addEventListener('click', e => {
+        if (e.target.classList.contains('more-btn')) return;
+        const symbol = card.querySelector('.event-header span:last-child');
+        symbol.textContent = card.classList.contains('open') ? '-' : '+';
+      });
+    });
+  </script>
+
+</body>
+</html>

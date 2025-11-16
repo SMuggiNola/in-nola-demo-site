@@ -19,7 +19,9 @@
   box-sizing: border-box;
 }
 
-/* Background + Typography */
+/* ======================================================
+   Background + Typography
+====================================================== */
 body {
   font-family: 'Cormorant Garamond', serif;
   color: var(--gold-light);
@@ -38,15 +40,14 @@ body::before {
   position: fixed;
   inset: 0;
   background: url('./assets/kells/book_of_kells_1.jpg') center/cover no-repeat;
-  opacity: 0.38; /* stronger image */
-  mix-blend-mode: normal; /* no darkening/multiplying */
+  opacity: 0.38;
   filter: brightness(0.92) contrast(1.1) saturate(1.25);
   z-index: -1;
 }
 
-
-
-/* Headings */
+/* ======================================================
+   Headings
+====================================================== */
 h1, h2 {
   font-family: 'Cinzel Decorative', serif;
   text-shadow:
@@ -56,9 +57,7 @@ h1, h2 {
 
 h1 {
   color: #000;
-  font-family: 'Cinzel Decorative', serif;
   font-size: 3.2rem;
-
   text-shadow:
     0 0 10px rgba(255,215,100,1),
     0 0 25px rgba(230,190,60,0.9),
@@ -66,14 +65,15 @@ h1 {
     0 0 60px rgba(160,120,30,0.5);
 }
 
-
 h2 {
   font-size: 1.55rem;
   color: var(--gold);
   margin-bottom: 1.4rem;
 }
 
-/* Paragraphs */
+/* ======================================================
+   Paragraphs
+====================================================== */
 p {
   font-size: 1.2rem;
   max-width: 720px;
@@ -82,55 +82,77 @@ p {
   line-height: 1.65;
 }
 
-/* Button grid */
+/* ======================================================
+   Button Grid
+====================================================== */
 .nav-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   width: 100%;
   max-width: 700px;
   margin-top: 2rem;
 }
 
-/* Buttons */
+/* ======================================================
+   Base Button (ALL buttons share this)
+====================================================== */
 .btn {
-  display: inline-block;
-  background: rgba(23, 77, 49, 0.78); /* translucent emerald */
-  backdrop-filter: blur(2px);         /* optional but beautiful */
-  
-  padding: 0.9rem 1.8rem;
-  border-radius: var(--radius);
-  
-  color: var(--gold-light);           /* stays solid */
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 120px;
+  padding: 0;
+
+  background: rgba(10, 60, 35, 0.85);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(212,175,55,0.4);
+
+  color: #e9dba8;
   text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 600;
 
   transition: 0.2s ease;
-  border: 1px solid rgba(212,175,55,0.4);
 }
 
-
 .btn:hover {
-  background: #1d6241;
+  background: rgba(10, 60, 35, 1);
   transform: translateY(-2px);
 }
 
+/* ======================================================
+   IN USA Button Variant
+====================================================== */
+.inusa-btn {
+  background: #ffffff;
+  border: 3px solid #0b6631;
+}
+
+.inusa-logo {
+  max-height: 70%;
+  width: auto;
+}
+
+/* ======================================================
+   Footer
+====================================================== */
 .site-footer {
   margin-top: 4rem;
   padding: 1.5rem 1rem;
   border-top: 1px solid rgba(212, 175, 55, 0.4);
   background: rgba(0, 0, 0, 0.35);
-  font-family: 'Cormorant Garamond', serif;
   color: #f5eedb;
+  font-family: 'Cormorant Garamond', serif;
 }
 
 .footer-line {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem; /* space between elements */
-  flex-wrap: wrap; /* keeps it neat on small screens */
-  margin: 0;
+  gap: 0.5rem;
+  flex-wrap: wrap;
   font-size: 0.95rem;
 }
 

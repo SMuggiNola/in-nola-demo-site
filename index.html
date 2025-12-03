@@ -21,40 +21,55 @@
   <p>Fáilte — Welcome</p>
 </div>
 
-
-  <h1>Irish Network New Orleans</h1>
-
-<!-- IN-NOLA Logo Inserted Here -->
-<div style="text-align:center; margin: 2rem 0;">
-  <img 
-    src="./assets/in_logo.png" 
-    alt="IN-NOLA Logo"
-    style="max-width: 240px; width: 100%; height: auto;"
-  >
-</div>
-<h2>Connecting Irish heritage, culture, and community</h2>
+<div id="main-content">
+  <!-- IN-NOLA Logo Inserted Here -->
+  <div class="logo-container">
+    <img 
+      src="./assets/in_logo.png" 
+      alt="IN-NOLA Logo"
+      class="logo"
+    >
+  </div>
+  <h2>Connecting Irish heritage, culture, and community</h2>
 
   <div class="nav-grid">
-<a href="./Our-Village/index.html" class="btn">
-  Our Village
- <span class="btn-sub">(where everything happens…)</span>
-</a>
+    <a href="./Our-Village/index.html" class="btn btn-gold">
+      Our Village
+      <span class="btn-sub">(where everything happens…)</span>
+    </a>
 
-   <a href="./About-IN-NOLA/index.html" class="btn">About IN-NOLA</a>
+    <a href="./About-IN-NOLA/index.html" class="btn">About IN-NOLA</a>
 
     <a href="contact_form.html" class="btn">Contact IN-NOLA</a>
-<a href="https://irishnetwork-usa.org/" class="btn inusa-btn" target="_blank" rel="noopener">
-  <img src="./assets/inusa_logo.png" alt="IN USA" class="inusa-logo">
-</a>
-
+    <a href="https://irishnetwork-usa.org/" class="btn inusa-btn" target="_blank" rel="noopener">
+      <img src="./assets/inusa_logo.png" alt="IN USA" class="inusa-logo">
+    </a>
   </div>
 
-<footer class="site-footer">
-  <p class="footer-line">
-    Website created by <a href="https://AiEmpoweredU.org" target="_blank" rel="noopener">AiEmpoweredU.org</a>.
-  </p>
-</footer>
+  <footer class="site-footer">
+    <div class="social-links">
+      <a href="#" target="_blank" rel="noopener" aria-label="Facebook">FB</a>
+      <a href="#" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
+    </div>
+    <p class="footer-line">
+      Copyright &copy; 2024, Irish Network New Orleans. All Rights Reserved.
+    </p>
+    <p class="footer-line">
+      Website created by <a href="https://AiEmpoweredU.org" target="_blank" rel="noopener">AiEmpoweredU.org</a>.
+    </p>
+  </footer>
+</div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const mainContent = document.getElementById('main-content');
+    // The splash screen animation is 2.8s in the CSS.
+    // We'll start the fade-in of the main content shortly before it ends.
+    setTimeout(() => {
+      mainContent.classList.add('fade-in');
+    }, 2000); // Start fade-in at 2 seconds
+  });
+</script>
 
 </body>
 </html>

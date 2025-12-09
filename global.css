@@ -83,22 +83,19 @@ p {
 }
 
 /* ======================================================
-   Button Grid
+   Button Stack
 ====================================================== */
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.nav-stack {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   width: 100%;
   max-width: 700px;
   margin-top: 2rem;
 }
 
-/* Centered buttons with flexbox */
-.nav-grid.centered-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem; /* optional spacing between buttons */
+.nav-stack .btn {
+  width: 100%;
 }
 
 /* ======================================================
@@ -109,8 +106,8 @@ p {
   align-items: center;
   justify-content: center;
 
-  height: 120px;
-  padding: 0;
+  height: 80px; /* Reduced height */
+  padding: 0.75rem 1rem; /* Added vertical padding */
 
   background: rgba(10, 60, 35, 0.85);
   border-radius: 1.5rem;
@@ -309,7 +306,6 @@ p {
 
 .btn-gold {
   width: 100%;
-  max-width: 620px; /* wider across the page */
   background: linear-gradient(
     135deg,
     rgba(180,145,40,0.85),  /* softer gold */
@@ -370,6 +366,63 @@ p {
 
 .contact-form button {
   margin-top: 0.5rem;
+}
+
+/* ======================================================
+   Donation Options
+====================================================== */
+.donation-options {
+  display: flex;
+  flex-direction: column; /* Stack vertically */
+  align-items: center;   /* Center horizontally */
+  gap: 2rem;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.donation-option {
+  background: rgba(10, 60, 35, 0.85); /* Slightly more prominent background */
+  border: 2px solid var(--gold); /* Thicker golden border */
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  width: 250px;
+  backdrop-filter: blur(3px);
+  transition: border 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease; /* Added transform for hover */
+  box-shadow: 0 0 8px rgba(212,175,55,0.25); /* Added initial shadow for depth */
+}
+
+.donation-option:hover {
+  border-color: var(--gold-light); /* Lighter gold on hover */
+  box-shadow: 0 0 16px var(--gold-light); /* Stronger glow on hover */
+  transform: translateY(-3px); /* Subtle lift on hover */
+}
+
+.donation-amount {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 2rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.donation-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(212,175,55,0.4);
+  background: rgba(12, 46, 26, 0.6);
+  color: var(--gold-light);
+  font-size: 1rem;
+  font-family: 'Cormorant Garamond', serif;
+  text-align: center;
+}
+
+.donation-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(212,175,55,0.4);
 }
 
 /* ============================

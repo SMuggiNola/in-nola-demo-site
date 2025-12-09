@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const pathPrefix = getPathPrefix();
 
-  // 1. Fetch and inject the header, then fix nav paths
+  // 1. Fetch and inject the header
   fetch(`${pathPrefix}header.html`)
     .then(response => {
       if (!response.ok) throw new Error(`Could not fetch header.html from ${pathPrefix}header.html`);
@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const headerPlaceholder = document.getElementById('main-header-placeholder');
       if (headerPlaceholder) {
         headerPlaceholder.innerHTML = data;
-        adjustNavPaths(pathPrefix);
         setActiveNavLink();
       }
     })
@@ -40,44 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const footerPlaceholder = document.getElementById('main-footer-placeholder');
       if (footerPlaceholder) {
         footerPlaceholder.innerHTML = data;
-        adjustFooterPaths(pathPrefix);
       }
     })
     .catch(error => console.error('Error injecting footer:', error));
 
-  // 3. Adjust navigation paths for relative depth
-  function adjustNavPaths(prefix) {
-    const navLinks = document.querySelectorAll('.main-nav .nav-link');
-    navLinks.forEach(link => {
-      const originalHref = link.getAttribute('href');
-      // Only adjust relative paths
-      if (originalHref && !originalHref.startsWith('http') && !originalHref.startsWith('#')) {
-        // Create a URL object to resolve the absolute path from the page's location
-        const absoluteUrl = new URL(originalHref, window.location.href);
-        // We only need to adjust paths for files not at the root
-        const pagePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-        if (pagePath) {
-           const relativePath = absoluteUrl.pathname.substring(pagePath.length + 1);
-           if (link.href.includes('index.html')) {
-             link.setAttribute('href', prefix + originalHref);
-           }
-        }
-      }
-    });
-  }
-
-  // 4. Adjust footer paths for relative depth
-  function adjustFooterPaths(prefix) {
-    const footerLinks = document.querySelectorAll('.site-footer a');
-    footerLinks.forEach(link => {
-      const originalHref = link.getAttribute('href');
-      if (originalHref && !originalHref.startsWith('http') && originalHref !== '#') {
-        link.setAttribute('href', prefix + originalHref);
-      }
-    });
-  }
-
-  // 5. Set the active navigation link
+  // 3. Set the active navigation link
   function setActiveNavLink() {
     const navLinks = document.querySelectorAll('.nav-link');
     const currentPage = window.location.pathname;
@@ -108,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // 6. Fade in main content
+  // 4. Fade in main content
   const mainContent = document.getElementById('main-content');
   if (mainContent) {
     const isHomePage = document.body.id === 'landing';
@@ -116,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => mainContent.classList.add('fade-in'), fadeInDelay);
   }
 
-  // 7. Event card toggle logic
+  // 5. Event card toggle logic
   document.querySelectorAll('.event-card').forEach(card => {
     card.addEventListener('click', e => {
       if (e.target.closest('.more-btn')) return;

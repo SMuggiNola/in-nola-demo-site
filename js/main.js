@@ -1,76 +1,114 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Function to determine the correct asset path prefix
+  function getPathPrefix() {
+    const path = window.location.pathname;
+    const pathSegments = path.split('/').filter(segment => segment.length > 0 && !segment.endsWith('.html'));
+    const depth = pathSegments.length;
+
+    if (depth === 0) {
+      return './';
+    }
+    return '../'.repeat(depth);
+  }
+
+  const pathPrefix = getPathPrefix();
+
   // 1. Fetch and inject the header, then fix nav paths
-  fetch('../header.html')
+  fetch(`${pathPrefix}header.html`)
     .then(response => {
-      if (!response.ok) throw new Error('Could not fetch header.html');
+      if (!response.ok) throw new Error(`Could not fetch header.html from ${pathPrefix}header.html`);
       return response.text();
     })
     .then(data => {
       const headerPlaceholder = document.getElementById('main-header-placeholder');
       if (headerPlaceholder) {
         headerPlaceholder.innerHTML = data;
-        adjustNavPaths();
+        adjustNavPaths(pathPrefix);
         setActiveNavLink();
       }
     })
     .catch(error => console.error('Error injecting header:', error));
 
-  // 2. Adjust navigation paths for relative depth
-  function adjustNavPaths() {
-    const path = window.location.pathname;
-    const isIndex = path.endsWith('/') || path.endsWith('/index.html');
-    const depth = isIndex ? path.split('/').length - 2 : path.split('/').length - 2;
+  // 2. Fetch and inject the footer
+  fetch(`${pathPrefix}footer.html`)
+    .then(response => {
+      if (!response.ok) throw new Error(`Could not fetch footer.html from ${pathPrefix}footer.html`);
+      return response.text();
+    })
+    .then(data => {
+      const footerPlaceholder = document.getElementById('main-footer-placeholder');
+      if (footerPlaceholder) {
+        footerPlaceholder.innerHTML = data;
+        adjustFooterPaths(pathPrefix);
+      }
+    })
+    .catch(error => console.error('Error injecting footer:', error));
 
-    if (depth > 0) {
-      const prefix = '../'.repeat(depth);
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        const originalHref = link.getAttribute('href');
-        if (originalHref && !originalHref.startsWith('http')) {
-          link.setAttribute('href', prefix + originalHref);
+  // 3. Adjust navigation paths for relative depth
+  function adjustNavPaths(prefix) {
+    const navLinks = document.querySelectorAll('.main-nav .nav-link');
+    navLinks.forEach(link => {
+      const originalHref = link.getAttribute('href');
+      // Only adjust relative paths
+      if (originalHref && !originalHref.startsWith('http') && !originalHref.startsWith('#')) {
+        // Create a URL object to resolve the absolute path from the page's location
+        const absoluteUrl = new URL(originalHref, window.location.href);
+        // We only need to adjust paths for files not at the root
+        const pagePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+        if (pagePath) {
+           const relativePath = absoluteUrl.pathname.substring(pagePath.length + 1);
+           if (link.href.includes('index.html')) {
+             link.setAttribute('href', prefix + originalHref);
+           }
         }
-      });
-    }
+      }
+    });
   }
 
-  // 3. Set the active navigation link
+  // 4. Adjust footer paths for relative depth
+  function adjustFooterPaths(prefix) {
+    const footerLinks = document.querySelectorAll('.site-footer a');
+    footerLinks.forEach(link => {
+      const originalHref = link.getAttribute('href');
+      if (originalHref && !originalHref.startsWith('http') && originalHref !== '#') {
+        link.setAttribute('href', prefix + originalHref);
+      }
+    });
+  }
+
+  // 5. Set the active navigation link
   function setActiveNavLink() {
     const navLinks = document.querySelectorAll('.nav-link');
     const currentPage = window.location.pathname;
 
-    let highestMatchLength = 0;
     let activeLink = null;
 
     navLinks.forEach(link => {
-      const linkPath = new URL(link.href).pathname;
-
-      // Exact match for index pages
-      if (linkPath.endsWith('index.html') && currentPage.endsWith('index.html') && linkPath === currentPage) {
-        activeLink = link;
-        return;
-      }
+      const linkUrl = new URL(link.href);
+      const linkPath = linkUrl.pathname;
       
-      // Find the link that has the longest matching prefix for the current page
-      if (!linkPath.endsWith('index.html') && currentPage.startsWith(linkPath)) {
-        if (linkPath.length > highestMatchLength) {
-          highestMatchLength = linkPath.length;
-          activeLink = link;
-        }
+      // Normalize paths to remove 'index.html' for comparison
+      const normLinkPath = linkPath.endsWith('/index.html') ? linkPath.slice(0, -10) : linkPath;
+      const normCurrentPath = currentPage.endsWith('/index.html') ? currentPage.slice(0, -10) : currentPage;
+
+      if (normLinkPath === normCurrentPath) {
+        activeLink = link;
+        return; // Exact match found, no need to check further
       }
     });
 
     if (activeLink) {
       activeLink.classList.add('active');
-    } else {
-      // Default to highlighting "Home" if no other link matches
+    } else { // Fallback for root
       const homeLink = document.querySelector('.nav-link[href$="index.html"]');
       if (homeLink && (currentPage === '/' || currentPage.endsWith('/index.html'))) {
-        homeLink.classList.add('active');
+          homeLink.classList.add('active');
       }
     }
   }
   
-  // 4. Fade in main content
+  // 6. Fade in main content
   const mainContent = document.getElementById('main-content');
   if (mainContent) {
     const isHomePage = document.body.id === 'landing';
@@ -78,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => mainContent.classList.add('fade-in'), fadeInDelay);
   }
 
-  // 5. Event card toggle logic
+  // 7. Event card toggle logic
   document.querySelectorAll('.event-card').forEach(card => {
     card.addEventListener('click', e => {
       if (e.target.closest('.more-btn')) return;

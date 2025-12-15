@@ -1,17 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="../../assets/in_logo.png">
   <meta charset="UTF-8">
-  <title>GNOIC | Irish Network NOLA</title>
+  <title>GNOIC Slide Deck | Irish Network NOLA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" type="image/png" href="../../assets/in_logo.png">
   <link rel="stylesheet" href="../../global.css">
 
   <style>
-    /* Optional — soften watermark for readability */
+    /* Watermark softening */
     body::before {
-      opacity: 0.35;
+      opacity: 0.30;
     }
+
+    /* Slide deck core */
+    .slides {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .slide p,
+    .slide ul {
+      text-align: left;
+    }
+
+    .slide {
+      display: none;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .slide.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Navigation controls */
+    .nav-controls {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-btn {
+      cursor: pointer;
+      padding: 0.6rem 1.2rem;
+      background: var(--accent-green, #0b5);
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: #084b36;
+    }
+
+    /* Slide counter */
+    .slide-counter {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
   </style>
 </head>
 
@@ -21,23 +80,105 @@
 
   <div id="main-content">
     <main class="page-content">
+      
+      <div class="slides">
 
-      <p>
-        <h1>Welcome to the Greater New Orleans</h1> 
-          <h1>Irish Continuum.</h1>
-      </p>
+        <!-- Slide 1 -->
+        <section class="slide active">
+          <h1>Welcome to the Greater New Orleans<br>Irish Continuum</h1>
+          <p>
+            A living project to preserve, organize, and connect the full story of Irish presence in New Orleans — from early 19th-century arrivals through famine evacuees and the Irish Channel communities.
+          </p>
+        </section>
 
-      <h2>1. PURPOSE OF THE GREATER NEW ORLEANS IRISH CONTINUUM</h2>
-      <p>
-        The New Orleans Irish Continuum exists to preserve, organize, and connect the full story of Irish presence in New Orleans — from early 19th-century arrivals through famine evacuees, Irish Channel
-      </p>
-      <p>
-        It is a multi-layered archival system
-      </p>
+        <!-- Slide 2 -->
+        <section class="slide">
+          <h2>1. Purpose of the Continuum</h2>
+          <p>
+            The New Orleans Irish Continuum exists to build a coherent, accessible archive of Irish life in the region — including genealogy, oral histories, immigration records, public works contributions, cultural memory, and modern community stories.
+          </p>
+        </section>
 
-      <!-- RETURN -->
-      <div class="back-link" style="margin-top:3rem;">
-        <a href="./index.html">← Return to Our Library</a>
+        <!-- Slide 3 -->
+        <section class="slide">
+          <h2>2. Scope of the Project</h2>
+          <p>
+            The Continuum spans centuries and disciplines:
+          </p>
+          <ul>
+            <li>Early immigration waves (1800–1850)</li>
+            <li>Famine-era refugees and work crews</li>
+            <li>Irish Channel neighborhood history</li>
+            <li>Cultural organizations and churches</li>
+            <li>Modern Irish New Orleanians and their stories</li>
+            <li>Digitized archives curated by historians</li>
+            <li>Community-sourced family records</li>
+          </ul>
+        </section>
+
+        <!-- Slide 4 -->
+        <section class="slide">
+          <h2>3. How You Can Participate</h2>
+          <p>
+            The Continuum grows through contributions from the community. You can help by:
+          </p>
+          <ul>
+            <li>Sharing a story or family history</li>
+            <li>Submitting photographs or documents</li>
+            <li>Recording an oral history session</li>
+            <li>Helping identify people or places in archived materials</li>
+          </ul>
+        </section>
+
+        <!-- Slide 5 -->
+        <section class="slide">
+          <h2>4. The Vision</h2>
+          <p>
+            Our long-term vision is a digital and physical archive that honors all generations of the Irish in Greater New Orleans — a space where scholarship, family memory, and lived experience meet.
+          </p>
+        </section>
+
+        <!-- Slide 6: Connecting to Ireland -->
+        <section class="slide">
+          <h2>6. Connecting to Our Roots: Ireland</h2>
+          <p>
+            A vital future endeavor for the Continuum is to forge direct connections with Ireland. We plan to organize trips for dedicated researchers and community members to explore historical records held in Irish archives and institutions. The goal is to cross-reference our local discoveries with records in Ireland, tracing genealogical lines and historical narratives back to their origins. This initiative will deepen our understanding of the Irish journey to New Orleans and enrich the tapestry of our shared heritage.
+          </p>
+        </section>
+
+        <!-- Slide 7: AI Integration for Data Analysis -->
+        <section class="slide">
+          <h2>7. AI Integration for Archival Research</h2>
+          <p>
+            To effectively manage and analyze the vast amount of information we uncover, IN NOLA will employ a very specific and exacting method of AI integration. Our goal is to systematically collect as much data as possible from the Irish Diaspora of the Greater New Orleans Area. This includes meticulously cataloging and cross-referencing historical records, oral histories, genealogical data, and other archival materials. By leveraging advanced AI, we aim to uncover patterns, connections, and insights that would be impossible to discern through traditional methods, ultimately providing a richer, more comprehensive understanding of our shared history.
+          </p>
+        </section>
+
+        <!-- Slide 8: Interactive User Interface -->
+        <section class="slide">
+          <h2>8. An Accessible & Interactive Interface</h2>
+          <p>
+            Using similarly exacting, AI-enhanced methods, we will develop a highly accessible and interactive online user interface. This platform will empower members of the IN NOLA community to conduct their own research, explore the digitized archives, and visualize the connections within the data. Our aim is to provide a powerful yet user-friendly tool that opens up the richness of the Continuum to everyone, from casual browsers to dedicated genealogists.
+          </p>
+        </section>
+
+        <!-- Slide 9 — Return -->
+        <section class="slide">
+          <h2>9. Return to Our Library</h2>
+          <p>Your contributions help build a living archive for generations to come.</p>
+
+          <div class="back-link" style="margin-top:2rem;">
+            <a href="./index.html">← Back to Our Library</a>
+          </div>
+        </section>
+
+        <!-- Navigation -->
+        <div class="nav-controls">
+          <button class="nav-btn" id="prevBtn">← Previous</button>
+          <div class="slide-counter" id="slideCounter">1 / 9</div>
+          <button class="nav-btn" id="nextBtn">Next →</button>
+        </div>
+
       </div>
 
     </main>
@@ -46,6 +187,34 @@
   </div>
 
   <script src="../../js/main.js"></script>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+
+    function updateSlides() {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === current);
+      });
+      document.getElementById("slideCounter").textContent = `${current + 1} / ${slides.length}`;
+    }
+
+    document.getElementById("nextBtn").onclick = () => {
+      if (current < slides.length - 1) current++;
+      updateSlides();
+    };
+
+    document.getElementById("prevBtn").onclick = () => {
+      if (current > 0) current--;
+      updateSlides();
+    };
+
+    // Keyboard navigation
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") document.getElementById("nextBtn").click();
+      if (e.key === "ArrowLeft") document.getElementById("prevBtn").click();
+    });
+  </script>
 
 </body>
 </html>

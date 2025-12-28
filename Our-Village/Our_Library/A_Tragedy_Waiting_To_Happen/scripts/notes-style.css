@@ -1,0 +1,159 @@
+/* ---- Notes Button ---- */
+#open-notes {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 6rem;
+  z-index: 1100;
+  padding: 0.6rem 1.3rem;
+  border-radius: 999px;
+  border: 2px solid #d4af37;
+  background: #0a1f13;
+  color: #d4af37;
+  font-family: "Cinzel Decorative", serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+#open-notes:hover {
+  background: #123b24;
+}
+
+/* ---- Panel ---- */
+#notes-panel {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  height: 100vh;
+  background: #fdfaf0;
+  color: #000;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+  transition: right 0.3s ease;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+}
+
+#notes-panel.open {
+  right: 0;
+}
+
+/* ---- Header ---- */
+.notes-header {
+  background: #0a1f13;
+  color: #d4af37;
+  padding: 1rem;
+  font-family: "Cinzel Decorative", serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#close-notes {
+  background: none;
+  border: none;
+  color: #d4af37;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+/* ---- Body ---- */
+.notes-body {
+  padding: 1.2rem;
+  overflow-y: auto;
+  font-family: "Cormorant Garamond", serif;
+}
+
+/* ---- Empty / Loading ---- */
+.notes-loading,
+.notes-error {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.notes-empty {
+  color: #000;          /* explicit black */
+  font-style: normal;
+  margin-bottom: 1rem;
+}
+
+/* ---- Individual Notes ---- */
+.note {
+  margin-bottom: 1.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.note-meta {
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+  opacity: 0.7;
+}
+
+.note-text {
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* ---- Editor ---- */
+.notes-editor {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #d4af37;
+}
+
+.notes-editor textarea {
+  width: 100%;
+  min-height: 260px;      /* always usable */
+  resize: vertical;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.75rem;
+  box-sizing: border-box;
+}
+
+/* ---- Editor Buttons ---- */
+.notes-editor button {
+  margin-top: 0.6rem;
+  margin-right: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  font-family: "Cinzel Decorative", serif;
+  font-size: 0.75rem;
+  background: #0a1f13;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  cursor: pointer;
+}
+
+.notes-editor button:hover {
+  background: #123b24;
+}
+
+/* ---- Note Actions (Edit/Delete) ---- */
+.note-actions {
+  margin-top: 0.4rem;
+}
+
+.note-actions button {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.note-actions button:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 600px) {
+  #notes-panel {
+    width: 100%;
+  }
+}

@@ -11,20 +11,25 @@
     `${API_BASE}/notes?bookId=${encodeURIComponent(window.BOOK_ID)}` +
     `&chapterId=${encodeURIComponent(window.CHAPTER_ID)}`;
 
-  // ----- EDITOR CONFIG ----- 
-  const EDITORS = {
-    "130303": "JJ",
-    "140404": "Tony"
-  };
-
-  let EDITING_NOTE_ID = null;
+    // ----- EDITOR CONFIG -----
+    const EDITORS = {
+      "130303": "JJ",
+      "140404": "Tony",
+      "284951": "Cork",
+      "736192": "Galway",
+      "519384": "Dublin",
+      "827461": "Kerry",
+      "391527": "Mayo",
+      "648219": "Donegal"
+    };
+    let EDITING_NOTE_ID = null;
   // Use RegExp constructor to avoid literal parsing issues
   const QUOTE_REGEX = new RegExp("^\\[QUOTE: ([\\s\\S]*?)\\]\\n+");
 
   // ----- CREATE NOTES BUTTON ----- 
   const openBtn = document.createElement("button");
   openBtn.id = "open-notes";
-  openBtn.textContent = "Notes";
+  openBtn.textContent = "Evidence Workbench";
   document.body.appendChild(openBtn);
 
   // ----- CREATE PANEL ----- 
@@ -32,11 +37,11 @@
   panel.id = "notes-panel";
   panel.innerHTML = `
     <div class="notes-header">
-      <span>Notes & Commentary</span>
+      <span>Evidence Workbench</span>
       <button id="close-notes" aria-label="Close notes">×</button>
     </div>
     <div class="notes-body">
-      <p class="notes-loading">Loading notes…</p>
+      <p class="notes-loading">Loading...</p>
     </div>
   `;
   document.body.appendChild(panel);
@@ -147,7 +152,7 @@
         };
 
         actions.querySelector("[data-delete]").onclick = async () => {
-          if (!confirm("Delete this note? ")) return;
+          if (!confirm("Delete this evidence? ")) return;
           await deleteNote(note.id);
           loadNotes();
         };
@@ -236,10 +241,11 @@
         };
       }
 
-      if (!notes.length) {
+      // ---- NOTES LIST ---- 
+      if (!processedNotes.length) {
         const empty = document.createElement("p");
         empty.className = "notes-empty";
-        empty.textContent = "No notes for this chapter yet.";
+        empty.textContent = "No evidence for this chapter yet.";
         bodyEl.appendChild(empty);
       } else {
           // Render Footnotes
@@ -277,7 +283,7 @@
     } catch (err) {
       console.error(err);
       bodyEl.innerHTML =
-        `<p class="notes-error">Notes are unavailable right now.</p>`;
+        `<p class="notes-error">Workbench is unavailable right now.</p>`;
     }
   }
 
@@ -291,8 +297,8 @@
         <div class="editor-controls" style="margin-bottom:0.5rem; text-align: left;">
             <button id="insert-selection" style="width:auto; font-size: 0.7rem;">+ Quote Selection</button>
         </div>
-        <textarea id="note-text" placeholder="Add a note…"></textarea>
-        <button id="save-note">Save Note</button>
+        <textarea id="note-text" placeholder="Add evidence…"></textarea>
+        <button id="save-note">Save Evidence</button>
         <button id="cancel-edit" style="display:none;">Cancel</button>
         <button id="lock-editor">Lock Editor</button>
       `;
@@ -319,13 +325,9 @@
           const textarea = document.getElementById("note-text");
           if (textarea.value.match(QUOTE_REGEX)) {
              if(!confirm("Replace existing quote? ")) return;
-             textarea.value = textarea.value.replace(QUOTE_REGEX, `[QUOTE: ${selection}]\
-\
-`);
+             textarea.value = textarea.value.replace(QUOTE_REGEX, `[QUOTE: ${selection}]\n\n`);
           } else {
-             const tag = `[QUOTE: ${selection}]\
-\
-`;
+             const tag = `[QUOTE: ${selection}]\n\n`;
              textarea.value = tag + textarea.value;
           }
       };

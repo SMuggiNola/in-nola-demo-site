@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>About the Evidence Workbench | Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../global.css">
+
+  <style>
+    /* Optional — soften watermark for readability */
+    body::before {
+      opacity: 0.35;
+    }
+    
+    .guide-container {
+      background: #fdfaf0;
+      color: #000000;
+      max-width: 850px;
+      margin: 2rem auto 8rem;
+      padding: 4rem 3.5rem;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      text-align: justify;
+      border: 1px solid rgba(212,175,55,0.2);
+      position: relative;
+    }
+
+    .guide-content h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      color: #000000;
+      font-size: 2.8rem;
+      font-family: "Cinzel Decorative", serif;
+    }
+
+    .guide-content h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+      color: #000000;
+      font-family: "Cormorant Garamond", serif;
+      font-weight: bold;
+      border-bottom: 1px solid #e0d5b0;
+      padding-bottom: 1rem;
+    }
+
+    .guide-content h3 {
+      font-family: "Cinzel Decorative", serif;
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #0c2e1a;
+    }
+
+    .guide-content p {
+      color: #000000;
+      font-size: 1.25rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      font-family: "Cormorant Garamond", serif;
+    }
+
+    .feature-list {
+      margin-bottom: 2rem;
+    }
+    
+    .feature-item {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+      border-left: 3px solid var(--gold);
+    }
+    
+    .feature-item strong {
+      display: block;
+      font-size: 1.1rem;
+      color: #0c2e1a;
+      margin-bottom: 0.2rem;
+    }
+
+    .try-it-out {
+      background: rgba(12, 46, 26, 0.05);
+      padding: 2rem;
+      border-radius: 8px;
+      border: 1px dashed var(--gold);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content" class="notes-shift-content">
+    <main class="guide-container">
+      <div class="guide-content book-content">
+        <h1>Evidence Workbench</h1>
+        <h2>Collaborative Research & Analysis Tool</h2>
+
+        <p>
+          The <strong>Evidence Workbench</strong> is a custom-built digital workspace integrated into the IN-NOLA Library. 
+          It is designed to allow researchers, community members, and authors to interact deeply with historical and 
+          contemporary texts by attaching specific evidence, commentary, and notes directly to the written word.
+        </p>
+
+        <h3>Key Features</h3>
+        
+        <div class="feature-list">
+          <div class="feature-item">
+            <strong>Dynamic Text Highlighting</strong>
+            Any note connected to a specific passage in the book will automatically create a gold highlight in the text. 
+            Clicking these highlights immediately opens the Workbench and scrolls to the relevant entry.
+          </div>
+
+          <div class="feature-item">
+            <strong>Footnotes vs. Endnotes</strong>
+            The Workbench intelligently sorts entries. If a note is connected to a specific quotation, it is categorized 
+            as a <em>Footnote</em> and numbered by its location in the text. General commentary is collected under 
+            <em>Endnotes</em> and sorted chronologically.
+          </div>
+
+          <div class="feature-item">
+            <strong>Intelligent Ordering</strong>
+            No matter when a note is added, the Workbench re-numbers the entire collection to ensure Footnotes 
+            always appear in the same order as the passages they reference in the text.
+          </div>
+
+          <div class="feature-item">
+            <strong>Side-by-Side Analysis</strong>
+            On larger screens, opening the Workbench causes the document text to slide gracefully to the left, 
+            reserving space for your analysis without obscuring the primary source material.
+          </div>
+        </div>
+
+        <div class="try-it-out">
+          <h3>Try it Yourself</h3>
+          <p>
+            You can try out the tool right here on this guide! Follow these steps to see it in action:
+          </p>
+          <ol style="font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; line-height: 1.6; margin-left: 1.5rem;">
+            <li>Click the <strong>Evidence Workbench</strong> button at the bottom right of your screen.</li>
+            <li>Select any sentence in the paragraphs above with your mouse.</li>
+            <li>In the Workbench panel, click <strong>Unlock Editor</strong> and use any authorized PIN (e.g., 519384 for Dublin).</li>
+            <li>Click <strong>+ Quote Selection</strong> to link your comment to the text you selected.</li>
+            <li>Add your thoughts and click <strong>Save Evidence</strong>.</li>
+          </ol>
+          <p style="margin-top: 1rem; font-style: italic; font-size: 1.1rem;">
+            Note: Your saved evidence will be visible to others visiting this guide, just as it would be in the 
+            historical chapters of the library.
+          </p>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- RETURN -->
+    <div class="back-link" style="margin-top:2rem; text-align: center;">
+      <a href="./stacks.html">← Return to The Stacks</a>
+    </div>
+
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <script src="../../js/main.js"></script>
+
+  <!-- ===== Notes / Commentary UI (read-only overlay) ===== -->
+  <script>
+    window.BOOK_ID = "workbench_system";
+    window.CHAPTER_ID = "user_guide";
+  </script>
+
+  <link rel="stylesheet" href="./A_Tragedy_Waiting_To_Happen/scripts/notes-style.css">
+  <script src="./A_Tragedy_Waiting_To_Happen/scripts/notes-ui.js"></script>
+</body>
+</html>

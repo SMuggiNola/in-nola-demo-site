@@ -160,12 +160,13 @@
 }
 
 /* ---- Responsive Layout Shift ---- */
-#main-content {
+#main-content, .notes-shift-content {
   transition: padding-right 0.3s ease;
 }
 
 @media (min-width: 1000px) {
-  body.with-notes-open #main-content {
+  body.with-notes-open #main-content,
+  body.with-notes-open .notes-shift-content {
     padding-right: 420px; /* 400px panel + 20px gap */
   }
 }

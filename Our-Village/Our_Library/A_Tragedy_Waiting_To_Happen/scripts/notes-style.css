@@ -32,6 +32,7 @@
   z-index: 1200;
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 
 #notes-panel.open {
@@ -156,4 +157,110 @@
   #notes-panel {
     width: 100%;
   }
+}
+
+/* ---- Responsive Layout Shift ---- */
+#main-content {
+  transition: padding-right 0.3s ease;
+}
+
+@media (min-width: 1000px) {
+  body.with-notes-open #main-content {
+    padding-right: 420px; /* 400px panel + 20px gap */
+  }
+}
+
+/* ---- Quote Counter ---- */
+.book-content {
+  counter-reset: quote-counter;
+}
+
+/* ---- Highlights in Text ---- */
+.highlighted-text {
+  background-color: rgba(212, 175, 55, 0.3); /* Gold/yellow tint */
+  border-bottom: 2px solid #d4af37;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  counter-increment: quote-counter;
+  position: relative;
+}
+
+.highlighted-text::before {
+  content: "[" counter(quote-counter) "]";
+  font-size: 0.7em;
+  vertical-align: super;
+  color: #d4af37; /* Solid gold */
+  font-weight: bold;
+  margin-right: 2px;
+  /* Prevent the number from being selected/underlined if desired, 
+     but keeping it simple is fine. */
+}
+
+.highlighted-text:hover, .highlighted-text.active {
+  background-color: rgba(212, 175, 55, 0.6);
+}
+
+/* ---- Note Number in Card ---- */
+.note-number {
+  display: inline-block;
+  background: #d4af37;
+  color: #0c2e1a;
+  font-family: "Cinzel Decorative", serif;
+  font-size: 0.8rem;
+  font-weight: bold;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ---- Quote in Note Card ---- */
+
+.note-quote {
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-style: italic;
+
+  font-size: 0.95rem;
+
+  color: #555;
+
+  border-left: 3px solid #d4af37;
+
+  padding-left: 0.8rem;
+
+  margin-bottom: 0.5rem;
+
+  background: rgba(0,0,0,0.03);
+
+  padding: 0.4rem 0.4rem 0.4rem 0.8rem;
+
+}
+
+
+
+/* ---- Section Divider ---- */
+
+.notes-section-title {
+
+  font-family: "Cinzel Decorative", serif;
+
+  font-size: 1.1rem;
+
+  color: #d4af37;
+
+  text-align: center;
+
+  margin: 1.5rem 0 1rem;
+
+  padding-bottom: 0.5rem;
+
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+
+  letter-spacing: 0.05em;
+
 }

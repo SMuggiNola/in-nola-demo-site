@@ -4,7 +4,16 @@
 
 - [ ] **Test contact form** - Verify emails arrive at sean.muggivan@gmail.com
 - [ ] **Move Resend API key to environment variable** - Add `RESEND_API_KEY` in Cloudflare Pages Settings → Environment Variables (security best practice)
-- [ ] **Complete in-nola.org domain transfer** - Transfer from WordPress/current registrar to Cloudflare
+- [ ] **Complete in-nola.org domain transfer:**
+  - [ ] Unlock domain at WordPress (Upgrades → Domains → Transfer Lock off)
+  - [ ] Get Authorization Code (EPP/Auth Code) from WordPress
+  - [ ] Verify domain is eligible (60+ days old, not expiring soon)
+  - [ ] Copy any existing DNS records you need to keep
+  - [ ] Go to Cloudflare Dashboard → Domain Registration → Transfer Domains
+  - [ ] Enter `in-nola.org` and paste Authorization Code
+  - [ ] Pay for 1 year renewal (Cloudflare at-cost pricing)
+  - [ ] Check email for Transfer Approval and click Approve
+  - [ ] Wait 1-7 days for transfer to complete
 
 ## Once Domain Transfers
 

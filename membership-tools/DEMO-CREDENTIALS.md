@@ -2,12 +2,12 @@
 
 ## Member Logins
 
-| Email | Password | Status | Type |
-|-------|----------|--------|------|
-| john.murphy@example.com | demo123 | Active | Individual |
-| mary.oconnor@example.com | demo456 | Active | Family |
-| patrick.walsh@example.com | demo789 | Active | Lifetime |
-| sean.brennan@example.com | expired1 | Expired | Individual |
+| Email | Password | Status | Expires |
+|-------|----------|--------|---------|
+| john.murphy@example.com | demo123 | Active | Jan 2027 |
+| mary.oconnor@example.com | demo456 | Active | Feb 2027 |
+| patrick.walsh@example.com | demo789 | Lifetime | Never |
+| sean.brennan@example.com | expired1 | Expired | Dec 2025 |
 
 ## Admin Scanner PINs
 

@@ -7,23 +7,23 @@ const MEMBERS_DB = {
     // Demo members with various statuses
     members: [
         {
-            id: 'MEM-2024-001',
+            id: 'MEM-2025-001',
             email: 'john.murphy@example.com',
             password: 'demo123', // In production, this would be hashed on server
             name: 'John Murphy',
             memberType: 'Individual',
-            joinDate: '2024-01-15',
-            expirationDate: '2025-03-15',
+            joinDate: '2025-01-15',
+            expirationDate: '2027-01-15',
             status: 'active'
         },
         {
-            id: 'MEM-2024-002',
+            id: 'MEM-2025-002',
             email: 'mary.oconnor@example.com',
             password: 'demo456',
             name: "Mary O'Connor",
             memberType: 'Family',
-            joinDate: '2024-02-20',
-            expirationDate: '2025-04-20',
+            joinDate: '2025-02-20',
+            expirationDate: '2027-02-20',
             status: 'active'
         },
         {
@@ -37,13 +37,13 @@ const MEMBERS_DB = {
             status: 'active'
         },
         {
-            id: 'MEM-2023-042',
+            id: 'MEM-2024-042',
             email: 'sean.brennan@example.com',
             password: 'expired1',
             name: 'Sean Brennan',
             memberType: 'Individual',
-            joinDate: '2023-08-05',
-            expirationDate: '2024-08-05', // Already expired
+            joinDate: '2024-12-01',
+            expirationDate: '2025-12-01', // Expired
             status: 'expired'
         }
     ],

@@ -91,10 +91,12 @@
 
 ### Phase 6: QuickBooks Integration
 
-#### Decision: Choose Integration Approach
-- [ ] **Option A: QuickBooks as Source of Truth** - Sister manages all members in QB, website reads from QB API
-- [ ] **Option B: Website Syncs to QuickBooks** - Members sign up on website, data auto-syncs to QB
-- [ ] **Option C: Manual CSV Export** - Admin exports member list from website, imports to QB
+#### Decision: Integration Approach
+- [x] **Option B: Website Syncs to QuickBooks** ✓ SELECTED
+  - Members sign up and pay on website
+  - New member data automatically pushed to QuickBooks as Customer
+  - Invoice created in QB for record-keeping
+  - Sister gets full roster in QuickBooks without manual entry
 
 #### QuickBooks Setup (Sister's Side)
 - [ ] Ensure QuickBooks Online subscription (Plus or Advanced recommended for API)

@@ -126,8 +126,16 @@
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
-      padding: 0.6rem 0;
+      padding: 0.6rem 0.5rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      text-decoration: none;
+    }
+
+    .task-item:hover {
+      background: rgba(212, 167, 38, 0.1);
     }
 
     .task-item:last-child {
@@ -217,7 +225,7 @@
 
       <p style="text-align: center; margin-bottom: 2rem;">
         Project tasks and progress for IN-NOLA website and membership portal.
-        <br><span style="color: var(--gold);">Look for "Help Wanted" tags where you can contribute!</span>
+        <br><span style="color: var(--gold);">Click any task to email information needed for that item.</span>
       </p>
 
       <div class="progress-summary">
@@ -396,6 +404,17 @@
       }
     ];
 
+    // Email config
+    const BOARD_EMAIL = 'sean.muggivan@gmail.com';
+
+    // Helper to strip HTML and create mailto link
+    function createMailtoLink(taskText, phaseTitle) {
+      const plainText = taskText.replace(/<[^>]*>/g, '').trim();
+      const subject = encodeURIComponent(`[IN-NOLA Task] ${phaseTitle}: ${plainText}`);
+      const body = encodeURIComponent(`Hi Sean,\n\nRegarding the task: "${plainText}"\n\nHere's the information you need:\n\n\n\n---\nSent from IN-NOLA Board Portal`);
+      return `mailto:${BOARD_EMAIL}?subject=${subject}&body=${body}`;
+    }
+
     // Render phases
     function renderPhases() {
       const container = document.getElementById('phasesContainer');
@@ -432,23 +451,25 @@
           const checkIcon = task.done ? '&#10003;' : '&#9675;';
           const checkClass = task.done ? 'done' : '';
           const helpTag = task.help ? '<span class="help-tag">Help Wanted</span>' : '';
+          const mailtoLink = createMailtoLink(task.text, phase.title);
 
           tasksHtml += `
-            <div class="task-item">
+            <a href="${mailtoLink}" class="task-item" title="Click to email info about this task">
               <span class="task-checkbox ${checkClass}">${checkIcon}</span>
               <span class="task-text ${checkClass}">${task.text}${helpTag}</span>
-            </div>
+            </a>
           `;
 
           if (task.subtasks) {
             task.subtasks.forEach(sub => {
               const subCheckIcon = sub.done ? '&#10003;' : '&#9675;';
               const subCheckClass = sub.done ? 'done' : '';
+              const subMailtoLink = createMailtoLink(sub.text, phase.title);
               tasksHtml += `
-                <div class="task-item" style="padding-left: 1.5rem;">
+                <a href="${subMailtoLink}" class="task-item" style="padding-left: 1.5rem;" title="Click to email info about this task">
                   <span class="task-checkbox ${subCheckClass}">${subCheckIcon}</span>
                   <span class="task-text ${subCheckClass}">${sub.text}</span>
-                </div>
+                </a>
               `;
             });
           }

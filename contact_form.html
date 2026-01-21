@@ -7,6 +7,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/global.css">
   <style>
+    .contact-form label {
+      color: var(--gold);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      background: rgba(13, 40, 24, 0.6);
+      border: 1px solid rgba(212, 167, 38, 0.4);
+      color: #ffffff;
+      font-size: 1.05rem;
+    }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(212, 167, 38, 0.3);
+      background: rgba(13, 40, 24, 0.8);
+    }
     .form-status {
       padding: 1rem;
       border-radius: var(--radius);

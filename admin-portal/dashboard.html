@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>Board Dashboard | Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/global.css">
+  <style>
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .dashboard-header h1 {
+      margin: 0;
+    }
+
+    .logout-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .progress-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .progress-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .progress-card .number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .progress-card .label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .phase-section {
+      margin-bottom: 1rem;
+    }
+
+    .phase-header {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--transition);
+    }
+
+    .phase-header:hover {
+      background: var(--glass-hover);
+      border-color: rgba(212, 167, 38, 0.3);
+    }
+
+    .phase-header.active {
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom-color: transparent;
+    }
+
+    .phase-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin: 0;
+    }
+
+    .phase-status {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .phase-count {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .phase-arrow {
+      transition: transform 0.3s ease;
+      color: var(--gold);
+    }
+
+    .phase-header.active .phase-arrow {
+      transform: rotate(180deg);
+    }
+
+    .phase-content {
+      background: rgba(13, 40, 24, 0.4);
+      border: 1px solid var(--glass-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .phase-content.open {
+      padding: 1rem 1.25rem;
+      max-height: 2000px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-checkbox {
+      color: var(--gold);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .task-checkbox.done {
+      color: #86efac;
+    }
+
+    .task-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .task-text.done {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .task-text strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .help-tag {
+      display: inline-block;
+      background: rgba(212, 167, 38, 0.2);
+      color: var(--gold);
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .subsection-title {
+      color: var(--gold);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .subsection-title:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .back-link a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      color: var(--gold);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <main class="page-content" style="max-width: 800px;">
+
+      <div class="dashboard-header">
+        <h1>Board Dashboard</h1>
+        <button id="logoutBtn" class="btn btn-gold logout-btn">Sign Out</button>
+      </div>
+
+      <p style="text-align: center; margin-bottom: 2rem;">
+        Project tasks and progress for IN-NOLA website and membership portal.
+        <br><span style="color: var(--gold);">Look for "Help Wanted" tags where you can contribute!</span>
+      </p>
+
+      <div class="progress-summary">
+        <div class="progress-card">
+          <div class="number" id="totalTasks">0</div>
+          <div class="label">Total Tasks</div>
+        </div>
+        <div class="progress-card">
+          <div class="number" id="completedTasks">0</div>
+          <div class="label">Completed</div>
+        </div>
+        <div class="progress-card">
+          <div class="number" id="remainingTasks">0</div>
+          <div class="label">Remaining</div>
+        </div>
+        <div class="progress-card">
+          <div class="number" id="helpWanted">0</div>
+          <div class="label">Help Wanted</div>
+        </div>
+      </div>
+
+      <div id="phasesContainer"></div>
+
+      <div class="back-link">
+        <a href="/index.html">Return to Home</a>
+      </div>
+
+    </main>
+
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // Check authentication
+    if (sessionStorage.getItem('boardAuth') !== 'true') {
+      window.location.href = 'index.html';
+    }
+
+    // Logout handler
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      sessionStorage.removeItem('boardAuth');
+      window.location.href = 'index.html';
+    });
+
+    // Task data (scrubbed of sensitive info)
+    const phases = [
+      {
+        title: "High Priority",
+        tasks: [
+          { done: true, text: "<strong>Test contact form</strong> - Verified working" },
+          { done: true, text: "<strong>Secure API credentials</strong> - Moved to environment variables" },
+          { done: false, text: "<strong>Complete in-nola.org domain transfer</strong>", help: true, subtasks: [
+            { done: false, text: "Unlock domain at WordPress" },
+            { done: false, text: "Get Authorization Code from WordPress" },
+            { done: false, text: "Verify domain eligibility (60+ days old)" },
+            { done: false, text: "Copy existing DNS records" },
+            { done: false, text: "Initiate transfer in Cloudflare" },
+            { done: false, text: "Pay for 1 year renewal" },
+            { done: false, text: "Approve transfer via email" },
+            { done: false, text: "Wait for transfer to complete (1-7 days)" }
+          ]}
+        ]
+      },
+      {
+        title: "Post-Domain Transfer",
+        tasks: [
+          { done: false, text: "<strong>Add custom domain</strong> - Connect in-nola.org to website" },
+          { done: false, text: "<strong>Set up email routing</strong> - Create contact@in-nola.org" },
+          { done: false, text: "<strong>Configure email sending</strong> - Send from in-nola.org domain" }
+        ]
+      },
+      {
+        title: "Cleanup Tasks",
+        tasks: [
+          { done: false, text: "<strong>Remove debug output</strong> - Clean up contact form logging" },
+          { done: false, text: "<strong>Remove old DNS records</strong> - Clean up unused email configuration" },
+          { done: false, text: "<strong>Update documentation</strong> - Reflect current email setup" }
+        ]
+      },
+      {
+        title: "Phase 1: PayPal Setup",
+        tasks: [
+          { done: false, text: "<strong>PayPal Business account</strong> - Log in or upgrade to business", help: true },
+          { done: false, text: "<strong>Developer credentials</strong> - Create app for payment processing" },
+          { done: false, text: "<strong>Set membership pricing tiers</strong>", help: true, subtasks: [
+            { done: false, text: "Individual membership ($XX/year)" },
+            { done: false, text: "Family membership ($XX/year)" },
+            { done: false, text: "Lifetime membership ($XXX one-time)" }
+          ]},
+          { done: false, text: "<strong>Configure payment notifications</strong> - Webhook setup" }
+        ]
+      },
+      {
+        title: "Phase 2: Database Setup",
+        tasks: [
+          { done: false, text: "<strong>Choose storage solution</strong> - Database for member records" },
+          { done: false, text: "<strong>Design member data structure</strong>", subtasks: [
+            { done: false, text: "Member ID, Name, Email" },
+            { done: false, text: "Username and PIN" },
+            { done: false, text: "Membership type and dates" },
+            { done: false, text: "Payment transaction reference" },
+            { done: false, text: "Status (active, expired, pending)" }
+          ]},
+          { done: false, text: "<strong>Create database</strong> - Set up tables" },
+          { done: false, text: "<strong>Connect to website</strong> - Database integration" }
+        ]
+      },
+      {
+        title: "Phase 3: Enrollment Flow",
+        tasks: [
+          { done: false, text: "<strong>Create signup page</strong>", subtasks: [
+            { done: false, text: "Membership tier selection" },
+            { done: false, text: "Personal info form (name, email, phone)" },
+            { done: false, text: "Terms & conditions checkbox" }
+          ]},
+          { done: false, text: "<strong>Build enrollment backend</strong>", subtasks: [
+            { done: false, text: "Payment initiation" },
+            { done: false, text: "Payment confirmation handling" },
+            { done: false, text: "Return page after payment" }
+          ]},
+          { done: false, text: "<strong>Add PayPal checkout button</strong>" },
+          { done: false, text: "<strong>Generate member credentials</strong> - Username and PIN" },
+          { done: false, text: "<strong>Store new members</strong> - Save to database after payment" },
+          { done: false, text: "<strong>Send welcome email</strong> - Include login credentials" }
+        ]
+      },
+      {
+        title: "Phase 4: Member Portal Updates",
+        tasks: [
+          { done: false, text: "<strong>Update login system</strong> - Connect to real database" },
+          { done: false, text: "<strong>Replace demo data</strong> - Use actual member records" },
+          { done: false, text: "<strong>Build authentication endpoint</strong> - Login verification" },
+          { done: false, text: "<strong>Update certificate page</strong> - Pull real member data" },
+          { done: false, text: "<strong>Update QR scanner</strong> - Verify against database" }
+        ]
+      },
+      {
+        title: "Phase 5: Admin Features",
+        tasks: [
+          { done: false, text: "<strong>Admin dashboard</strong> - View all members", help: true },
+          { done: false, text: "<strong>Member management</strong> - Add, edit, remove members" },
+          { done: false, text: "<strong>Export member list</strong> - CSV download", help: true },
+          { done: false, text: "<strong>Renewal reminders</strong> - Automated emails" },
+          { done: false, text: "<strong>Payment history</strong> - View transaction records" }
+        ]
+      },
+      {
+        title: "Phase 6: QuickBooks Integration",
+        tasks: [
+          { done: true, text: "<strong>Integration approach decided</strong> - Website syncs to QuickBooks automatically" },
+          { done: false, text: "<strong>QuickBooks setup (Treasurer)</strong>", help: true, subtasks: [
+            { done: false, text: "Ensure QuickBooks Online subscription (Plus or Advanced)" },
+            { done: false, text: "Set up Customer list structure for members" },
+            { done: false, text: "Create Products/Services for membership tiers" },
+            { done: false, text: "Set up recurring invoices template" },
+            { done: false, text: "Decide: QuickBooks Payments vs PayPal vs both" }
+          ]},
+          { done: false, text: "<strong>QuickBooks API setup</strong> - Developer portal credentials" },
+          { done: false, text: "<strong>Build sync endpoints</strong> - Connect website to QuickBooks" },
+          { done: false, text: "<strong>Map data fields</strong>", subtasks: [
+            { done: false, text: "Member Name to Customer DisplayName" },
+            { done: false, text: "Email to PrimaryEmailAddr" },
+            { done: false, text: "Membership Type to custom field" },
+            { done: false, text: "Expiration Date to custom field" }
+          ]}
+        ]
+      },
+      {
+        title: "Future Improvements",
+        tasks: [
+          { done: false, text: "<strong>Spam protection</strong> - Add CAPTCHA to contact form" },
+          { done: false, text: "<strong>Email confirmation</strong> - Confirm contact form submissions" },
+          { done: false, text: "<strong>Rate limiting</strong> - Prevent form abuse" }
+        ]
+      }
+    ];
+
+    // Render phases
+    function renderPhases() {
+      const container = document.getElementById('phasesContainer');
+      let totalTasks = 0;
+      let completedTasks = 0;
+      let helpWanted = 0;
+
+      phases.forEach((phase, index) => {
+        const phaseEl = document.createElement('div');
+        phaseEl.className = 'phase-section';
+
+        let phaseDone = 0;
+        let phaseTotal = 0;
+
+        // Count tasks
+        phase.tasks.forEach(task => {
+          phaseTotal++;
+          if (task.done) phaseDone++;
+          if (task.help) helpWanted++;
+          if (task.subtasks) {
+            task.subtasks.forEach(sub => {
+              phaseTotal++;
+              if (sub.done) phaseDone++;
+            });
+          }
+        });
+
+        totalTasks += phaseTotal;
+        completedTasks += phaseDone;
+
+        // Build task HTML
+        let tasksHtml = '';
+        phase.tasks.forEach(task => {
+          const checkIcon = task.done ? '&#10003;' : '&#9675;';
+          const checkClass = task.done ? 'done' : '';
+          const helpTag = task.help ? '<span class="help-tag">Help Wanted</span>' : '';
+
+          tasksHtml += `
+            <div class="task-item">
+              <span class="task-checkbox ${checkClass}">${checkIcon}</span>
+              <span class="task-text ${checkClass}">${task.text}${helpTag}</span>
+            </div>
+          `;
+
+          if (task.subtasks) {
+            task.subtasks.forEach(sub => {
+              const subCheckIcon = sub.done ? '&#10003;' : '&#9675;';
+              const subCheckClass = sub.done ? 'done' : '';
+              tasksHtml += `
+                <div class="task-item" style="padding-left: 1.5rem;">
+                  <span class="task-checkbox ${subCheckClass}">${subCheckIcon}</span>
+                  <span class="task-text ${subCheckClass}">${sub.text}</span>
+                </div>
+              `;
+            });
+          }
+        });
+
+        phaseEl.innerHTML = `
+          <div class="phase-header" data-index="${index}">
+            <h3 class="phase-title">${phase.title}</h3>
+            <div class="phase-status">
+              <span class="phase-count">${phaseDone}/${phaseTotal}</span>
+              <span class="phase-arrow">&#9660;</span>
+            </div>
+          </div>
+          <div class="phase-content" data-index="${index}">
+            ${tasksHtml}
+          </div>
+        `;
+
+        container.appendChild(phaseEl);
+      });
+
+      // Update summary
+      document.getElementById('totalTasks').textContent = totalTasks;
+      document.getElementById('completedTasks').textContent = completedTasks;
+      document.getElementById('remainingTasks').textContent = totalTasks - completedTasks;
+      document.getElementById('helpWanted').textContent = helpWanted;
+    }
+
+    // Toggle phase dropdowns
+    document.addEventListener('click', function(e) {
+      const header = e.target.closest('.phase-header');
+      if (header) {
+        const index = header.dataset.index;
+        const content = document.querySelector(`.phase-content[data-index="${index}"]`);
+
+        header.classList.toggle('active');
+        content.classList.toggle('open');
+      }
+    });
+
+    // Initialize
+    renderPhases();
+  </script>
+
+</body>
+</html>

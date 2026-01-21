@@ -1,6 +1,6 @@
 /**
  * Cloudflare Pages Function - Contact Form Handler
- * Sends emails via MailChannels API (free for Cloudflare Workers/Pages)
+ * Sends emails via Resend API
  */
 
 export async function onRequestPost(context) {
@@ -51,14 +51,22 @@ export async function onRequestPost(context) {
     });
   }
 
-  // Configuration - update these values
+  // Configuration
+  const RESEND_API_KEY = env.RESEND_API_KEY || 're_K98V95ac_JSkW4cabEQ4w1wuULXtYthf2';
   const TO_EMAIL = env.CONTACT_TO_EMAIL || 'sean.muggivan@gmail.com';
-  const TO_NAME = env.CONTACT_TO_NAME || 'Irish Network NOLA';
-  const FROM_EMAIL = env.CONTACT_FROM_EMAIL || 'noreply@in-nola.org';
-  const FROM_NAME = env.CONTACT_FROM_NAME || 'IN-NOLA Contact Form';
 
   // Build email content
-  const emailContent = `
+  const emailHtml = `
+    <h2>New Contact Form Submission</h2>
+    <p><strong>From:</strong> ${name} (${email})</p>
+    <hr>
+    <p><strong>Message:</strong></p>
+    <p>${message.replace(/\n/g, '<br>')}</p>
+    <hr>
+    <p style="color: #666; font-size: 12px;">Sent via IN-NOLA Contact Form</p>
+  `;
+
+  const emailText = `
 New contact form submission from in-nola.org
 
 Name: ${name}
@@ -71,35 +79,27 @@ ${message}
 Sent via IN-NOLA Contact Form
   `.trim();
 
-  // Send via MailChannels API
+  // Send via Resend API
   try {
-    const mailResponse = await fetch('https://api.mailchannels.net/tx/v1/send', {
+    const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        personalizations: [
-          {
-            to: [{ email: TO_EMAIL, name: TO_NAME }],
-            reply_to: { email: email, name: name },
-          },
-        ],
-        from: {
-          email: FROM_EMAIL,
-          name: FROM_NAME,
-        },
+        from: 'IN-NOLA Contact <onboarding@resend.dev>',
+        to: [TO_EMAIL],
+        reply_to: email,
         subject: `[IN-NOLA Contact] Message from ${name}`,
-        content: [
-          {
-            type: 'text/plain',
-            value: emailContent,
-          },
-        ],
+        html: emailHtml,
+        text: emailText,
       }),
     });
 
-    if (mailResponse.status === 202 || mailResponse.status === 200) {
+    const result = await response.json();
+
+    if (response.ok) {
       return new Response(JSON.stringify({
         success: true,
         message: 'Your message has been sent. We\'ll be in touch soon!'
@@ -108,15 +108,13 @@ Sent via IN-NOLA Contact Form
         headers: { 'Content-Type': 'application/json' }
       });
     } else {
-      const errorText = await mailResponse.text();
-      console.error('MailChannels error:', mailResponse.status, errorText);
+      console.error('Resend error:', response.status, result);
 
       return new Response(JSON.stringify({
         error: 'Failed to send message. Please try again later.',
         debug: {
-          status: mailResponse.status,
-          response: errorText,
-          fromEmail: FROM_EMAIL
+          status: response.status,
+          response: result
         }
       }), {
         status: 500,

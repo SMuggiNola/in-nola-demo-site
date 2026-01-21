@@ -568,7 +568,7 @@ p {
 }
 
 .hero-logo {
-  width: 120px;
+  width: 220px;
   height: auto;
   filter: drop-shadow(0 0 40px var(--gold-glow));
   animation: logoFloat 6s ease-in-out infinite;
@@ -830,7 +830,7 @@ p {
   }
 
   .hero-logo {
-    width: 100px;
+    width: 180px;
   }
 
   .hero-tagline {

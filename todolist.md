@@ -89,6 +89,44 @@
 - Store PayPal transaction IDs for refund/dispute handling
 - Consider PayPal Subscriptions API for recurring annual dues
 
+### Phase 6: QuickBooks Integration
+
+#### Decision: Choose Integration Approach
+- [ ] **Option A: QuickBooks as Source of Truth** - Sister manages all members in QB, website reads from QB API
+- [ ] **Option B: Website Syncs to QuickBooks** - Members sign up on website, data auto-syncs to QB
+- [ ] **Option C: Manual CSV Export** - Admin exports member list from website, imports to QB
+
+#### QuickBooks Setup (Sister's Side)
+- [ ] Ensure QuickBooks Online subscription (Plus or Advanced recommended for API)
+- [ ] Set up Customer list structure for members
+- [ ] Create Products/Services for membership tiers (Individual, Family, Lifetime)
+- [ ] Set up recurring invoices template for annual dues
+- [ ] Decide on payment method: QuickBooks Payments vs PayPal vs both
+
+#### QuickBooks API Setup (If using Option A or B)
+- [ ] Go to Intuit Developer Portal (developer.intuit.com)
+- [ ] Create new app and get OAuth credentials (Client ID, Client Secret)
+- [ ] Set up OAuth 2.0 redirect URI for your domain
+- [ ] Store QB credentials in Cloudflare environment variables
+- [ ] Create `/api/quickbooks/auth` endpoint for OAuth flow
+- [ ] Create `/api/quickbooks/sync` endpoint for member sync
+
+#### Data Mapping (Website ↔ QuickBooks)
+- [ ] Map member fields to QuickBooks Customer fields:
+  - Member Name → Customer DisplayName
+  - Email → PrimaryEmailAddr
+  - Membership Type → Custom field or memo
+  - Expiration Date → Custom field
+  - Member ID → Customer reference number
+- [ ] Decide: Store QB Customer ID in website database for linking
+
+#### QuickBooks Integration Notes
+- QuickBooks API uses OAuth 2.0 (tokens expire, need refresh logic)
+- API rate limits: 500 requests per minute
+- Sandbox environment available for testing
+- Consider using official `intuit-oauth` Node.js library
+- QB Payments can replace PayPal if sister prefers single system
+
 ---
 
 ## Future Improvements

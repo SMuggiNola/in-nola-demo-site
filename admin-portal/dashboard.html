@@ -26,18 +26,20 @@
     }
 
     .progress-summary {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      display: flex;
+      justify-content: center;
       gap: 1rem;
       margin-bottom: 2rem;
+      flex-wrap: wrap;
     }
 
     .progress-card {
       background: var(--glass);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      padding: 1rem;
+      padding: 1rem 1.5rem;
       text-align: center;
+      min-width: 120px;
     }
 
     .progress-card .number {

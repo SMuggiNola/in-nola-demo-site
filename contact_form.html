@@ -137,6 +137,10 @@
           showStatus(result.message || 'Message sent successfully!', 'success');
           form.reset();
         } else {
+          console.log('Contact form error:', result);
+          if (result.debug) {
+            console.log('Debug info:', result.debug);
+          }
           showStatus(result.error || 'Something went wrong. Please try again.', 'error');
         }
       } catch (error) {

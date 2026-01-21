@@ -113,7 +113,11 @@ Sent via IN-NOLA Contact Form
 
       return new Response(JSON.stringify({
         error: 'Failed to send message. Please try again later.',
-        debug: env.DEBUG === 'true' ? errorText : undefined
+        debug: {
+          status: mailResponse.status,
+          response: errorText,
+          fromEmail: FROM_EMAIL
+        }
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }

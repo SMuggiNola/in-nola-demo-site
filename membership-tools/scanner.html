@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Scanner - IN-NOLA</title>
+    <link rel="stylesheet" href="css/membership.css">
+    <!-- html5-qrcode library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="portal-header">
+            <h1>Irish Network NOLA</h1>
+            <p class="subtitle">Admin Verification Scanner</p>
+        </header>
+
+        <!-- PIN Entry -->
+        <div id="pinSection" class="celtic-border card">
+            <div id="pinMessage" class="message"></div>
+
+            <form id="pinForm" class="pin-entry">
+                <div class="form-group">
+                    <label for="pin">Enter Admin PIN</label>
+                    <input type="password" id="pin" name="pin"
+                           pattern="[0-9]*" inputmode="numeric"
+                           maxlength="6" required
+                           placeholder="••••••" autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Access Scanner</button>
+            </form>
+
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="index.html" style="color: var(--celtic-gold); font-size: 0.85rem;">
+                    ← Back to Member Login
+                </a>
+            </p>
+        </div>
+
+        <!-- Scanner Section (hidden until PIN verified) -->
+        <div id="scannerSection" class="scanner-container" style="display: none;">
+            <div class="celtic-border card">
+                <div class="scanner-header">
+                    <h2 style="color: var(--celtic-gold); margin-bottom: 15px;">Scan Member QR Code</h2>
+                </div>
+
+                <div id="reader" style="display: none;"></div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <button id="startScanBtn" class="btn btn-primary" onclick="window.Scanner.startScanner()">
+                        Start Camera
+                    </button>
+                    <button id="stopScanBtn" class="btn btn-secondary" onclick="window.Scanner.stopScanner()" style="display: none;">
+                        Stop Camera
+                    </button>
+                </div>
+
+                <!-- Verification Result -->
+                <div id="verificationResult" class="verification-result">
+                    <div id="statusIcon" class="status-icon"></div>
+                    <div id="statusText" class="status-text"></div>
+                    <div id="memberInfo" class="member-info"></div>
+                    <button class="btn btn-primary scan-again-btn" onclick="window.Scanner.scanAgain()">
+                        Scan Another
+                    </button>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <span class="sign-out-link" onclick="exitScanner()">Exit Scanner</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/members-data.js"></script>
+    <script src="js/scanner.js"></script>
+    <script>
+        const pinSection = document.getElementById('pinSection');
+        const scannerSection = document.getElementById('scannerSection');
+        const pinForm = document.getElementById('pinForm');
+        const pinMessage = document.getElementById('pinMessage');
+
+        // Check if already authenticated (session storage for scanner)
+        const scannerAuth = sessionStorage.getItem('innola_scanner_auth');
+        if (scannerAuth === 'true') {
+            showScanner();
+        }
+
+        function showMessage(text, type) {
+            pinMessage.textContent = text;
+            pinMessage.className = 'message ' + type + ' show';
+        }
+
+        function showScanner() {
+            pinSection.style.display = 'none';
+            scannerSection.style.display = 'block';
+            sessionStorage.setItem('innola_scanner_auth', 'true');
+        }
+
+        function exitScanner() {
+            window.Scanner.stopScanner();
+            sessionStorage.removeItem('innola_scanner_auth');
+            pinSection.style.display = 'block';
+            scannerSection.style.display = 'none';
+            document.getElementById('pin').value = '';
+        }
+
+        pinForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const pin = document.getElementById('pin').value;
+
+            if (window.MembersDB.validateAdminPin(pin)) {
+                showMessage('Access granted!', 'success');
+                setTimeout(showScanner, 500);
+            } else {
+                showMessage('Invalid PIN. Please try again.', 'error');
+                document.getElementById('pin').value = '';
+                document.getElementById('pin').focus();
+            }
+        });
+    </script>
+</body>
+</html>

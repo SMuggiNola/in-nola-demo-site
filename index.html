@@ -54,6 +54,35 @@
 <div id="main-footer-placeholder"></div>
 </div>
 
+<!-- Floating Membership Portal Buttons -->
+<div style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000;">
+  <a href="./membership-tools/index.html" style="
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #1a5f2a 0%, #0d2818 100%);
+    color: #c9a227; padding: 12px 20px; border-radius: 30px;
+    text-decoration: none; font-family: 'Cormorant Garamond', serif;
+    font-weight: 600; font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 2px solid #c9a227;
+    transition: transform 0.2s, box-shadow 0.2s;
+  " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.4)';"
+     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)';">
+    <span style="font-size: 1.2rem;">☘</span> Member Login
+  </a>
+  <a href="./membership-tools/scanner.html" style="
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(201, 162, 39, 0.9);
+    color: #0d2818; padding: 10px 16px; border-radius: 30px;
+    text-decoration: none; font-family: 'Cormorant Garamond', serif;
+    font-weight: 600; font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.4)';"
+     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)';">
+    <span style="font-size: 1.1rem;">📷</span> Admin Scanner
+  </a>
+</div>
+
 <script src="./js/main.js"></script>
 
 </body>

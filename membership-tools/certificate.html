@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Certificate - IN-NOLA</title>
+    <link rel="stylesheet" href="css/membership.css">
+    <!-- QRCode.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="portal-header">
+            <h1>Irish Network NOLA</h1>
+            <p class="subtitle">Membership Certificate</p>
+        </header>
+
+        <div class="celtic-border certificate">
+            <div class="certificate-header">
+                <h1>Irish Network New Orleans</h1>
+                <h2>Member in Good Standing</h2>
+            </div>
+
+            <div class="certificate-body">
+                <p class="label">This certifies that</p>
+                <p class="member-name" id="memberName">Loading...</p>
+                <span class="member-type" id="memberType">Member</span>
+
+                <div class="certificate-dates">
+                    <div class="date-group">
+                        <p class="date-label">Member Since</p>
+                        <p class="date-value" id="joinDate">-</p>
+                    </div>
+                    <div class="date-group">
+                        <p class="date-label">Valid Through</p>
+                        <p class="date-value" id="expirationDate">-</p>
+                    </div>
+                </div>
+
+                <div class="qr-container">
+                    <div id="qrCode"></div>
+                    <p class="qr-label">Scan to verify membership</p>
+                </div>
+            </div>
+
+            <div class="certificate-footer">
+                <span class="sign-out-link" onclick="signOut()">Sign Out</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/members-data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/certificate.js"></script>
+    <script>
+        // Require authentication
+        if (!window.Auth.requireAuth()) {
+            // Will redirect to login
+        } else {
+            // Get current member and render certificate
+            const member = window.Auth.getCurrentMember();
+
+            if (member) {
+                window.Certificate.renderCertificate(member);
+            } else {
+                // Member not found - session may be stale
+                window.Auth.logout();
+                window.location.href = 'index.html';
+            }
+        }
+
+        function signOut() {
+            window.Auth.logout();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

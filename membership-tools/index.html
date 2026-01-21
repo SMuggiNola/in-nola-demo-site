@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Login - IN-NOLA</title>
+    <link rel="stylesheet" href="css/membership.css">
+</head>
+<body>
+    <div class="container">
+        <header class="portal-header">
+            <h1>Irish Network NOLA</h1>
+            <p class="subtitle">Member Portal</p>
+        </header>
+
+        <div class="celtic-border card">
+            <div id="message" class="message"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required
+                           placeholder="your.email@example.com" autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required
+                           placeholder="Enter your password" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Signing in...</p>
+            </div>
+        </div>
+
+        <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; opacity: 0.7;">
+            <a href="scanner.html" style="color: var(--celtic-gold);">Admin Scanner</a>
+        </p>
+    </div>
+
+    <script src="js/members-data.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Redirect if already logged in
+        window.Auth.redirectIfAuthenticated();
+
+        const form = document.getElementById('loginForm');
+        const messageEl = document.getElementById('message');
+        const loadingEl = document.getElementById('loading');
+
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type + ' show';
+        }
+
+        function hideMessage() {
+            messageEl.className = 'message';
+        }
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                form.style.display = 'none';
+                loadingEl.classList.add('show');
+            } else {
+                form.style.display = 'block';
+                loadingEl.classList.remove('show');
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideMessage();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                showMessage('Please enter both email and password', 'error');
+                return;
+            }
+
+            setLoading(true);
+
+            // Simulate network delay for realism
+            setTimeout(function() {
+                const result = window.Auth.login(email, password);
+
+                if (result.success) {
+                    showMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(function() {
+                        window.location.href = 'certificate.html';
+                    }, 500);
+                } else {
+                    setLoading(false);
+                    showMessage(result.error, 'error');
+                }
+            }, 800);
+        });
+    </script>
+</body>
+</html>

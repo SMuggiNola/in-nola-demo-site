@@ -2,8 +2,8 @@
 
 ## High Priority
 
-- [ ] **Test contact form** - Verify emails arrive at sean.muggivan@gmail.com
-- [ ] **Move Resend API key to environment variable** - Add `RESEND_API_KEY` in Cloudflare Pages Settings → Environment Variables (security best practice)
+- [x] **Test contact form** - Verify emails arrive at sean.muggivan@gmail.com
+- [x] **Move Resend API key to environment variable** - Add `RESEND_API_KEY` in Cloudflare Pages Settings → Environment Variables (security best practice)
 - [ ] **Complete in-nola.org domain transfer:**
   - [ ] Unlock domain at WordPress (Upgrades → Domains → Transfer Lock off)
   - [ ] Get Authorization Code (EPP/Auth Code) from WordPress

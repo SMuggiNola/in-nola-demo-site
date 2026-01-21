@@ -28,6 +28,69 @@
 - [ ] **Remove MailChannels DNS records** - Clean up _mailchannels TXT record from muggsofdatasci.net
 - [ ] **Update _contact-setup.md** - Reflect Resend setup instead of MailChannels
 
+## Membership Enrollment Portal
+
+### Phase 1: PayPal Setup
+- [ ] Log into PayPal Business account (or upgrade personal to business)
+- [ ] Go to PayPal Developer Dashboard (developer.paypal.com)
+- [ ] Create new app (get Client ID and Secret for sandbox + live)
+- [ ] Set up membership pricing tiers:
+  - [ ] Individual membership ($XX/year)
+  - [ ] Family membership ($XX/year)
+  - [ ] Lifetime membership ($XXX one-time)
+- [ ] Configure PayPal webhook URL for payment notifications
+
+### Phase 2: Database Setup
+- [ ] Choose storage solution:
+  - [ ] Option A: Cloudflare D1 (SQLite, free tier available)
+  - [ ] Option B: Cloudflare KV (key-value, simpler)
+  - [ ] Option C: External (Supabase, PlanetScale, etc.)
+- [ ] Design member data schema:
+  - [ ] Member ID, Name, Email
+  - [ ] Username, PIN (hashed)
+  - [ ] Membership type, Start date, Expiration date
+  - [ ] PayPal transaction ID
+  - [ ] Status (active, expired, pending)
+- [ ] Create database/tables in chosen solution
+- [ ] Set up Cloudflare bindings for Pages Functions
+
+### Phase 3: Enrollment Flow
+- [ ] Create membership signup page (`/join-new.html` or similar)
+  - [ ] Membership tier selection
+  - [ ] Personal info form (name, email, phone)
+  - [ ] Terms & conditions checkbox
+- [ ] Create Cloudflare Pages Function for enrollment:
+  - [ ] `/api/enroll` - Initiate PayPal checkout
+  - [ ] `/api/paypal-webhook` - Handle payment confirmation
+  - [ ] `/api/enroll-complete` - Return URL after payment
+- [ ] Integrate PayPal JavaScript SDK for checkout button
+- [ ] Generate unique username (or let user choose)
+- [ ] Generate random PIN (4-6 digits)
+- [ ] Store member in database after successful payment
+- [ ] Send welcome email with login credentials (via Resend)
+
+### Phase 4: Member Portal Updates
+- [ ] Update existing `/membership-tools/` login to use new database
+- [ ] Replace demo `members-data.js` with real database queries
+- [ ] Create `/api/auth` endpoint for login verification
+- [ ] Update certificate page to pull real member data
+- [ ] Update QR scanner to verify against database
+
+### Phase 5: Admin Features
+- [ ] Admin dashboard to view all members
+- [ ] Manual member add/edit/remove
+- [ ] Export member list (CSV)
+- [ ] Renewal reminder emails (automated)
+- [ ] Payment history view
+
+### PayPal Integration Notes
+- Sandbox testing: Use sandbox credentials first
+- Webhook events to handle: `PAYMENT.CAPTURE.COMPLETED`, `BILLING.SUBSCRIPTION.ACTIVATED`
+- Store PayPal transaction IDs for refund/dispute handling
+- Consider PayPal Subscriptions API for recurring annual dues
+
+---
+
 ## Future Improvements
 
 - [ ] **Add reCAPTCHA or Turnstile** - Spam protection for contact form

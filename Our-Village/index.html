@@ -8,16 +8,12 @@
   <link rel="stylesheet" href="../global.css">
 
   <style>
-    /* Override default Book of Kells watermark for this page */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
+    /* Override default watermark for this page */
+    body::after {
       background: url('../assets/watermarks/aerial-view-village-1.jpg')
                   center/cover no-repeat;
-      opacity: 0.45;
-      filter: brightness(0.95) contrast(1.08) saturate(1.1);
-      z-index: -1;
+      opacity: 0.15;
+      filter: grayscale(30%) brightness(0.6);
     }
   </style>
 </head>

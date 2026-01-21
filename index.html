@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Global Theme -->
   <link rel="stylesheet" href="./global.css">
@@ -24,34 +24,54 @@
 </div>
 
 <div id="main-content">
-  <!-- IN-NOLA Logo Inserted Here -->
-  <div class="logo-container">
-    <img 
-      src="./assets/in_logo.png" 
-      alt="IN-NOLA Logo"
-      class="logo"
-    >
-  </div>
-  <h2>Connecting Irish heritage, culture, and community</h2>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <img src="./assets/in_logo.png" alt="IN-NOLA Logo" class="hero-logo">
+      <p class="hero-tagline">Connecting Irish heritage, culture, and community</p>
+      <a href="./Our-Village/index.html" class="btn-hero">
+        Explore Our Village
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </section>
 
-  <div class="nav-stack">
-    <a href="./Our-Village/index.html" class="btn btn-gold">
-      Our Village
-      <span class="btn-sub">(where everything happens…)</span>
+  <!-- Navigation Cards -->
+  <section class="nav-cards">
+    <a href="./About-IN-NOLA/index.html" class="nav-card">
+      <span class="nav-card-icon">☘</span>
+      <span class="nav-card-title">About</span>
+      <span class="nav-card-desc">Our story & mission</span>
     </a>
 
-    <a href="./About-IN-NOLA/index.html" class="btn">About IN-NOLA</a>
-
-    <a href="contact_form.html" class="btn">Contact IN-NOLA</a>
-
-    <a href="join.html" class="btn">Join IN-NOLA</a>
-    <a href="donate.html" class="btn">Donate to IN-NOLA</a>
-    <a href="https://irishnetwork-usa.org/" class="btn inusa-btn" target="_blank" rel="noopener">
-      <img src="./assets/inusa_logo.png" alt="IN USA" class="inusa-logo">
+    <a href="join.html" class="nav-card">
+      <span class="nav-card-icon">✦</span>
+      <span class="nav-card-title">Join</span>
+      <span class="nav-card-desc">Become a member</span>
     </a>
-  </div>
 
-<div id="main-footer-placeholder"></div>
+    <a href="donate.html" class="nav-card">
+      <span class="nav-card-icon">♡</span>
+      <span class="nav-card-title">Donate</span>
+      <span class="nav-card-desc">Support our cause</span>
+    </a>
+
+    <a href="contact_form.html" class="nav-card">
+      <span class="nav-card-icon">✉</span>
+      <span class="nav-card-title">Contact</span>
+      <span class="nav-card-desc">Get in touch</span>
+    </a>
+  </section>
+
+  <!-- IN-USA Partner -->
+  <a href="https://irishnetwork-usa.org/" class="partner-link" target="_blank" rel="noopener">
+    <span>Part of</span>
+    <img src="./assets/inusa_logo.png" alt="Irish Network USA">
+  </a>
+
+  <div id="main-footer-placeholder"></div>
 </div>
 
 <!-- Floating Membership Portal Buttons -->

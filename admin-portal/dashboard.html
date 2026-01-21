@@ -122,6 +122,15 @@
       max-height: 2000px;
     }
 
+    .phase-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin: 0 0 1rem 0;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     .task-item {
       display: flex;
       align-items: flex-start;
@@ -223,10 +232,20 @@
         <button id="logoutBtn" class="btn btn-gold logout-btn">Sign Out</button>
       </div>
 
-      <p style="text-align: center; margin-bottom: 2rem;">
-        Project tasks and progress for IN-NOLA website and membership portal.
-        <br><span style="color: var(--gold);">Click any task to email information needed for that item.</span>
-      </p>
+      <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 2rem;">
+        <p style="text-align: center; margin-bottom: 1rem;">
+          Project tasks and progress for the IN-NOLA website and membership portal.
+        </p>
+        <div style="background: rgba(212, 167, 38, 0.1); border-radius: 8px; padding: 1rem; font-size: 0.9rem;">
+          <strong style="color: var(--gold);">How to Help:</strong>
+          <ol style="margin: 0.5rem 0 0 1.25rem; padding: 0; color: var(--text-secondary);">
+            <li>Click any task below to open an email</li>
+            <li>The subject line will be pre-filled with the task name</li>
+            <li>Add any info, credentials, or details needed for that task</li>
+            <li>Send it - sensitive info stays secure in email</li>
+          </ol>
+        </div>
+      </div>
 
       <div class="progress-summary">
         <div class="progress-card">
@@ -275,6 +294,7 @@
     const phases = [
       {
         title: "High Priority",
+        description: "Critical items blocking other work. Domain transfer is the main blocker right now.",
         tasks: [
           { done: true, text: "<strong>Test contact form</strong> - Verified working" },
           { done: true, text: "<strong>Secure API credentials</strong> - Moved to environment variables" },
@@ -292,6 +312,7 @@
       },
       {
         title: "Post-Domain Transfer",
+        description: "These tasks unlock once we own in-nola.org. Sets up professional email and domain.",
         tasks: [
           { done: false, text: "<strong>Add custom domain</strong> - Connect in-nola.org to website" },
           { done: false, text: "<strong>Set up email routing</strong> - Create contact@in-nola.org" },
@@ -300,6 +321,7 @@
       },
       {
         title: "Cleanup Tasks",
+        description: "Housekeeping items to tidy up temporary configurations and documentation.",
         tasks: [
           { done: false, text: "<strong>Remove debug output</strong> - Clean up contact form logging" },
           { done: false, text: "<strong>Remove old DNS records</strong> - Clean up unused email configuration" },
@@ -308,6 +330,7 @@
       },
       {
         title: "Phase 1: PayPal Setup",
+        description: "Configure PayPal to accept membership dues. Need business account access and pricing decisions.",
         tasks: [
           { done: false, text: "<strong>PayPal Business account</strong> - Log in or upgrade to business", help: true },
           { done: false, text: "<strong>Developer credentials</strong> - Create app for payment processing" },
@@ -321,6 +344,7 @@
       },
       {
         title: "Phase 2: Database Setup",
+        description: "Create secure storage for member records. Technical work - no board input needed.",
         tasks: [
           { done: false, text: "<strong>Choose storage solution</strong> - Database for member records" },
           { done: false, text: "<strong>Design member data structure</strong>", subtasks: [
@@ -336,6 +360,7 @@
       },
       {
         title: "Phase 3: Enrollment Flow",
+        description: "Build the new member signup experience - from selecting a tier to receiving login credentials.",
         tasks: [
           { done: false, text: "<strong>Create signup page</strong>", subtasks: [
             { done: false, text: "Membership tier selection" },
@@ -355,6 +380,7 @@
       },
       {
         title: "Phase 4: Member Portal Updates",
+        description: "Connect the existing member login and certificate pages to real member data.",
         tasks: [
           { done: false, text: "<strong>Update login system</strong> - Connect to real database" },
           { done: false, text: "<strong>Replace demo data</strong> - Use actual member records" },
@@ -365,6 +391,7 @@
       },
       {
         title: "Phase 5: Admin Features",
+        description: "Tools for board members to manage membership - view roster, export lists, send reminders.",
         tasks: [
           { done: false, text: "<strong>Admin dashboard</strong> - View all members", help: true },
           { done: false, text: "<strong>Member management</strong> - Add, edit, remove members" },
@@ -375,6 +402,7 @@
       },
       {
         title: "Phase 6: QuickBooks Integration",
+        description: "Sync new members to QuickBooks automatically. Treasurer needs to set up QB side first.",
         tasks: [
           { done: true, text: "<strong>Integration approach decided</strong> - Website syncs to QuickBooks automatically" },
           { done: false, text: "<strong>QuickBooks setup (Treasurer)</strong>", help: true, subtasks: [
@@ -396,6 +424,7 @@
       },
       {
         title: "Future Improvements",
+        description: "Nice-to-have enhancements after core functionality is complete. Low priority for now.",
         tasks: [
           { done: false, text: "<strong>Spam protection</strong> - Add CAPTCHA to contact form" },
           { done: false, text: "<strong>Email confirmation</strong> - Confirm contact form submissions" },
@@ -475,6 +504,10 @@
           }
         });
 
+        const descriptionHtml = phase.description
+          ? `<p class="phase-description">${phase.description}</p>`
+          : '';
+
         phaseEl.innerHTML = `
           <div class="phase-header" data-index="${index}">
             <h3 class="phase-title">${phase.title}</h3>
@@ -484,6 +517,7 @@
             </div>
           </div>
           <div class="phase-content" data-index="${index}">
+            ${descriptionHtml}
             ${tasksHtml}
           </div>
         `;

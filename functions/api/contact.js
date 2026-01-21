@@ -51,9 +51,17 @@ export async function onRequestPost(context) {
     });
   }
 
-  // Configuration
-  const RESEND_API_KEY = env.RESEND_API_KEY || 're_K98V95ac_JSkW4cabEQ4w1wuULXtYthf2';
+  // Configuration (set in Cloudflare Pages Environment Variables)
+  const RESEND_API_KEY = env.RESEND_API_KEY;
   const TO_EMAIL = env.CONTACT_TO_EMAIL || 'sean.muggivan@gmail.com';
+
+  if (!RESEND_API_KEY) {
+    console.error('RESEND_API_KEY environment variable not set');
+    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
   // Build email content
   const emailHtml = `

@@ -125,6 +125,8 @@ export async function onRequestPost(context) {
       cost: body.cost?.trim() || '',
       contact: body.contact?.trim() || '',
       notes: body.notes?.trim() || '',
+      facebook: body.facebook?.trim() || '',
+      instagram: body.instagram?.trim() || '',
       createdAt: new Date().toISOString()
     };
 
@@ -220,6 +222,8 @@ export async function onRequestPut(context) {
       cost: body.cost?.trim() ?? existingEvent.cost,
       contact: body.contact?.trim() ?? existingEvent.contact,
       notes: body.notes?.trim() ?? existingEvent.notes,
+      facebook: body.facebook?.trim() ?? existingEvent.facebook ?? '',
+      instagram: body.instagram?.trim() ?? existingEvent.instagram ?? '',
       createdAt: existingEvent.createdAt,
       updatedAt: new Date().toISOString()
     };

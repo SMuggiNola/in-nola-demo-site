@@ -246,6 +246,19 @@
           <textarea id="additionalNotes" name="additionalNotes" placeholder="Any other details - parking info, dress code, RSVP instructions, etc." style="min-height: 80px;"></textarea>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label for="facebookLink">Facebook Link</label>
+            <input type="url" id="facebookLink" name="facebookLink" placeholder="https://facebook.com/...">
+            <p class="hint">Event page or post with photos/flyer</p>
+          </div>
+          <div class="form-group">
+            <label for="instagramLink">Instagram Link</label>
+            <input type="url" id="instagramLink" name="instagramLink" placeholder="https://instagram.com/...">
+            <p class="hint">Post or reel with photos/flyer</p>
+          </div>
+        </div>
+
         <button type="submit" class="submit-btn" id="submitBtn">Post Event</button>
 
         <div class="status-message" id="statusMessage"></div>
@@ -311,7 +324,9 @@
         emoji: document.getElementById('eventEmoji').value.trim(),
         cost: document.getElementById('eventCost').value.trim(),
         contact: document.getElementById('eventContact').value.trim(),
-        notes: document.getElementById('additionalNotes').value.trim()
+        notes: document.getElementById('additionalNotes').value.trim(),
+        facebook: document.getElementById('facebookLink').value.trim(),
+        instagram: document.getElementById('instagramLink').value.trim()
       };
 
       try {

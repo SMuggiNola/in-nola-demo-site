@@ -199,6 +199,9 @@ fetch('/api/events').then(r => r.json()).then(console.log)
 - Added inline edit/delete buttons on event cards
 - Added Facebook/Instagram link fields for social media photos
 - Local dev fallback so events page works without API
+- Moved "Our Village" from hero button to nav card (3rd position)
+- Removed old "Upcoming Events" / "Past Events" buttons from Our Village page
+- Nav cards now: About → Events → Our Village → Join → Donate → Contact
 
 **KV Setup Done:**
 - Namespace created: `INNOLA_EVENTS`

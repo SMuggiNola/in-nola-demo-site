@@ -160,6 +160,92 @@ export async function onRequestPost(context) {
   }
 }
 
+export async function onRequestPut(context) {
+  // PUT /api/events - Update an event (admin only)
+  try {
+    const { request, env } = context;
+
+    if (!env.EVENTS_KV) {
+      return new Response(JSON.stringify({ error: 'KV not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const body = await request.json();
+
+    // Check admin PIN
+    if (!body.adminPin || !ADMIN_PINS.includes(body.adminPin)) {
+      return new Response(JSON.stringify({ error: 'Invalid admin PIN' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (!body.eventId) {
+      return new Response(JSON.stringify({ error: 'Missing event ID' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Get existing events
+    let eventsData = await env.EVENTS_KV.get(EVENTS_KEY, 'json');
+    if (!eventsData || !eventsData.events) {
+      return new Response(JSON.stringify({ error: 'No events found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Find and update event
+    const eventIndex = eventsData.events.findIndex(e => e.id === body.eventId);
+    if (eventIndex === -1) {
+      return new Response(JSON.stringify({ error: 'Event not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Update fields (keep id and createdAt)
+    const existingEvent = eventsData.events[eventIndex];
+    eventsData.events[eventIndex] = {
+      id: existingEvent.id,
+      title: body.title?.trim() || existingEvent.title,
+      date: body.date || existingEvent.date,
+      time: body.time?.trim() ?? existingEvent.time,
+      location: body.location?.trim() || existingEvent.location,
+      description: body.description?.trim() || existingEvent.description,
+      emoji: body.emoji?.trim() ?? existingEvent.emoji,
+      cost: body.cost?.trim() ?? existingEvent.cost,
+      contact: body.contact?.trim() ?? existingEvent.contact,
+      notes: body.notes?.trim() ?? existingEvent.notes,
+      createdAt: existingEvent.createdAt,
+      updatedAt: new Date().toISOString()
+    };
+
+    // Save back to KV
+    await env.EVENTS_KV.put(EVENTS_KEY, JSON.stringify(eventsData));
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Event updated successfully',
+      event: eventsData.events[eventIndex]
+    }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    return new Response(JSON.stringify({
+      error: 'Failed to update event',
+      details: error.message
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
 export async function onRequestDelete(context) {
   // DELETE /api/events - Remove an event (admin only)
   try {
@@ -235,7 +321,7 @@ export async function onRequestOptions() {
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   });

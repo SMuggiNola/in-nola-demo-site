@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>Events • Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../global.css">
+
+  <style>
+    body::after {
+      background: url('../../assets/kells/book_of_kells_2.jpg') center/cover no-repeat;
+      opacity: 0.1;
+      filter: grayscale(30%) brightness(0.6);
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .section-intro {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    /* Section headers */
+    .section-header {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      text-align: center;
+      margin: 2.5rem 0 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(212, 167, 38, 0.3);
+    }
+
+    .section-header:first-of-type {
+      margin-top: 0;
+    }
+
+    /* Accordion structure */
+    .event-card {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(10, 60, 35, 0.82);
+      border: 1px solid rgba(212,175,55,0.5);
+      border-radius: 1.4rem;
+      margin: 1rem auto;
+      overflow: hidden;
+      backdrop-filter: blur(2px);
+      cursor: pointer;
+    }
+
+    .event-header {
+      padding: 1.2rem 1.4rem;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .event-header:hover {
+      background: rgba(23,77,49,0.5);
+    }
+
+    .event-header span:first-child {
+      text-align: center;
+      flex: 1;
+    }
+
+    .event-body {
+      display: none;
+      padding: 1.2rem 1.6rem 2rem;
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      line-height: 1.6;
+    }
+
+    .event-body img {
+      width: 100%;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .event-card.open .event-body {
+      display: block;
+    }
+
+    /* Past events styling - slightly muted */
+    .past-events .event-card {
+      opacity: 0.85;
+      background: rgba(10, 50, 30, 0.7);
+    }
+
+    .past-events .event-header {
+      font-size: 1.3rem;
+    }
+
+    .past-events .event-card:hover {
+      opacity: 1;
+    }
+
+    /* Event action buttons */
+    .event-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .event-actions .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .event-actions .btn-gold {
+      background: var(--gold);
+      color: var(--green-dark);
+    }
+
+    .event-actions .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 167, 38, 0.4);
+    }
+
+    .event-actions .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: var(--text-secondary);
+    }
+
+    .event-actions .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .event-actions .admin-btn {
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    .event-actions .admin-btn:hover {
+      opacity: 1;
+    }
+
+    /* Loading state */
+    .loading-message {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 2rem;
+      font-style: italic;
+    }
+
+    .no-events {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 1.5rem;
+      font-style: italic;
+      opacity: 0.8;
+    }
+
+    .error-message {
+      text-align: center;
+      color: #fca5a5;
+      padding: 1rem;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+      margin: 1rem auto;
+      max-width: 600px;
+    }
+  </style>
+</head>
+
+<body id="events">
+
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <h1>Events</h1>
+    <p class="section-intro">Join us for celebrations of Irish heritage, culture, and community in New Orleans.</p>
+
+    <div class="event-actions">
+      <a href="../../contact_form.html?subject=Event%20Idea" class="btn btn-gold">
+        Let us know about your event!
+      </a>
+      <a href="add-event.html" class="btn btn-outline admin-btn">
+        Admin: Add Event
+      </a>
+    </div>
+
+    <!-- UPCOMING EVENTS -->
+    <h2 class="section-header">Upcoming Events</h2>
+    <div id="upcomingEvents">
+      <p class="loading-message">Loading events...</p>
+    </div>
+
+    <!-- PAST EVENTS -->
+    <div class="past-events">
+      <h2 class="section-header">Past Events</h2>
+      <div id="pastEvents">
+        <p class="loading-message">Loading events...</p>
+      </div>
+    </div>
+
+    <div class="back-link" style="margin-top:2rem;">
+      <a href="../index.html">← Return to Our Village</a>
+    </div>
+  </div>
+
+  <div id="main-footer-placeholder"></div>
+
+  <script src="../../js/main.js"></script>
+
+  <script>
+    // Format date nicely
+    function formatDate(dateStr) {
+      const date = new Date(dateStr + 'T00:00:00');
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // Create event card HTML
+    function createEventCard(event) {
+      const emoji = event.emoji ? ` ${event.emoji}` : '';
+      const timeStr = event.time ? `<span style="font-size: 0.9em; opacity: 0.8;">${event.time}</span><br>` : '';
+      const dateDisplay = formatDate(event.date);
+
+      let bodyContent = '';
+      if (event.time) bodyContent += `<p><strong>Time:</strong> ${event.time}</p>`;
+      bodyContent += `<p><strong>Location:</strong> ${event.location}</p>`;
+      bodyContent += `<p><strong>Details:</strong> ${event.description}</p>`;
+      if (event.cost) bodyContent += `<p><strong>Cost:</strong> ${event.cost}</p>`;
+      if (event.contact) bodyContent += `<p><strong>Contact:</strong> ${event.contact}</p>`;
+      if (event.notes) bodyContent += `<p>${event.notes}</p>`;
+
+      return `
+        <div class="event-card" data-event-id="${event.id}">
+          <div class="event-header">
+            <span>
+              <strong>${event.title}</strong>${emoji}<br>
+              <span style="font-size: 0.9em; opacity: 0.8;">${dateDisplay}</span>
+            </span>
+            <span class="toggle">+</span>
+          </div>
+          <div class="event-body">
+            ${bodyContent}
+          </div>
+        </div>
+      `;
+    }
+
+    // Fallback events for local development
+    const fallbackEvents = {
+      upcoming: [
+        {
+          id: 'seed-1',
+          title: 'St. Patrick\'s Ceili',
+          date: '2026-03-08',
+          time: '',
+          location: '600 North Broad, New Orleans, 70119',
+          description: '$5 General Admission. Get ready for a lively evening of traditional Irish music, dancing, and good cheer as we celebrate St. Patrick\'s Day a little early!',
+          emoji: '☘️'
+        },
+        {
+          id: 'seed-2',
+          title: 'Bloomsday Celebration',
+          date: '2026-06-16',
+          time: '',
+          location: 'TBD',
+          description: 'Bloomsday is a vibrant annual celebration of the life and work of the iconic Irish writer James Joyce, observed every June 16th. Join fellow literary enthusiasts in immersing yourself in the world of "Ulysses"!',
+          emoji: '📖'
+        },
+        {
+          id: 'seed-3',
+          title: 'Oíche Shamhna (Halloween) Ceili',
+          date: '2026-10-31',
+          time: '',
+          location: 'Muggivan\'s School of Irish Dance Studio',
+          description: 'Help us attempt what may be the first ever Samhain festival to be held in New Orleans. Get ready for an evening of spooky fun with costumes, lively music, traditional dance, delicious food, and refreshing drinks.',
+          emoji: '🎃'
+        },
+        {
+          id: 'seed-4',
+          title: '2nd Annual Holiday Party',
+          date: '2026-12-15',
+          time: '',
+          location: 'To Be Determined',
+          description: 'Help us celebrate another year of working together to celebrate the rich history the Irish have helped contribute to New Orleans and its surrounding areas.',
+          emoji: '🎄'
+        }
+      ],
+      past: [
+        {
+          id: 'seed-past-1',
+          title: '1st Annual Holiday Party',
+          date: '2025-12-16',
+          time: '6:00 PM',
+          location: 'Ember Indian Cuisine — 5606 Canal Blvd',
+          description: 'Potluck dinner, cash bar, and a warm holiday evening celebrating Irish culture in New Orleans. Thank you to everyone who attended our inaugural holiday celebration!',
+          emoji: '🎄'
+        }
+      ]
+    };
+
+    // Load events from API
+    async function loadEvents() {
+      const upcomingContainer = document.getElementById('upcomingEvents');
+      const pastContainer = document.getElementById('pastEvents');
+
+      try {
+        const response = await fetch('/api/events');
+
+        // Check if we got a valid response (not a 404 HTML page)
+        const contentType = response.headers.get('content-type');
+        if (!response.ok || !contentType || !contentType.includes('application/json')) {
+          console.log('API not available, using fallback events (local dev mode)');
+          renderEvents(fallbackEvents);
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data.error && data.error === 'KV not configured') {
+          // KV not set up yet - use fallback
+          console.log('KV not configured, using fallback events');
+          renderEvents(fallbackEvents);
+          return;
+        }
+
+        // Render events from API
+        renderEvents(data);
+
+      } catch (error) {
+        console.error('Failed to load events:', error);
+        // Use fallback on error
+        console.log('Using fallback events due to error');
+        renderEvents(fallbackEvents);
+      }
+    }
+
+    // Render events to the page
+    function renderEvents(data) {
+      const upcomingContainer = document.getElementById('upcomingEvents');
+      const pastContainer = document.getElementById('pastEvents');
+
+      // Render upcoming events
+      if (data.upcoming && data.upcoming.length > 0) {
+        upcomingContainer.innerHTML = data.upcoming.map(createEventCard).join('');
+      } else {
+        upcomingContainer.innerHTML = '<p class="no-events">No upcoming events scheduled. Check back soon!</p>';
+      }
+
+      // Render past events
+      if (data.past && data.past.length > 0) {
+        pastContainer.innerHTML = data.past.map(createEventCard).join('');
+      } else {
+        pastContainer.innerHTML = '<p class="no-events">No past events yet.</p>';
+      }
+
+      // Re-attach click handlers for accordions
+      document.querySelectorAll('.event-card').forEach(card => {
+        card.addEventListener('click', () => {
+          card.classList.toggle('open');
+          const toggle = card.querySelector('.toggle');
+          toggle.textContent = card.classList.contains('open') ? '−' : '+';
+        });
+      });
+    }
+
+    // Load events on page load
+    loadEvents();
+  </script>
+
+</body>
+</html>

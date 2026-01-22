@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>Add Event • Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../global.css">
+
+  <style>
+    body::after {
+      background: url('../../assets/kells/book_of_kells_2.jpg') center/cover no-repeat;
+      opacity: 0.1;
+      filter: grayscale(30%) brightness(0.6);
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .form-intro {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .event-form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group .hint {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--gold);
+      color: var(--green-dark);
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 167, 38, 0.4);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-message {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .status-message.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-message.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .admin-note {
+      background: rgba(212, 167, 38, 0.1);
+      border: 1px solid rgba(212, 167, 38, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .admin-note strong {
+      color: var(--gold);
+    }
+
+    .pin-group {
+      background: rgba(212, 167, 38, 0.05);
+      border: 1px solid rgba(212, 167, 38, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pin-group label {
+      color: var(--gold);
+    }
+
+    .pin-group input {
+      text-align: center;
+      letter-spacing: 0.3em;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <main class="page-content">
+
+      <h1>Add New Event</h1>
+      <p class="form-intro">Submit event details to post on the IN-NOLA events page.</p>
+
+      <div class="admin-note">
+        <strong>Admin Use Only:</strong> Events are posted immediately after submission.
+      </div>
+
+      <form class="event-form" id="eventForm">
+
+        <div class="pin-group">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="adminPin">Admin PIN *</label>
+            <input type="password" id="adminPin" name="adminPin" required placeholder="••••••" maxlength="6" pattern="[0-9]{6}">
+            <p class="hint">6-digit admin PIN required to post events</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="eventTitle">Event Title *</label>
+          <input type="text" id="eventTitle" name="eventTitle" required placeholder="e.g., St. Patrick's Day Ceili">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eventDate">Date *</label>
+            <input type="date" id="eventDate" name="eventDate" required>
+          </div>
+          <div class="form-group">
+            <label for="eventTime">Time</label>
+            <input type="text" id="eventTime" name="eventTime" placeholder="e.g., 6:00 PM">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="eventLocation">Location *</label>
+          <input type="text" id="eventLocation" name="eventLocation" required placeholder="Venue name and address">
+        </div>
+
+        <div class="form-group">
+          <label for="eventDescription">Description *</label>
+          <textarea id="eventDescription" name="eventDescription" required placeholder="Describe the event - what to expect, any costs, what to bring, etc."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="eventEmoji">Event Emoji</label>
+          <input type="text" id="eventEmoji" name="eventEmoji" placeholder="e.g., ☘️ 🎄 🎃 📖" maxlength="4">
+          <p class="hint">Optional: An emoji to display with the event title</p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eventCost">Cost/Admission</label>
+            <input type="text" id="eventCost" name="eventCost" placeholder="e.g., $5, Free, Donation">
+          </div>
+          <div class="form-group">
+            <label for="eventContact">Contact Person</label>
+            <input type="text" id="eventContact" name="eventContact" placeholder="Name or email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="additionalNotes">Additional Notes</label>
+          <textarea id="additionalNotes" name="additionalNotes" placeholder="Any other details - parking info, dress code, RSVP instructions, etc." style="min-height: 80px;"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Post Event</button>
+
+        <div class="status-message" id="statusMessage"></div>
+      </form>
+
+      <div class="back-link" style="margin-top: 2rem;">
+        <a href="index.html">← Back to Events</a>
+      </div>
+
+    </main>
+
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <script src="../../js/main.js"></script>
+
+  <script>
+    const form = document.getElementById('eventForm');
+    const statusMessage = document.getElementById('statusMessage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Check if running locally
+    const isLocal = window.location.hostname === '127.0.0.1' ||
+                    window.location.hostname === 'localhost' ||
+                    window.location.port === '5500';
+
+    if (isLocal) {
+      // Show local dev message
+      const adminNote = document.querySelector('.admin-note');
+      adminNote.innerHTML = `
+        <strong style="color: #fca5a5;">Local Development Mode</strong><br>
+        <span style="font-size: 0.85rem;">Event posting only works on the deployed Cloudflare site.<br>
+        Deploy to test this feature, or use the fallback events on the events page.</span>
+      `;
+      adminNote.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+      adminNote.style.background = 'rgba(239, 68, 68, 0.1)';
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Block submission in local dev
+      if (isLocal) {
+        statusMessage.textContent = 'Event posting is disabled in local development. Deploy to Cloudflare to use this feature.';
+        statusMessage.className = 'status-message error';
+        return;
+      }
+
+      // Disable button while submitting
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting...';
+      statusMessage.className = 'status-message';
+      statusMessage.style.display = 'none';
+
+      // Gather form data
+      const eventData = {
+        adminPin: document.getElementById('adminPin').value.trim(),
+        title: document.getElementById('eventTitle').value.trim(),
+        date: document.getElementById('eventDate').value,
+        time: document.getElementById('eventTime').value.trim(),
+        location: document.getElementById('eventLocation').value.trim(),
+        description: document.getElementById('eventDescription').value.trim(),
+        emoji: document.getElementById('eventEmoji').value.trim(),
+        cost: document.getElementById('eventCost').value.trim(),
+        contact: document.getElementById('eventContact').value.trim(),
+        notes: document.getElementById('additionalNotes').value.trim()
+      };
+
+      try {
+        const response = await fetch('/api/events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(eventData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          statusMessage.textContent = 'Event posted successfully! Redirecting to events page...';
+          statusMessage.className = 'status-message success';
+
+          // Clear form
+          form.reset();
+
+          // Redirect after short delay
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+        } else {
+          throw new Error(result.error || 'Failed to post event');
+        }
+
+      } catch (error) {
+        console.error('Error posting event:', error);
+        statusMessage.textContent = error.message || 'Failed to post event. Please try again.';
+        statusMessage.className = 'status-message error';
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Post Event';
+      }
+    });
+  </script>
+
+</body>
+</html>

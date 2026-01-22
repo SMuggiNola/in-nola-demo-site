@@ -4,6 +4,7 @@
 
 - [x] **Test contact form** - Verify emails arrive at sean.muggivan@gmail.com
 - [x] **Move Resend API key to environment variable** - Add `RESEND_API_KEY` in Cloudflare Pages Settings → Environment Variables (security best practice)
+- [ ] **Create IN-NOLA Cloudflare account** - Organization account so all infrastructure (domain, site, email) stays with IN-NOLA, not tied to personal accounts
 - [ ] **Complete in-nola.org domain transfer:**
   - [ ] Unlock domain at WordPress (Upgrades → Domains → Transfer Lock off)
   - [ ] Get Authorization Code (EPP/Auth Code) from WordPress

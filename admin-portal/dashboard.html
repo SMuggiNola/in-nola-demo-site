@@ -178,15 +178,71 @@
       font-weight: 600;
     }
 
-    .help-tag {
+    .owner-tag {
       display: inline-block;
-      background: rgba(212, 167, 38, 0.2);
-      color: var(--gold);
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       padding: 0.15rem 0.5rem;
       border-radius: 10px;
       margin-left: 0.5rem;
       vertical-align: middle;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .owner-tag.board {
+      background: rgba(212, 167, 38, 0.25);
+      color: #f0c040;
+      border: 1px solid rgba(212, 167, 38, 0.4);
+    }
+
+    .owner-tag.treasurer {
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+    }
+
+    .owner-tag.tech {
+      background: rgba(100, 116, 139, 0.2);
+      color: #94a3b8;
+      border: 1px solid rgba(100, 116, 139, 0.3);
+    }
+
+    /* Dim tech tasks so board tasks stand out */
+    .task-item.owner-tech {
+      opacity: 0.6;
+    }
+
+    .task-item.owner-tech:hover {
+      opacity: 1;
+    }
+
+    /* Highlight board/treasurer tasks */
+    .task-item.owner-board,
+    .task-item.owner-treasurer {
+      background: rgba(212, 167, 38, 0.05);
+    }
+
+    .task-item.owner-treasurer {
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .legend-box {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
     }
 
     .subsection-title {
@@ -239,11 +295,16 @@
         <div style="background: rgba(212, 167, 38, 0.1); border-radius: 8px; padding: 1rem; font-size: 0.9rem;">
           <strong style="color: var(--gold);">How to Help:</strong>
           <ol style="margin: 0.5rem 0 0 1.25rem; padding: 0; color: var(--text-secondary);">
-            <li>Click any task below to open an email</li>
-            <li>The subject line will be pre-filled with the task name</li>
-            <li>Add any info, credentials, or details needed for that task</li>
-            <li>Send it - sensitive info stays secure in email</li>
+            <li>Look for <span class="owner-tag board">Board</span> or <span class="owner-tag treasurer">Treasurer</span> tags - those need your input</li>
+            <li>Click any task to open an email with the task name pre-filled</li>
+            <li>Add any info, credentials, or details needed</li>
+            <li><span class="owner-tag tech">Tech</span> tasks are handled by Sean - no action needed from you</li>
           </ol>
+          <div class="legend-box">
+            <div class="legend-item"><span class="owner-tag board">Board</span> Needs board member input</div>
+            <div class="legend-item"><span class="owner-tag treasurer">Treasurer</span> Needs treasurer action</div>
+            <div class="legend-item"><span class="owner-tag tech">Tech</span> Technical work (Sean)</div>
+          </div>
         </div>
       </div>
 
@@ -261,8 +322,8 @@
           <div class="label">Remaining</div>
         </div>
         <div class="progress-card">
-          <div class="number" id="helpWanted">0</div>
-          <div class="label">Help Wanted</div>
+          <div class="number" id="boardTasks">0</div>
+          <div class="label">Board Tasks</div>
         </div>
       </div>
 
@@ -290,23 +351,25 @@
       window.location.href = 'index.html';
     });
 
-    // Task data (scrubbed of sensitive info)
+    // Task data with owner assignments
+    // owner: "board" = needs board member input, "treasurer" = needs treasurer, "tech" = Sean handles it
     const phases = [
       {
         title: "High Priority",
         description: "Critical items blocking other work. Domain transfer is the main blocker right now.",
         tasks: [
-          { done: true, text: "<strong>Test contact form</strong> - Verified working" },
-          { done: true, text: "<strong>Secure API credentials</strong> - Moved to environment variables" },
-          { done: false, text: "<strong>Complete in-nola.org domain transfer</strong>", help: true, subtasks: [
-            { done: false, text: "Unlock domain at WordPress" },
-            { done: false, text: "Get Authorization Code from WordPress" },
-            { done: false, text: "Verify domain eligibility (60+ days old)" },
-            { done: false, text: "Copy existing DNS records" },
-            { done: false, text: "Initiate transfer in Cloudflare" },
-            { done: false, text: "Pay for 1 year renewal" },
-            { done: false, text: "Approve transfer via email" },
-            { done: false, text: "Wait for transfer to complete (1-7 days)" }
+          { done: true, text: "<strong>Test contact form</strong> - Verified working", owner: "tech" },
+          { done: true, text: "<strong>Secure API credentials</strong> - Moved to environment variables", owner: "tech" },
+          { done: false, text: "<strong>Create IN-NOLA Cloudflare account</strong> - Organization account so infrastructure stays with IN-NOLA", owner: "board" },
+          { done: false, text: "<strong>Complete in-nola.org domain transfer</strong>", owner: "board", subtasks: [
+            { done: false, text: "Unlock domain at WordPress", owner: "board" },
+            { done: false, text: "Get Authorization Code from WordPress", owner: "board" },
+            { done: false, text: "Verify domain eligibility (60+ days old)", owner: "board" },
+            { done: false, text: "Copy existing DNS records", owner: "tech" },
+            { done: false, text: "Initiate transfer in Cloudflare", owner: "tech" },
+            { done: false, text: "Pay for 1 year renewal", owner: "board" },
+            { done: false, text: "Approve transfer via email", owner: "board" },
+            { done: false, text: "Wait for transfer to complete (1-7 days)", owner: "tech" }
           ]}
         ]
       },
@@ -314,111 +377,112 @@
         title: "Post-Domain Transfer",
         description: "These tasks unlock once we own in-nola.org. Sets up professional email and domain.",
         tasks: [
-          { done: false, text: "<strong>Add custom domain</strong> - Connect in-nola.org to website" },
-          { done: false, text: "<strong>Set up email routing</strong> - Create contact@in-nola.org" },
-          { done: false, text: "<strong>Configure email sending</strong> - Send from in-nola.org domain" }
+          { done: false, text: "<strong>Add custom domain</strong> - Connect in-nola.org to website", owner: "tech" },
+          { done: false, text: "<strong>Set up email routing</strong> - Create contact@in-nola.org", owner: "tech" },
+          { done: false, text: "<strong>Configure email sending</strong> - Send from in-nola.org domain", owner: "tech" }
         ]
       },
       {
         title: "Cleanup Tasks",
         description: "Housekeeping items to tidy up temporary configurations and documentation.",
         tasks: [
-          { done: false, text: "<strong>Remove debug output</strong> - Clean up contact form logging" },
-          { done: false, text: "<strong>Remove old DNS records</strong> - Clean up unused email configuration" },
-          { done: false, text: "<strong>Update documentation</strong> - Reflect current email setup" }
+          { done: false, text: "<strong>Remove debug output</strong> - Clean up contact form logging", owner: "tech" },
+          { done: false, text: "<strong>Remove old DNS records</strong> - Clean up unused email configuration", owner: "tech" },
+          { done: false, text: "<strong>Update documentation</strong> - Reflect current email setup", owner: "tech" }
         ]
       },
       {
         title: "Phase 1: PayPal Setup",
         description: "Configure PayPal to accept membership dues. Need business account access and pricing decisions.",
         tasks: [
-          { done: false, text: "<strong>PayPal Business account</strong> - Log in or upgrade to business", help: true },
-          { done: false, text: "<strong>Developer credentials</strong> - Create app for payment processing" },
-          { done: false, text: "<strong>Set membership pricing tiers</strong>", help: true, subtasks: [
-            { done: false, text: "Individual membership ($XX/year)" },
-            { done: false, text: "Family membership ($XX/year)" },
-            { done: false, text: "Lifetime membership ($XXX one-time)" }
+          { done: false, text: "<strong>PayPal Business account</strong> - Log in or upgrade to business", owner: "board" },
+          { done: false, text: "<strong>Developer credentials</strong> - Create app for payment processing", owner: "tech" },
+          { done: false, text: "<strong>Set membership pricing tiers</strong>", owner: "board", subtasks: [
+            { done: false, text: "Individual membership ($XX/year)", owner: "board" },
+            { done: false, text: "Family membership ($XX/year)", owner: "board" },
+            { done: false, text: "Lifetime membership ($XXX one-time)", owner: "board" }
           ]},
-          { done: false, text: "<strong>Configure payment notifications</strong> - Webhook setup" }
+          { done: false, text: "<strong>Configure payment notifications</strong> - Webhook setup", owner: "tech" }
         ]
       },
       {
         title: "Phase 2: Database Setup",
         description: "Create secure storage for member records. Technical work - no board input needed.",
         tasks: [
-          { done: false, text: "<strong>Choose storage solution</strong> - Database for member records" },
-          { done: false, text: "<strong>Design member data structure</strong>", subtasks: [
-            { done: false, text: "Member ID, Name, Email" },
-            { done: false, text: "Username and PIN" },
-            { done: false, text: "Membership type and dates" },
-            { done: false, text: "Payment transaction reference" },
-            { done: false, text: "Status (active, expired, pending)" }
+          { done: false, text: "<strong>Choose storage solution</strong> - Database for member records", owner: "tech" },
+          { done: false, text: "<strong>Design member data structure</strong>", owner: "tech", subtasks: [
+            { done: false, text: "Member ID, Name, Email", owner: "tech" },
+            { done: false, text: "Username and PIN", owner: "tech" },
+            { done: false, text: "Membership type and dates", owner: "tech" },
+            { done: false, text: "Payment transaction reference", owner: "tech" },
+            { done: false, text: "Status (active, expired, pending)", owner: "tech" }
           ]},
-          { done: false, text: "<strong>Create database</strong> - Set up tables" },
-          { done: false, text: "<strong>Connect to website</strong> - Database integration" }
+          { done: false, text: "<strong>Create database</strong> - Set up tables", owner: "tech" },
+          { done: false, text: "<strong>Connect to website</strong> - Database integration", owner: "tech" }
         ]
       },
       {
         title: "Phase 3: Enrollment Flow",
         description: "Build the new member signup experience - from selecting a tier to receiving login credentials.",
         tasks: [
-          { done: false, text: "<strong>Create signup page</strong>", subtasks: [
-            { done: false, text: "Membership tier selection" },
-            { done: false, text: "Personal info form (name, email, phone)" },
-            { done: false, text: "Terms & conditions checkbox" }
+          { done: false, text: "<strong>Create signup page</strong>", owner: "tech", subtasks: [
+            { done: false, text: "Membership tier selection", owner: "tech" },
+            { done: false, text: "Personal info form (name, email, phone)", owner: "tech" },
+            { done: false, text: "Terms & conditions checkbox", owner: "tech" }
           ]},
-          { done: false, text: "<strong>Build enrollment backend</strong>", subtasks: [
-            { done: false, text: "Payment initiation" },
-            { done: false, text: "Payment confirmation handling" },
-            { done: false, text: "Return page after payment" }
+          { done: false, text: "<strong>Build enrollment backend</strong>", owner: "tech", subtasks: [
+            { done: false, text: "Payment initiation", owner: "tech" },
+            { done: false, text: "Payment confirmation handling", owner: "tech" },
+            { done: false, text: "Return page after payment" , owner: "tech" }
           ]},
-          { done: false, text: "<strong>Add PayPal checkout button</strong>" },
-          { done: false, text: "<strong>Generate member credentials</strong> - Username and PIN" },
-          { done: false, text: "<strong>Store new members</strong> - Save to database after payment" },
-          { done: false, text: "<strong>Send welcome email</strong> - Include login credentials" }
+          { done: false, text: "<strong>Add PayPal checkout button</strong>", owner: "tech" },
+          { done: false, text: "<strong>Generate member credentials</strong> - Username and PIN", owner: "tech" },
+          { done: false, text: "<strong>Store new members</strong> - Save to database after payment", owner: "tech" },
+          { done: false, text: "<strong>Send welcome email</strong> - Include login credentials", owner: "tech" }
         ]
       },
       {
         title: "Phase 4: Member Portal Updates",
         description: "Connect the existing member login and certificate pages to real member data.",
         tasks: [
-          { done: false, text: "<strong>Update login system</strong> - Connect to real database" },
-          { done: false, text: "<strong>Replace demo data</strong> - Use actual member records" },
-          { done: false, text: "<strong>Build authentication endpoint</strong> - Login verification" },
-          { done: false, text: "<strong>Update certificate page</strong> - Pull real member data" },
-          { done: false, text: "<strong>Update QR scanner</strong> - Verify against database" }
+          { done: false, text: "<strong>Update login system</strong> - Connect to real database", owner: "tech" },
+          { done: false, text: "<strong>Replace demo data</strong> - Use actual member records", owner: "tech" },
+          { done: false, text: "<strong>Build authentication endpoint</strong> - Login verification", owner: "tech" },
+          { done: false, text: "<strong>Update certificate page</strong> - Pull real member data", owner: "tech" },
+          { done: false, text: "<strong>Update QR scanner</strong> - Verify against database", owner: "tech" }
         ]
       },
       {
         title: "Phase 5: Admin Features",
         description: "Tools for board members to manage membership - view roster, export lists, send reminders.",
         tasks: [
-          { done: false, text: "<strong>Admin dashboard</strong> - View all members", help: true },
-          { done: false, text: "<strong>Member management</strong> - Add, edit, remove members" },
-          { done: false, text: "<strong>Export member list</strong> - CSV download", help: true },
-          { done: false, text: "<strong>Renewal reminders</strong> - Automated emails" },
-          { done: false, text: "<strong>Payment history</strong> - View transaction records" }
+          { done: false, text: "<strong>Admin dashboard</strong> - View all members", owner: "tech" },
+          { done: false, text: "<strong>Member management</strong> - Add, edit, remove members", owner: "tech" },
+          { done: false, text: "<strong>Export member list</strong> - CSV download", owner: "tech" },
+          { done: false, text: "<strong>Renewal reminders</strong> - Automated emails", owner: "tech" },
+          { done: false, text: "<strong>Payment history</strong> - View transaction records", owner: "tech" },
+          { done: false, text: "<strong>Send current membership roster</strong> - Need existing member list to import", owner: "board" }
         ]
       },
       {
         title: "Phase 6: QuickBooks Integration",
         description: "Sync new members to QuickBooks automatically. Treasurer needs to set up QB side first.",
         tasks: [
-          { done: true, text: "<strong>Integration approach decided</strong> - Website syncs to QuickBooks automatically" },
-          { done: false, text: "<strong>QuickBooks setup (Treasurer)</strong>", help: true, subtasks: [
-            { done: false, text: "Ensure QuickBooks Online subscription (Plus or Advanced)" },
-            { done: false, text: "Set up Customer list structure for members" },
-            { done: false, text: "Create Products/Services for membership tiers" },
-            { done: false, text: "Set up recurring invoices template" },
-            { done: false, text: "Decide: QuickBooks Payments vs PayPal vs both" }
+          { done: true, text: "<strong>Integration approach decided</strong> - Website syncs to QuickBooks automatically", owner: "tech" },
+          { done: false, text: "<strong>QuickBooks setup</strong>", owner: "treasurer", subtasks: [
+            { done: false, text: "Ensure QuickBooks Online subscription (Plus or Advanced)", owner: "treasurer" },
+            { done: false, text: "Set up Customer list structure for members", owner: "treasurer" },
+            { done: false, text: "Create Products/Services for membership tiers", owner: "treasurer" },
+            { done: false, text: "Set up recurring invoices template", owner: "treasurer" },
+            { done: false, text: "Decide: QuickBooks Payments vs PayPal vs both", owner: "board" }
           ]},
-          { done: false, text: "<strong>QuickBooks API setup</strong> - Developer portal credentials" },
-          { done: false, text: "<strong>Build sync endpoints</strong> - Connect website to QuickBooks" },
-          { done: false, text: "<strong>Map data fields</strong>", subtasks: [
-            { done: false, text: "Member Name to Customer DisplayName" },
-            { done: false, text: "Email to PrimaryEmailAddr" },
-            { done: false, text: "Membership Type to custom field" },
-            { done: false, text: "Expiration Date to custom field" }
+          { done: false, text: "<strong>QuickBooks API setup</strong> - Developer portal credentials", owner: "tech" },
+          { done: false, text: "<strong>Build sync endpoints</strong> - Connect website to QuickBooks", owner: "tech" },
+          { done: false, text: "<strong>Map data fields</strong>", owner: "tech", subtasks: [
+            { done: false, text: "Member Name to Customer DisplayName", owner: "tech" },
+            { done: false, text: "Email to PrimaryEmailAddr", owner: "tech" },
+            { done: false, text: "Membership Type to custom field", owner: "tech" },
+            { done: false, text: "Expiration Date to custom field", owner: "tech" }
           ]}
         ]
       },
@@ -426,9 +490,9 @@
         title: "Future Improvements",
         description: "Nice-to-have enhancements after core functionality is complete. Low priority for now.",
         tasks: [
-          { done: false, text: "<strong>Spam protection</strong> - Add CAPTCHA to contact form" },
-          { done: false, text: "<strong>Email confirmation</strong> - Confirm contact form submissions" },
-          { done: false, text: "<strong>Rate limiting</strong> - Prevent form abuse" }
+          { done: false, text: "<strong>Spam protection</strong> - Add CAPTCHA to contact form", owner: "tech" },
+          { done: false, text: "<strong>Email confirmation</strong> - Confirm contact form submissions", owner: "tech" },
+          { done: false, text: "<strong>Rate limiting</strong> - Prevent form abuse", owner: "tech" }
         ]
       }
     ];
@@ -444,12 +508,22 @@
       return `mailto:${BOARD_EMAIL}?subject=${subject}&body=${body}`;
     }
 
+    // Helper to get owner tag HTML
+    function getOwnerTag(owner) {
+      const labels = {
+        board: 'Board',
+        treasurer: 'Treasurer',
+        tech: 'Tech'
+      };
+      return owner ? `<span class="owner-tag ${owner}">${labels[owner] || owner}</span>` : '';
+    }
+
     // Render phases
     function renderPhases() {
       const container = document.getElementById('phasesContainer');
       let totalTasks = 0;
       let completedTasks = 0;
-      let helpWanted = 0;
+      let boardTasks = 0;
 
       phases.forEach((phase, index) => {
         const phaseEl = document.createElement('div');
@@ -462,11 +536,12 @@
         phase.tasks.forEach(task => {
           phaseTotal++;
           if (task.done) phaseDone++;
-          if (task.help) helpWanted++;
+          if (!task.done && (task.owner === 'board' || task.owner === 'treasurer')) boardTasks++;
           if (task.subtasks) {
             task.subtasks.forEach(sub => {
               phaseTotal++;
               if (sub.done) phaseDone++;
+              if (!sub.done && (sub.owner === 'board' || sub.owner === 'treasurer')) boardTasks++;
             });
           }
         });
@@ -479,13 +554,14 @@
         phase.tasks.forEach(task => {
           const checkIcon = task.done ? '&#10003;' : '&#9675;';
           const checkClass = task.done ? 'done' : '';
-          const helpTag = task.help ? '<span class="help-tag">Help Wanted</span>' : '';
+          const ownerTag = getOwnerTag(task.owner);
+          const ownerClass = task.owner ? `owner-${task.owner}` : '';
           const mailtoLink = createMailtoLink(task.text, phase.title);
 
           tasksHtml += `
-            <a href="${mailtoLink}" class="task-item" title="Click to email info about this task">
+            <a href="${mailtoLink}" class="task-item ${ownerClass}" title="Click to email info about this task">
               <span class="task-checkbox ${checkClass}">${checkIcon}</span>
-              <span class="task-text ${checkClass}">${task.text}${helpTag}</span>
+              <span class="task-text ${checkClass}">${task.text}${ownerTag}</span>
             </a>
           `;
 
@@ -493,11 +569,13 @@
             task.subtasks.forEach(sub => {
               const subCheckIcon = sub.done ? '&#10003;' : '&#9675;';
               const subCheckClass = sub.done ? 'done' : '';
+              const subOwnerTag = getOwnerTag(sub.owner);
+              const subOwnerClass = sub.owner ? `owner-${sub.owner}` : '';
               const subMailtoLink = createMailtoLink(sub.text, phase.title);
               tasksHtml += `
-                <a href="${subMailtoLink}" class="task-item" style="padding-left: 1.5rem;" title="Click to email info about this task">
+                <a href="${subMailtoLink}" class="task-item ${subOwnerClass}" style="padding-left: 1.5rem;" title="Click to email info about this task">
                   <span class="task-checkbox ${subCheckClass}">${subCheckIcon}</span>
-                  <span class="task-text ${subCheckClass}">${sub.text}</span>
+                  <span class="task-text ${subCheckClass}">${sub.text}${subOwnerTag}</span>
                 </a>
               `;
             });
@@ -529,7 +607,7 @@
       document.getElementById('totalTasks').textContent = totalTasks;
       document.getElementById('completedTasks').textContent = completedTasks;
       document.getElementById('remainingTasks').textContent = totalTasks - completedTasks;
-      document.getElementById('helpWanted').textContent = helpWanted;
+      document.getElementById('boardTasks').textContent = boardTasks;
     }
 
     // Toggle phase dropdowns

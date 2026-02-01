@@ -10,7 +10,7 @@ Irish Network New Orleans (IN-NOLA) community website with membership management
 **Live Site:** https://in-nola-demo-site.pages.dev (currently on Sean's Cloudflare)
 **Repo:** https://github.com/SMuggiNola/in-nola-demo-site
 
-**Status:** Pre-production POC - Events system is live and dynamic. Membership system still using demo data.
+**Status:** Pre-production POC - Events and Membership systems are dynamic with Cloudflare KV backend.
 
 ---
 
@@ -32,6 +32,18 @@ Irish Network New Orleans (IN-NOLA) community website with membership management
 ### Board Dashboard
 - Color-coded tasks by owner (Board=gold, Treasurer=purple, Tech=gray)
 - Clickable tasks open email drafts
+
+### Membership System (Completed This Session)
+- **Backend API** - `/api/members` with HMAC-SHA256 signed QR codes
+- **CSV Import** - `admin-import.html` for bulk member import
+- **QR Generator** - `admin-qr.html` for printable button QR codes
+- **Static QR Codes** - Only contain member ID + signature (no expiration)
+  - Same QR works forever - renewal just updates database
+  - Real-time status lookup at scan time
+- **Member Login** - Username + 6-digit PIN (auto-generated at import)
+- **KV Namespace:** `MEMBERS_KV` (needs to be created)
+- **Required Secret:** `MEMBER_SECRET` (32+ random chars for HMAC signing)
+- **Admin PINs:** Same board member PINs as events (101010, 202020, etc.)
 
 ---
 
@@ -111,9 +123,9 @@ All [SEAN] technical tasks - blocked until PayPal decisions made
 
 ### Critical Issues (Must Fix Before Live)
 1. **Hardcoded credentials** - Board login in source (`admin-portal/index.html:127-128`)
-2. **Demo member data** - Passwords/PINs visible (`membership-tools/js/members-data.js`)
+2. ~~**Demo member data** - Passwords/PINs visible~~ FIXED - moved to backend KV
 3. **XSS vulnerability** - Contact form email template (`functions/api/contact.js:67-75`)
-4. **No real auth** - Using localStorage/sessionStorage flags
+4. **No real auth** - Using localStorage/sessionStorage flags (member login now uses backend API)
 5. **CORS too open** - `Access-Control-Allow-Origin: *`
 
 ### High Priority Fixes
@@ -146,9 +158,12 @@ in-nola-demo/
 ├── functions/api/          # Cloudflare Pages Functions
 │   ├── contact.js          # Contact form handler
 │   ├── events.js           # Events CRUD API
-│   └── events-seed.js      # One-time event seeding
+│   ├── events-seed.js      # One-time event seeding
+│   └── members.js          # Members API (import, login, verify, QR batch)
 ├── js/                     # Main site JavaScript
-├── membership-tools/       # Member login, certificate, QR scanner
+├── membership-tools/       # Member login, certificate, QR scanner, admin tools
+│   ├── admin-import.html   # CSV roster import
+│   ├── admin-qr.html       # Printable QR code generator
 ├── Our-Village/
 │   └── Events-Page/        # Dynamic events system
 │       ├── index.html      # Main events page
@@ -207,3 +222,30 @@ fetch('/api/events').then(r => r.json()).then(console.log)
 - Namespace created: `INNOLA_EVENTS`
 - Binding configured: `EVENTS_KV`
 - Events seeded via `/api/events-seed`
+
+### Session: February 2025
+**Completed:**
+- Built membership backend API (`functions/api/members.js`)
+  - POST `/api/members/import` - CSV roster import with auto-generated usernames/PINs
+  - POST `/api/members/login` - Member authentication
+  - GET `/api/members/verify?id=X&sig=Y` - QR code verification (real-time status)
+  - GET `/api/members?adminPin=X` - List all members (admin)
+  - POST `/api/members/qr/batch` - Generate QR data for selected members
+- Created admin import page (`admin-import.html`)
+- Created admin QR generator page (`admin-qr.html`)
+- Updated auth.js to use backend API instead of client-side data
+- Updated scanner.js to verify via API
+- Updated certificate.js to use server-generated signatures
+- Changed login from email/password to username/PIN
+- Deleted client-side member database (`members-data.js`)
+
+**Membership KV Setup Needed:**
+1. Create KV namespace: `MEMBERS_KV`
+2. Add binding in wrangler.toml or Cloudflare dashboard
+3. Add secret: `MEMBER_SECRET` (32+ random chars)
+
+**CSV Import Format:**
+```csv
+name,email,memberType,joinDate,expirationDate
+John Murphy,john@example.com,Individual,2025-01-15,2027-01-15
+```

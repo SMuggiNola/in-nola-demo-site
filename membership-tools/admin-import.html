@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Members - IN-NOLA Admin</title>
+    <link rel="stylesheet" href="css/membership.css">
+    <style>
+        .container {
+            max-width: 600px;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--glass-border);
+            border-radius: var(--radius);
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+
+        .file-upload:hover {
+            border-color: var(--gold);
+            background: var(--glass-hover);
+        }
+
+        .file-upload.has-file {
+            border-color: var(--success-green);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .file-upload-text strong {
+            color: var(--gold);
+        }
+
+        .file-name {
+            margin-top: 12px;
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .csv-preview {
+            background: var(--glass);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .csv-format {
+            background: var(--glass);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+
+        .csv-format h3 {
+            color: var(--gold);
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .csv-format code {
+            display: block;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            color: var(--text-secondary);
+        }
+
+        .results-section {
+            margin-top: 24px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .results-table th {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .results-table td {
+            color: var(--text-secondary);
+        }
+
+        .results-table .credential {
+            font-family: monospace;
+            background: rgba(212, 167, 38, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--gold);
+        }
+
+        .skipped-list {
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .skipped-list h4 {
+            color: var(--warning-orange);
+            margin-bottom: 8px;
+        }
+
+        .skipped-list p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .summary {
+            text-align: center;
+            padding: 20px;
+            background: var(--glass);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+
+        .summary .count {
+            font-size: 2rem;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .summary .label {
+            color: var(--text-secondary);
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .nav-links a {
+            color: var(--gold);
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="portal-header">
+            <h1>Irish Network NOLA</h1>
+            <p class="subtitle">Member Import</p>
+        </header>
+
+        <!-- PIN Entry -->
+        <div id="pinSection" class="celtic-border card">
+            <div id="pinMessage" class="message"></div>
+
+            <form id="pinForm" class="pin-entry">
+                <div class="form-group">
+                    <label for="pin">Enter Admin PIN</label>
+                    <input type="password" id="pin" name="pin"
+                           pattern="[0-9]*" inputmode="numeric"
+                           maxlength="6" required
+                           placeholder="******" autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Access Import</button>
+            </form>
+        </div>
+
+        <!-- Import Section -->
+        <div id="importSection" class="celtic-border card" style="display: none;">
+            <div id="importMessage" class="message"></div>
+
+            <div class="csv-format">
+                <h3>CSV Format Required</h3>
+                <code>name,email,memberType,joinDate,expirationDate
+John Murphy,john@example.com,Individual,2025-01-15,2027-01-15
+"Mary O'Connor",mary@example.com,Family,2025-02-20,2027-02-20</code>
+            </div>
+
+            <form id="importForm">
+                <label class="file-upload" id="fileUpload">
+                    <input type="file" id="csvFile" accept=".csv,text/csv">
+                    <div class="file-upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        CSV file only
+                    </div>
+                    <div class="file-name" id="fileName" style="display: none;"></div>
+                </label>
+
+                <div id="csvPreview" class="csv-preview" style="display: none;"></div>
+
+                <button type="submit" class="btn btn-primary" id="importBtn" disabled>
+                    Import Members
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Importing members...</p>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsSection" class="results-section" style="display: none;">
+                <div class="summary">
+                    <div class="count" id="importedCount">0</div>
+                    <div class="label">Members Imported</div>
+                </div>
+
+                <div id="importedList"></div>
+
+                <div id="skippedSection" class="skipped-list" style="display: none;">
+                    <h4>Skipped (already exist)</h4>
+                    <div id="skippedList"></div>
+                </div>
+
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 20px;" onclick="resetImport()">
+                    Import More
+                </button>
+            </div>
+
+            <div class="nav-links">
+                <a href="admin-qr.html">Generate QR Codes</a>
+                <a href="scanner.html">Scanner</a>
+                <a href="index.html">Member Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let adminPin = '';
+        let csvContent = '';
+
+        const pinSection = document.getElementById('pinSection');
+        const importSection = document.getElementById('importSection');
+        const pinForm = document.getElementById('pinForm');
+        const importForm = document.getElementById('importForm');
+        const pinMessage = document.getElementById('pinMessage');
+        const importMessage = document.getElementById('importMessage');
+        const csvFile = document.getElementById('csvFile');
+        const fileUpload = document.getElementById('fileUpload');
+        const fileName = document.getElementById('fileName');
+        const csvPreview = document.getElementById('csvPreview');
+        const importBtn = document.getElementById('importBtn');
+        const loading = document.getElementById('loading');
+        const resultsSection = document.getElementById('resultsSection');
+
+        // Check session
+        const savedPin = sessionStorage.getItem('innola_admin_pin');
+        if (savedPin) {
+            adminPin = savedPin;
+            showImportSection();
+        }
+
+        function showMessage(el, text, type) {
+            el.textContent = text;
+            el.className = 'message ' + type + ' show';
+        }
+
+        function hideMessage(el) {
+            el.className = 'message';
+        }
+
+        function showImportSection() {
+            pinSection.style.display = 'none';
+            importSection.style.display = 'block';
+            sessionStorage.setItem('innola_admin_pin', adminPin);
+        }
+
+        // PIN form
+        pinForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const pin = document.getElementById('pin').value;
+
+            // Validate PIN by attempting a list call
+            try {
+                const response = await fetch('/api/members?adminPin=' + encodeURIComponent(pin));
+                if (response.ok) {
+                    adminPin = pin;
+                    showMessage(pinMessage, 'Access granted!', 'success');
+                    setTimeout(showImportSection, 500);
+                } else {
+                    showMessage(pinMessage, 'Invalid PIN', 'error');
+                }
+            } catch (err) {
+                // Fallback for local development - check known PINs
+                const validPins = ['101010', '202020', '303030', '404040', '505050', '606060'];
+                if (validPins.includes(pin)) {
+                    adminPin = pin;
+                    showMessage(pinMessage, 'Access granted!', 'success');
+                    setTimeout(showImportSection, 500);
+                } else {
+                    showMessage(pinMessage, 'Invalid PIN', 'error');
+                }
+            }
+        });
+
+        // File upload
+        csvFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                csvContent = e.target.result;
+                fileName.textContent = file.name;
+                fileName.style.display = 'block';
+                fileUpload.classList.add('has-file');
+
+                // Preview first few lines
+                const lines = csvContent.split('\n').slice(0, 5);
+                csvPreview.textContent = lines.join('\n') + (csvContent.split('\n').length > 5 ? '\n...' : '');
+                csvPreview.style.display = 'block';
+
+                importBtn.disabled = false;
+            };
+            reader.readAsText(file);
+        });
+
+        // Drag and drop
+        fileUpload.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUpload.style.borderColor = 'var(--gold)';
+        });
+
+        fileUpload.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            if (!fileUpload.classList.contains('has-file')) {
+                fileUpload.style.borderColor = '';
+            }
+        });
+
+        fileUpload.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                csvFile.files = e.dataTransfer.files;
+                csvFile.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Import form
+        importForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!csvContent) return;
+
+            hideMessage(importMessage);
+            importForm.style.display = 'none';
+            loading.classList.add('show');
+
+            try {
+                const response = await fetch('/api/members/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        adminPin: adminPin,
+                        csv: csvContent
+                    })
+                });
+
+                const data = await response.json();
+
+                loading.classList.remove('show');
+
+                if (!response.ok) {
+                    importForm.style.display = 'block';
+                    showMessage(importMessage, data.error || 'Import failed', 'error');
+                    return;
+                }
+
+                // Show results
+                showResults(data);
+
+            } catch (err) {
+                loading.classList.remove('show');
+                importForm.style.display = 'block';
+                showMessage(importMessage, 'Failed to connect to server. Make sure you are on the deployed site.', 'error');
+            }
+        });
+
+        function showResults(data) {
+            resultsSection.style.display = 'block';
+            document.getElementById('importedCount').textContent = data.imported.length;
+
+            // Build imported table
+            if (data.imported.length > 0) {
+                let html = '<table class="results-table"><thead><tr><th>Name</th><th>Username</th><th>PIN</th></tr></thead><tbody>';
+                for (const m of data.imported) {
+                    html += `<tr>
+                        <td>${escapeHtml(m.name)}</td>
+                        <td><span class="credential">${m.username}</span></td>
+                        <td><span class="credential">${m.pin}</span></td>
+                    </tr>`;
+                }
+                html += '</tbody></table>';
+                document.getElementById('importedList').innerHTML = html;
+            }
+
+            // Show skipped if any
+            if (data.skipped && data.skipped.length > 0) {
+                const skippedSection = document.getElementById('skippedSection');
+                skippedSection.style.display = 'block';
+
+                let html = '';
+                for (const s of data.skipped) {
+                    html += `<p>${escapeHtml(s.name)} (${escapeHtml(s.email)}) - ${s.reason}</p>`;
+                }
+                document.getElementById('skippedList').innerHTML = html;
+            }
+        }
+
+        function resetImport() {
+            csvContent = '';
+            csvFile.value = '';
+            fileName.style.display = 'none';
+            fileUpload.classList.remove('has-file');
+            csvPreview.style.display = 'none';
+            importBtn.disabled = true;
+            resultsSection.style.display = 'none';
+            document.getElementById('skippedSection').style.display = 'none';
+            importForm.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -18,15 +18,17 @@
 
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required
-                           placeholder="your.email@example.com" autocomplete="email">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required
+                           placeholder="e.g. jmurphy" autocomplete="username"
+                           autocapitalize="none">
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required
-                           placeholder="Enter your password" autocomplete="current-password">
+                    <label for="pin">PIN</label>
+                    <input type="password" id="pin" name="pin" required
+                           placeholder="6-digit PIN" autocomplete="current-password"
+                           pattern="[0-9]*" inputmode="numeric" maxlength="6">
                 </div>
 
                 <button type="submit" class="btn btn-primary">Sign In</button>
@@ -43,7 +45,6 @@
         </p>
     </div>
 
-    <script src="js/members-data.js"></script>
     <script src="js/auth.js"></script>
     <script>
         // Redirect if already logged in
@@ -72,34 +73,31 @@
             }
         }
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             hideMessage();
 
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value.trim();
+            const pin = document.getElementById('pin').value;
 
-            if (!email || !password) {
-                showMessage('Please enter both email and password', 'error');
+            if (!username || !pin) {
+                showMessage('Please enter both username and PIN', 'error');
                 return;
             }
 
             setLoading(true);
 
-            // Simulate network delay for realism
-            setTimeout(function() {
-                const result = window.Auth.login(email, password);
+            const result = await window.Auth.login(username, pin);
 
-                if (result.success) {
-                    showMessage('Login successful! Redirecting...', 'success');
-                    setTimeout(function() {
-                        window.location.href = 'certificate.html';
-                    }, 500);
-                } else {
-                    setLoading(false);
-                    showMessage(result.error, 'error');
-                }
-            }, 800);
+            if (result.success) {
+                showMessage('Login successful! Redirecting...', 'success');
+                setTimeout(function() {
+                    window.location.href = 'certificate.html';
+                }, 500);
+            } else {
+                setLoading(false);
+                showMessage(result.error, 'error');
+            }
         });
     </script>
 </body>

@@ -1,26 +1,20 @@
 /**
  * IN-NOLA Membership Portal - Certificate & QR Code Generation
+ * Uses server-generated QR signature from session
  */
 
 /**
- * Generate QR code data for a member
- * @param {Object} member - Member object
+ * Generate QR code data for a member using server signature
+ * Static QR format: only member ID + signature (no expiration)
+ * @param {Object} member - Member object with qrSignature from server
  * @returns {Object} QR data object
  */
 function generateQRData(member) {
-    const data = {
-        v: 1,                              // Version
-        id: member.id,                     // Member ID
-        n: member.name,                    // Name
-        e: member.expirationDate,          // Expiration date
-        t: Date.now()                      // Timestamp
+    return {
+        v: 1,                          // Version
+        id: member.id,                 // Member ID
+        sig: member.qrSignature        // Server-generated HMAC signature
     };
-
-    // Generate signature from core data
-    const sigData = data.id + '|' + data.e + '|' + data.t;
-    data.sig = window.MembersDB.generateSignature(sigData);
-
-    return data;
 }
 
 /**
@@ -92,7 +86,7 @@ function renderCertificate(member) {
     }
 
     // Check if membership is valid and show warning if expired
-    if (!window.MembersDB.isMembershipValid(member)) {
+    if (!window.Auth.isMembershipValid()) {
         const warningEl = document.createElement('div');
         warningEl.className = 'message error show';
         warningEl.textContent = 'Your membership has expired. Please renew to maintain benefits.';

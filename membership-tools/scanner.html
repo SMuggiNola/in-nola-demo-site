@@ -73,13 +73,15 @@
         </div>
     </div>
 
-    <script src="js/members-data.js"></script>
     <script src="js/scanner.js"></script>
     <script>
         const pinSection = document.getElementById('pinSection');
         const scannerSection = document.getElementById('scannerSection');
         const pinForm = document.getElementById('pinForm');
         const pinMessage = document.getElementById('pinMessage');
+
+        // Board member PINs for scanner access
+        const ADMIN_PINS = ['101010', '202020', '303030', '404040', '505050', '606060'];
 
         // Check if already authenticated (session storage for scanner)
         const scannerAuth = sessionStorage.getItem('innola_scanner_auth');
@@ -111,7 +113,7 @@
 
             const pin = document.getElementById('pin').value;
 
-            if (window.MembersDB.validateAdminPin(pin)) {
+            if (ADMIN_PINS.includes(pin)) {
                 showMessage('Access granted!', 'success');
                 setTimeout(showScanner, 500);
             } else {

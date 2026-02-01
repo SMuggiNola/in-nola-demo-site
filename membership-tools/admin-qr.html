@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate QR Codes - IN-NOLA Admin</title>
+    <link rel="stylesheet" href="css/membership.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        .container {
+            max-width: 800px;
+        }
+
+        .member-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--glass-border);
+            transition: var(--transition);
+        }
+
+        .member-item:hover {
+            background: var(--glass-hover);
+        }
+
+        .member-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: var(--gold);
+        }
+
+        .member-item .name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .member-item .type {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding: 2px 8px;
+            background: var(--glass);
+            border-radius: 4px;
+        }
+
+        .selection-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .selection-controls button {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .qr-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            break-inside: avoid;
+        }
+
+        .qr-card .qr-code {
+            margin-bottom: 12px;
+        }
+
+        .qr-card .qr-code canvas,
+        .qr-card .qr-code img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .qr-card .member-name {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.9rem;
+            color: var(--green-800);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .qr-card .member-type {
+            font-size: 0.75rem;
+            color: var(--green-700);
+        }
+
+        .qr-card .member-id {
+            font-size: 0.65rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            body::before,
+            body::after {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .container {
+                max-width: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .qr-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .qr-card {
+                border: 1px solid #ddd;
+                padding: 10px;
+                page-break-inside: avoid;
+            }
+
+            .qr-card .qr-code canvas,
+            .qr-card .qr-code img {
+                width: 100px !important;
+                height: 100px !important;
+            }
+        }
+
+        @media print and (orientation: landscape) {
+            .qr-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .nav-links a {
+            color: var(--gold);
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .count-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--green-900);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="portal-header no-print">
+            <h1>Irish Network NOLA</h1>
+            <p class="subtitle">QR Code Generator</p>
+        </header>
+
+        <!-- PIN Entry -->
+        <div id="pinSection" class="celtic-border card no-print">
+            <div id="pinMessage" class="message"></div>
+
+            <form id="pinForm" class="pin-entry">
+                <div class="form-group">
+                    <label for="pin">Enter Admin PIN</label>
+                    <input type="password" id="pin" name="pin"
+                           pattern="[0-9]*" inputmode="numeric"
+                           maxlength="6" required
+                           placeholder="******" autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Access QR Generator</button>
+            </form>
+        </div>
+
+        <!-- Member Selection Section -->
+        <div id="selectSection" class="celtic-border card no-print" style="display: none;">
+            <h2 style="color: var(--gold); margin-bottom: 16px;">
+                Select Members
+                <span class="count-badge" id="selectedCount">0</span>
+            </h2>
+
+            <div class="selection-controls">
+                <button class="btn btn-secondary" onclick="selectAll()">Select All</button>
+                <button class="btn btn-secondary" onclick="selectNone()">Select None</button>
+            </div>
+
+            <div class="member-list" id="memberList">
+                <div class="empty-state">Loading members...</div>
+            </div>
+
+            <button class="btn btn-primary" id="generateBtn" disabled onclick="generateQRCodes()">
+                Generate QR Codes
+            </button>
+
+            <div class="nav-links">
+                <a href="admin-import.html">Import Members</a>
+                <a href="scanner.html">Scanner</a>
+                <a href="index.html">Member Login</a>
+            </div>
+        </div>
+
+        <!-- QR Output Section -->
+        <div id="qrSection" style="display: none;">
+            <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="window.print()">Print QR Codes</button>
+                <button class="btn btn-secondary" onclick="backToSelect()">Back to Selection</button>
+            </div>
+
+            <div class="qr-grid" id="qrGrid"></div>
+        </div>
+
+        <div class="loading no-print" id="loading">
+            <div class="spinner"></div>
+            <p>Generating QR codes...</p>
+        </div>
+    </div>
+
+    <script>
+        let adminPin = '';
+        let members = [];
+        let selectedIds = new Set();
+
+        const pinSection = document.getElementById('pinSection');
+        const selectSection = document.getElementById('selectSection');
+        const qrSection = document.getElementById('qrSection');
+        const pinForm = document.getElementById('pinForm');
+        const pinMessage = document.getElementById('pinMessage');
+        const memberList = document.getElementById('memberList');
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const qrGrid = document.getElementById('qrGrid');
+
+        // Check session
+        const savedPin = sessionStorage.getItem('innola_admin_pin');
+        if (savedPin) {
+            adminPin = savedPin;
+            showSelectSection();
+        }
+
+        function showMessage(el, text, type) {
+            el.textContent = text;
+            el.className = 'message ' + type + ' show';
+        }
+
+        async function showSelectSection() {
+            pinSection.style.display = 'none';
+            selectSection.style.display = 'block';
+            sessionStorage.setItem('innola_admin_pin', adminPin);
+            await loadMembers();
+        }
+
+        // PIN form
+        pinForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const pin = document.getElementById('pin').value;
+
+            try {
+                const response = await fetch('/api/members?adminPin=' + encodeURIComponent(pin));
+                if (response.ok) {
+                    adminPin = pin;
+                    showMessage(pinMessage, 'Access granted!', 'success');
+                    setTimeout(showSelectSection, 500);
+                } else {
+                    showMessage(pinMessage, 'Invalid PIN', 'error');
+                }
+            } catch (err) {
+                // Fallback for local dev
+                const validPins = ['101010', '202020', '303030', '404040', '505050', '606060'];
+                if (validPins.includes(pin)) {
+                    adminPin = pin;
+                    showMessage(pinMessage, 'Access granted!', 'success');
+                    setTimeout(showSelectSection, 500);
+                } else {
+                    showMessage(pinMessage, 'Invalid PIN', 'error');
+                }
+            }
+        });
+
+        async function loadMembers() {
+            try {
+                const response = await fetch('/api/members?adminPin=' + encodeURIComponent(adminPin));
+                if (!response.ok) throw new Error('Failed to load');
+
+                const data = await response.json();
+                members = data.members || [];
+
+                renderMemberList();
+            } catch (err) {
+                memberList.innerHTML = '<div class="empty-state">Failed to load members. Make sure you are on the deployed site.</div>';
+            }
+        }
+
+        function renderMemberList() {
+            if (members.length === 0) {
+                memberList.innerHTML = '<div class="empty-state">No members found. <a href="admin-import.html" style="color: var(--gold);">Import members first</a>.</div>';
+                return;
+            }
+
+            let html = '';
+            for (const m of members) {
+                html += `
+                    <label class="member-item">
+                        <input type="checkbox" value="${m.id}" onchange="updateSelection()">
+                        <span class="name">${escapeHtml(m.name)}</span>
+                        <span class="type">${escapeHtml(m.memberType)}</span>
+                    </label>
+                `;
+            }
+            memberList.innerHTML = html;
+        }
+
+        function updateSelection() {
+            selectedIds.clear();
+            const checkboxes = memberList.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => selectedIds.add(cb.value));
+
+            document.getElementById('selectedCount').textContent = selectedIds.size;
+            generateBtn.disabled = selectedIds.size === 0;
+        }
+
+        function selectAll() {
+            memberList.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+            updateSelection();
+        }
+
+        function selectNone() {
+            memberList.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        async function generateQRCodes() {
+            if (selectedIds.size === 0) return;
+
+            selectSection.style.display = 'none';
+            loading.classList.add('show');
+
+            try {
+                const response = await fetch('/api/members/qr/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        adminPin: adminPin,
+                        memberIds: Array.from(selectedIds)
+                    })
+                });
+
+                const data = await response.json();
+                loading.classList.remove('show');
+
+                if (!response.ok) {
+                    alert(data.error || 'Failed to generate QR codes');
+                    selectSection.style.display = 'block';
+                    return;
+                }
+
+                renderQRCodes(data.qrData);
+                qrSection.style.display = 'block';
+
+            } catch (err) {
+                loading.classList.remove('show');
+                alert('Failed to connect to server');
+                selectSection.style.display = 'block';
+            }
+        }
+
+        function renderQRCodes(qrData) {
+            qrGrid.innerHTML = '';
+
+            for (const item of qrData) {
+                const card = document.createElement('div');
+                card.className = 'qr-card';
+
+                const qrDiv = document.createElement('div');
+                qrDiv.className = 'qr-code';
+
+                card.appendChild(qrDiv);
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'member-name';
+                nameDiv.textContent = item.name;
+                card.appendChild(nameDiv);
+
+                const typeDiv = document.createElement('div');
+                typeDiv.className = 'member-type';
+                typeDiv.textContent = item.memberType;
+                card.appendChild(typeDiv);
+
+                const idDiv = document.createElement('div');
+                idDiv.className = 'member-id';
+                idDiv.textContent = item.id;
+                card.appendChild(idDiv);
+
+                qrGrid.appendChild(card);
+
+                // Generate QR code
+                new QRCode(qrDiv, {
+                    text: item.qrString,
+                    width: 120,
+                    height: 120,
+                    colorDark: '#0d2818',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
+        }
+
+        function backToSelect() {
+            qrSection.style.display = 'none';
+            selectSection.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

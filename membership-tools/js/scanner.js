@@ -1,21 +1,22 @@
 /**
  * IN-NOLA Membership Portal - QR Scanner & Verification
+ * Uses backend API for verification
  */
 
 let html5QrCode = null;
 let isScanning = false;
 
 /**
- * Verify QR code data
+ * Verify QR code data via API
  * @param {string} qrString - Raw QR code string
- * @returns {Object} Verification result
+ * @returns {Promise<Object>} Verification result
  */
-function verifyQRData(qrString) {
+async function verifyQRData(qrString) {
     try {
         const data = JSON.parse(qrString);
 
-        // Check required fields
-        if (!data.v || !data.id || !data.n || !data.e || !data.t || !data.sig) {
+        // Check required fields for static QR format
+        if (!data.v || !data.id || !data.sig) {
             return {
                 valid: false,
                 status: 'invalid',
@@ -23,62 +24,29 @@ function verifyQRData(qrString) {
             };
         }
 
-        // Verify signature
-        const sigData = data.id + '|' + data.e + '|' + data.t;
-        if (!window.MembersDB.verifySignature(sigData, data.sig)) {
-            return {
-                valid: false,
-                status: 'invalid',
-                message: 'QR code signature is invalid - possible tampering'
-            };
-        }
+        // Call API to verify
+        const response = await fetch(
+            `/api/members/verify?id=${encodeURIComponent(data.id)}&sig=${encodeURIComponent(data.sig)}`
+        );
 
-        // Check if member exists
-        const member = window.MembersDB.findMemberById(data.id);
-        if (!member) {
-            return {
-                valid: false,
-                status: 'invalid',
-                message: 'Member not found in database'
-            };
-        }
-
-        // Check expiration
-        const expirationDate = new Date(data.e);
-        const today = new Date();
-
-        if (expirationDate < today) {
-            return {
-                valid: false,
-                status: 'expired',
-                message: 'Membership has expired',
-                member: {
-                    id: member.id,
-                    name: member.name,
-                    type: member.memberType,
-                    expiredOn: data.e
-                }
-            };
-        }
-
-        // Valid!
-        return {
-            valid: true,
-            status: 'valid',
-            message: 'Member in Good Standing',
-            member: {
-                id: member.id,
-                name: member.name,
-                type: member.memberType,
-                validUntil: data.e
-            }
-        };
+        const result = await response.json();
+        return result;
 
     } catch (e) {
+        // Check if it's a JSON parse error
+        if (e instanceof SyntaxError) {
+            return {
+                valid: false,
+                status: 'invalid',
+                message: 'Could not read QR code data'
+            };
+        }
+
+        // Network error
         return {
             valid: false,
-            status: 'invalid',
-            message: 'Could not read QR code data'
+            status: 'error',
+            message: 'Cannot connect to verification server'
         };
     }
 }
@@ -113,13 +81,14 @@ function showResult(result) {
     // Set icon
     switch (result.status) {
         case 'valid':
-            iconEl.textContent = '✓';
+            iconEl.textContent = '\u2713';
             break;
         case 'expired':
-            iconEl.textContent = '⚠';
+            iconEl.textContent = '\u26A0';
             break;
         case 'invalid':
-            iconEl.textContent = '✗';
+        case 'error':
+            iconEl.textContent = '\u2717';
             break;
     }
 
@@ -129,9 +98,9 @@ function showResult(result) {
     // Set member info if available
     if (result.member) {
         let html = `
-            <p><strong>Name:</strong> ${result.member.name}</p>
-            <p><strong>ID:</strong> ${result.member.id}</p>
-            <p><strong>Type:</strong> ${result.member.type}</p>
+            <p><strong>Name:</strong> ${escapeHtml(result.member.name)}</p>
+            <p><strong>ID:</strong> ${escapeHtml(result.member.id)}</p>
+            <p><strong>Type:</strong> ${escapeHtml(result.member.type)}</p>
         `;
 
         if (result.status === 'valid') {
@@ -157,15 +126,24 @@ function hideResult() {
 }
 
 /**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
  * QR code scan success callback
  * @param {string} decodedText - Decoded QR code text
  */
-function onScanSuccess(decodedText) {
+async function onScanSuccess(decodedText) {
     // Stop scanning
     stopScanner();
 
     // Verify and display result
-    const result = verifyQRData(decodedText);
+    const result = await verifyQRData(decodedText);
     showResult(result);
 
     // Play sound feedback (if available)

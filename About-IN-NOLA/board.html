@@ -6,6 +6,156 @@
   <title>Board of Directors | Irish Network NOLA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../global.css">
+
+  <style>
+    .board-grid {
+      display: grid;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .board-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--gold-muted);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .board-card:hover {
+      border-color: var(--gold-primary);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.25rem;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header:hover {
+      background: rgba(212, 168, 75, 0.1);
+    }
+
+    .member-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--gold-primary);
+      flex-shrink: 0;
+    }
+
+    .member-initials {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-muted) 0%, var(--gold-dark) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: bold;
+      color: #1a1a1a;
+      flex-shrink: 0;
+      border: 3px solid var(--gold-primary);
+    }
+
+    .member-header-info {
+      flex: 1;
+    }
+
+    .member-role {
+      font-size: 0.85rem;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.25rem;
+    }
+
+    .member-name {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      margin: 0;
+    }
+
+    .expand-icon {
+      color: var(--gold-muted);
+      font-size: 1.5rem;
+      transition: transform 0.3s;
+    }
+
+    .board-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .card-content {
+      display: none;
+      padding: 1.25rem;
+      border-top: 1px solid var(--gold-muted);
+    }
+
+    .board-card.expanded .card-content {
+      display: block;
+    }
+
+    .member-email {
+      color: var(--gold-primary);
+      margin-bottom: 1rem;
+    }
+
+    .member-email a {
+      color: var(--gold-primary);
+    }
+
+    .member-bio {
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+
+    .edit-link {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.5rem 1rem;
+      background: rgba(212, 168, 75, 0.1);
+      border: 1px solid var(--gold-muted);
+      border-radius: 4px;
+      color: var(--gold-light);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .edit-link:hover {
+      background: rgba(212, 168, 75, 0.2);
+      border-color: var(--gold-primary);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--gold-muted);
+      border-top-color: var(--gold-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 
 <body>
@@ -18,104 +168,20 @@
       <h1>Board of Directors</h1>
       <p>Meet the leadership team guiding the mission and work of Irish Network NOLA.</p>
 
-      <!-- PRESIDENT -->
-      <details class="board-member">
-        <summary>President</summary>
-        <div class="member-content">
-          <p><strong>Name:</strong> Shannon Kelly</p>
-          <p><strong>Email:</strong> [email@example.com]</p>
-          <p><strong>Bio:</strong> Shannon Kelly is a passionate advocate for Irish culture. Her father, a native of Co.
-Clare, Ireland, encouraged her to begin studying Irish music and dance at age seven.
-She has since competed and performed across the United States and internationally
-with her harp, fiddle, and dance shoes. Her mother was born in a small village in Brazil,
-inspiring Shannon’s lifelong appreciation for diversity and cultural exchange.
-
-Since moving to New Orleans in 2019, Shannon has worked as a civil engineer while
-dedicating herself to strengthening and growing the local Irish community, promoting
-cultural awareness, and educating the city’s diverse population about Irish heritage and
-traditions.</p>
+      <!-- Board Members Grid -->
+      <div id="board-grid" class="board-grid">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>Loading board members...</p>
         </div>
-      </details>
+      </div>
 
-      <!-- VICE PRESIDENT -->
-      <details class="board-member">
-        <summary>Vice President</summary>
-        <div class="member-content">
-          <p><strong>Name:</strong> Erin Marjorie</p>
-          <p><strong>Email:</strong> [email@example.com]</p>
-          <p><strong>Bio:</strong> Erin is a luxury travel advisor and small business owner with over 11 years of
-experience designing personalized, high-end travel experiences for clients worldwide. A
-devoted mother, avid traveler, and passionate foodie, she brings creativity, curiosity, and
-care to every journey she curates.
-
-Outside of her work on the board of the Irish Network New Orleans, she is an active
-member of two Mardi Gras krewes and expresses her creativity each year by designing
-her own Mardi Gras costumes.
-
-In addition to her travel work, Erin has served for more than 13 years as a doula and
-natural childbirth educator, supporting families through life-changing moments. She is
-guided by a belief in lifelong learning in all aspects of her life.</p>
-        </div>
-      </details>
-
-      <!-- GRANT MANAGER -->
-      <details class="board-member">
-        <summary>Grant Manager</summary>
-        <div class="member-content">
-          <p><strong>Name:</strong> Andrew Jones</p>
-          <p><strong>Email:</strong> [email@example.com]</p>
-          <p><strong>Bio:</strong> Andrew Jones joined the board of Irish Network New Orleans in 2025. A Gulf Coast
-native, Andrew moved to New Orleans in 2011. Andrew attended Tulane University,
-earning a master’s degree with research focused on the history of the Irish in New
-Orleans in the early 20 th century. He currently works for Tulane University as a curator
-with the university’s ichthyological research collection and is pursuing a degree at
-Harvard University in Museum Studies. He continues to research and write on the Irish
-in New Orleans. In addition to his work with the Irish Network, Andrew is a riding
-member of the Krewe of Tucks.</p>
-        </div>
-      </details>
-
-      <!-- TREASURER -->
-      <details class="board-member">
-        <summary>Treasurer</summary>
-        <div class="member-content">
-          <p><strong>Name:</strong> Joni Muggivan</p>
-          <p><strong>Email:</strong> [email@example.com]</p>
-          <p><strong>Bio:</strong> A lifelong resident of the Greater New Orleans area, Joni Muggivan began her Irish  │
-│    dance career at the age of four. She became a championship dancer and was the first dancer from Louisiana to       │
-│    compete in the World Championships in Ireland. As a certified Irish Dance Teacher (TCRG) with over 20 years of     │
-│    experience, she founded and operates the Muggivan School of Irish Dance. An active member of Irish Network New     │
-│    Orleans for nearly a decade, she has organized numerous Irish cultural events, including the city's Irish Famine   │
-│    Commemoration. Additionally, Joni has served as a professional tax expert for a number of years, bringing valuable │
-│    financial acumen to the board.</p>
-        </div>
-      </details>
-      
-
-      <!-- EVENT COORDINATOR -->
-      <details class="board-member">
-        <summary>Event Coordinator</summary>
-        <div class="member-content">
-          <p><strong>Name:</strong> Colm Kennedy</p>
-          <p><strong>Email:</strong> [email@example.com]</p>
-          <p><strong>Bio Placeholder:</strong> Details about event planning experience, community engagement, and contributions to IN-NOLA events.</p>
-        </div>
-      </details>
-
-      <!-- DATA Manager & AI STRATEGist -->
-      <details class="board-member">
-        <summary><strong>Data Manager & AI Strategist</strong></summary>
-        <div class="member-content">
-          <p><strong>Name:</strong> Seán Muggivan, LCSW</p>
-          <p><strong>Email:</strong> muggs@muggsofdatasci.net</p>
-
-          <p><strong>Bio:</strong> Seán Muggivan, LCSW, is a Licensed Clinical Social Worker and longtime New Orleans public school educator with over a decade of experience. As Data Manager & AI Strategist, he manages IN-NOLA’s digital infrastructure and web presence, developing data tools and member-facing resources. He focuses on building accessible digital infrastructure, responsible offline AI tools, and community-centered data systems that strengthen and share the Irish cultural legacy in New Orleans.</p>
-        </div>
-      </details>
+      <!-- Edit Link for Board Members -->
+      <a href="./board-edit.html" class="edit-link">Board Member? Edit Your Profile &rarr;</a>
 
       <!-- RETURN LINK -->
       <div class="back-link" style="margin-top:2rem;">
-        <a href="./index.html">← Return to About IN-NOLA</a>
+        <a href="./index.html">&larr; Return to About IN-NOLA</a>
       </div>
 
     </main>
@@ -124,6 +190,87 @@ member of the Krewe of Tucks.</p>
   </div>
 
   <script src="../js/main.js"></script>
+
+  <script>
+    // Fallback data in case API is unavailable
+    const fallbackMembers = [
+      { id: 'shannon', name: 'Shannon Kelly', role: 'President', email: '', bio: 'Shannon Kelly is a passionate advocate for Irish culture...', photo: '' },
+      { id: 'erin', name: 'Erin Marjorie', role: 'Vice President', email: '', bio: 'Erin is a luxury travel advisor and small business owner...', photo: '' },
+      { id: 'andrew', name: 'Andrew Jones', role: 'Grant Manager', email: '', bio: 'Andrew Jones joined the board of Irish Network New Orleans in 2025...', photo: '' },
+      { id: 'joni', name: 'Joni Muggivan', role: 'Treasurer', email: '', bio: 'A lifelong resident of the Greater New Orleans area...', photo: '' },
+      { id: 'colm', name: 'Colm Kennedy', role: 'Event Coordinator', email: '', bio: 'Details about event planning experience...', photo: '' },
+      { id: 'sean', name: 'Seán Muggivan, LCSW', role: 'Data Manager & AI Strategist', email: 'muggs@muggsofdatasci.net', bio: 'Seán Muggivan, LCSW, is a Licensed Clinical Social Worker...', photo: '' }
+    ];
+
+    function getInitials(name) {
+      return name
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('')
+        .substring(0, 2)
+        .toUpperCase();
+    }
+
+    function renderMember(member) {
+      const initials = getInitials(member.name);
+      const photoHtml = member.photo
+        ? `<img src="${member.photo}" alt="${member.name}" class="member-photo" onerror="this.outerHTML='<div class=\\'member-initials\\'>${initials}</div>'">`
+        : `<div class="member-initials">${initials}</div>`;
+
+      const emailHtml = member.email
+        ? `<p class="member-email"><a href="mailto:${member.email}">${member.email}</a></p>`
+        : '';
+
+      return `
+        <div class="board-card" data-member-id="${member.id}">
+          <div class="card-header" onclick="toggleCard('${member.id}')">
+            ${photoHtml}
+            <div class="member-header-info">
+              <div class="member-role">${member.role}</div>
+              <h3 class="member-name">${member.name}</h3>
+            </div>
+            <span class="expand-icon">▼</span>
+          </div>
+          <div class="card-content">
+            ${emailHtml}
+            <div class="member-bio">${member.bio}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleCard(memberId) {
+      const card = document.querySelector(`[data-member-id="${memberId}"]`);
+      if (card) {
+        card.classList.toggle('expanded');
+      }
+    }
+
+    async function loadBoardMembers() {
+      const grid = document.getElementById('board-grid');
+
+      try {
+        const response = await fetch('/api/board');
+        if (!response.ok) throw new Error('API error');
+
+        const data = await response.json();
+        const members = data.members || fallbackMembers;
+
+        grid.innerHTML = members.map(renderMember).join('');
+
+      } catch (error) {
+        console.log('Could not load from API, using fallback:', error);
+        grid.innerHTML = fallbackMembers.map(renderMember).join('');
+      }
+    }
+
+    // Load on page ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadBoardMembers);
+    } else {
+      loadBoardMembers();
+    }
+  </script>
 
 </body>
 </html>

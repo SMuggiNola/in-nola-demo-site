@@ -48,8 +48,9 @@ const MEMBERS_DB = {
         }
     ],
 
-    // Admin PINs for scanner access
-    adminPins: ['112233', '445566', '778899'],
+    // Board member PINs for scanner/admin access
+    // shannon, erin, andrew, joni, colm, sean
+    adminPins: ['101010', '202020', '303030', '404040', '505050', '606060'],
 
     // Secret key for signature generation (POC only - not secure)
     signatureKey: 'innola-poc-2024'

@@ -4,9 +4,19 @@
 
 const EVENTS_KEY = 'all_events';
 
-// Simple admin PIN check (same pattern as board portal for now)
-// In production, use proper auth
-const ADMIN_PINS = ['112233', '445566', '778899'];
+// Board member PINs - unified across the site
+// Each board member can add/edit events
+const BOARD_MEMBER_PINS = {
+  'shannon': '101010',
+  'erin': '202020',
+  'andrew': '303030',
+  'joni': '404040',
+  'colm': '505050',
+  'sean': '606060'
+};
+
+// Accept any board member PIN for admin actions
+const ADMIN_PINS = Object.values(BOARD_MEMBER_PINS);
 
 export async function onRequestGet(context) {
   // GET /api/events - Return all events

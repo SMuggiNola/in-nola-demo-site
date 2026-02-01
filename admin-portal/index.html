@@ -104,10 +104,10 @@
 
         <form id="loginForm" class="login-form">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" placeholder="Enter username" required>
+          <input type="text" id="username" name="username" placeholder="Your first name (lowercase)" required>
 
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="Enter password" required>
+          <label for="password">PIN</label>
+          <input type="password" id="password" name="password" placeholder="Your 6-digit PIN" maxlength="6" required>
 
           <button type="submit" class="btn btn-gold">Sign In</button>
         </form>
@@ -124,8 +124,15 @@
 
   <script src="/js/main.js"></script>
   <script>
-    const VALID_USERNAME = 'boardmember';
-    const VALID_PASSWORD = 'board12345';
+    // Board member credentials - unified across the site
+    const BOARD_MEMBERS = {
+      'shannon': '101010',
+      'erin': '202020',
+      'andrew': '303030',
+      'joni': '404040',
+      'colm': '505050',
+      'sean': '606060'
+    };
 
     const form = document.getElementById('loginForm');
     const errorMessage = document.getElementById('errorMessage');
@@ -133,14 +140,15 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
+      const username = document.getElementById('username').value.toLowerCase().trim();
+      const password = document.getElementById('password').value.trim();
 
-      if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+      if (BOARD_MEMBERS[username] && BOARD_MEMBERS[username] === password) {
         sessionStorage.setItem('boardAuth', 'true');
+        sessionStorage.setItem('boardUser', username);
         window.location.href = 'dashboard.html';
       } else {
-        errorMessage.textContent = 'Invalid username or password';
+        errorMessage.textContent = 'Invalid username or PIN';
         errorMessage.classList.add('show');
       }
     });

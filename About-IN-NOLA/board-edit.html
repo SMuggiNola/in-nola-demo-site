@@ -203,125 +203,156 @@
       background: rgba(212, 168, 75, 0.1);
     }
 
-    /* Photo Positioning Tool */
-    .position-tool {
+    /* Photo Cropping Tool */
+    .crop-tool {
       margin-top: 1.5rem;
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.3);
+      padding: 1.5rem;
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid var(--gold-muted);
       border-radius: 8px;
     }
 
-    .position-tool h4 {
-      margin: 0 0 0.75rem 0;
+    .crop-tool h4 {
+      margin: 0 0 0.5rem 0;
       color: var(--gold-light);
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
 
-    .position-container {
+    .crop-tool .instructions {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .crop-container {
       display: flex;
       gap: 2rem;
       align-items: flex-start;
       flex-wrap: wrap;
     }
 
-    .position-source {
+    .crop-area-wrapper {
+      flex: 0 0 auto;
+    }
+
+    /* The cropping viewport - fixed circle with image underneath */
+    .crop-viewport {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--gold-primary);
+      cursor: grab;
+      background: #1a1a1a;
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .crop-viewport:active {
+      cursor: grabbing;
+    }
+
+    .crop-viewport img {
+      position: absolute;
+      transform-origin: 0 0;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Overlay to show crop area on full image */
+    .crop-overlay-container {
+      position: relative;
+      display: inline-block;
+      margin-top: 1rem;
+    }
+
+    .crop-overlay-container img {
+      display: block;
+      max-width: 280px;
+      max-height: 200px;
+      border-radius: 4px;
+      opacity: 0.4;
+    }
+
+    .crop-overlay-circle {
+      position: absolute;
+      border: 2px solid var(--gold-primary);
+      border-radius: 50%;
+      box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+    }
+
+    .crop-controls {
       flex: 1;
       min-width: 200px;
     }
 
-    .position-source p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
+    .crop-slider-group {
+      margin-bottom: 1.25rem;
     }
 
-    .position-image-wrapper {
-      position: relative;
-      display: inline-block;
-      cursor: crosshair;
-      border: 2px solid var(--gold-muted);
-      border-radius: 4px;
-      overflow: hidden;
-      max-width: 100%;
-    }
-
-    .position-image-wrapper img {
+    .crop-slider-group label {
       display: block;
-      max-width: 300px;
-      max-height: 300px;
-    }
-
-    .position-crosshair {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--gold-primary);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(0, 0, 0, 0.5);
-    }
-
-    .position-crosshair::before,
-    .position-crosshair::after {
-      content: '';
-      position: absolute;
-      background: var(--gold-primary);
-    }
-
-    .position-crosshair::before {
-      width: 2px;
-      height: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .position-crosshair::after {
-      width: 100%;
-      height: 2px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .position-preview {
-      text-align: center;
-    }
-
-    .position-preview p {
       font-size: 0.85rem;
-      color: var(--text-muted);
+      color: var(--gold-light);
       margin-bottom: 0.5rem;
     }
 
-    .preview-circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 3px solid var(--gold-primary);
-      overflow: hidden;
-      margin: 0 auto;
-    }
-
-    .preview-circle img {
+    .crop-slider-group input[type="range"] {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      -webkit-appearance: none;
     }
 
-    .position-reset {
-      margin-top: 0.75rem;
-      padding: 0.4rem 0.8rem;
+    .crop-slider-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .crop-slider-group input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      cursor: pointer;
+      border: none;
+    }
+
+    .crop-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .crop-btn {
+      padding: 0.5rem 1rem;
       background: transparent;
       color: var(--gold-light);
       border: 1px solid var(--gold-muted);
       border-radius: 4px;
       font-size: 0.85rem;
       cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .position-reset:hover {
+    .crop-btn:hover {
       border-color: var(--gold-primary);
+      background: rgba(212, 168, 75, 0.1);
+    }
+
+    .crop-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      font-style: italic;
     }
   </style>
 </head>
@@ -419,25 +450,28 @@
               </div>
             </div>
 
-            <!-- Photo Position Tool -->
-            <div id="position-tool" class="position-tool hidden">
-              <h4>Set Photo Center Point</h4>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                Click on your image where you want the center of the circle to be.
-              </p>
-              <div class="position-container">
-                <div class="position-source">
-                  <p>Click to set center:</p>
-                  <div class="position-image-wrapper" id="position-wrapper" onclick="handlePositionClick(event)">
-                    <img id="position-source-img" src="" alt="Position source">
-                    <div class="position-crosshair" id="position-crosshair" style="left: 50%; top: 50%;"></div>
+            <!-- Photo Crop Tool -->
+            <div id="crop-tool" class="crop-tool hidden">
+              <h4>Adjust Your Photo</h4>
+              <p class="instructions">Drag the image to position it. Use the slider to zoom in or out.</p>
+
+              <div class="crop-container">
+                <div class="crop-area-wrapper">
+                  <div class="crop-viewport" id="crop-viewport">
+                    <img id="crop-image" src="" alt="Crop preview" draggable="false">
                   </div>
-                  <button type="button" class="position-reset" onclick="resetPosition()">Reset to Center</button>
+                  <p class="crop-hint">This is how your photo will appear</p>
                 </div>
-                <div class="position-preview">
-                  <p>Preview:</p>
-                  <div class="preview-circle">
-                    <img id="position-preview-img" src="" alt="Preview" style="object-position: 50% 50%;">
+
+                <div class="crop-controls">
+                  <div class="crop-slider-group">
+                    <label>Zoom: <span id="zoom-value">100%</span></label>
+                    <input type="range" id="zoom-slider" min="100" max="300" value="100" step="5">
+                  </div>
+
+                  <div class="crop-buttons">
+                    <button type="button" class="crop-btn" onclick="resetCrop()">Reset</button>
+                    <button type="button" class="crop-btn" onclick="centerCrop()">Center</button>
                   </div>
                 </div>
               </div>
@@ -469,7 +503,18 @@
     let currentUser = null;
     let currentMemberData = null;
     let uploadedPhotoBase64 = null;
-    let photoPosition = { x: 50, y: 50 }; // Default center
+
+    // Crop state: zoom (100-300%), offset in percentage of image size
+    let cropState = {
+      zoom: 100,
+      offsetX: 0,  // percentage offset from center
+      offsetY: 0
+    };
+
+    // For drag handling
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let imageNaturalSize = { width: 0, height: 0 };
 
     function showMessage(text, type) {
       const msg = document.getElementById('message');
@@ -515,20 +560,20 @@
         // Show photo preview if exists
         updatePhotoPreview(member.photo);
 
-        // Load saved photo position
-        if (member.photoPosition) {
-          const parts = member.photoPosition.split(' ');
-          photoPosition = {
-            x: parseFloat(parts[0]) || 50,
-            y: parseFloat(parts[1]) || 50
+        // Load saved crop data
+        if (member.photoCrop) {
+          cropState = {
+            zoom: member.photoCrop.zoom || 100,
+            offsetX: member.photoCrop.offsetX || 0,
+            offsetY: member.photoCrop.offsetY || 0
           };
         } else {
-          photoPosition = { x: 50, y: 50 };
+          cropState = { zoom: 100, offsetX: 0, offsetY: 0 };
         }
 
-        // Show position tool if photo exists
+        // Show crop tool if photo exists
         if (member.photo) {
-          showPositionTool(member.photo);
+          showCropTool(member.photo);
         }
 
         // Switch views
@@ -557,12 +602,21 @@
     function updatePhotoPreview(photoUrl) {
       const container = document.getElementById('photo-preview-container');
       if (photoUrl) {
-        const pos = `${photoPosition.x}% ${photoPosition.y}%`;
-        container.innerHTML = `<img src="${photoUrl}" class="photo-preview" alt="Profile photo" style="object-position: ${pos};" onerror="this.style.display='none'">`;
+        // Calculate object-position from crop state
+        const pos = getCropPosition();
+        container.innerHTML = `<img src="${photoUrl}" class="photo-preview" alt="Profile photo" style="object-fit: cover; object-position: ${pos};" onerror="this.style.display='none'">`;
       } else {
         const initial = currentMemberData?.name?.charAt(0) || '?';
         container.innerHTML = `<div class="no-photo">${initial}</div>`;
       }
+    }
+
+    // Convert crop state to CSS object-position
+    function getCropPosition() {
+      // Center is 50% 50%, offsets move it
+      const x = 50 - (cropState.offsetX * (cropState.zoom / 100));
+      const y = 50 - (cropState.offsetY * (cropState.zoom / 100));
+      return `${x}% ${y}%`;
     }
 
     function togglePhotoMethod() {
@@ -599,82 +653,167 @@
 
         updatePhotoPreview(uploadedPhotoBase64);
 
-        // Show position tool for uploaded image
-        photoPosition = { x: 50, y: 50 }; // Reset to center for new image
-        showPositionTool(uploadedPhotoBase64);
+        // Show crop tool for uploaded image
+        cropState = { zoom: 100, offsetX: 0, offsetY: 0 };
+        showCropTool(uploadedPhotoBase64);
       };
       reader.readAsDataURL(file);
     }
 
-    function showPositionTool(photoSrc) {
-      const tool = document.getElementById('position-tool');
-      const sourceImg = document.getElementById('position-source-img');
-      const previewImg = document.getElementById('position-preview-img');
+    function showCropTool(photoSrc) {
+      const tool = document.getElementById('crop-tool');
+      const cropImage = document.getElementById('crop-image');
 
       if (!photoSrc) {
         tool.classList.add('hidden');
         return;
       }
 
-      sourceImg.src = photoSrc;
-      previewImg.src = photoSrc;
-      tool.classList.remove('hidden');
+      // Load image to get natural dimensions
+      const tempImg = new Image();
+      tempImg.onload = function() {
+        imageNaturalSize = { width: this.width, height: this.height };
+        cropImage.src = photoSrc;
+        tool.classList.remove('hidden');
 
-      // Apply current position
-      updatePositionDisplay();
-    }
+        // Apply current crop state
+        updateCropDisplay();
 
-    function handlePositionClick(event) {
-      const wrapper = document.getElementById('position-wrapper');
-      const img = document.getElementById('position-source-img');
-      const rect = img.getBoundingClientRect();
-
-      // Calculate click position as percentage
-      const x = ((event.clientX - rect.left) / rect.width) * 100;
-      const y = ((event.clientY - rect.top) / rect.height) * 100;
-
-      // Clamp to 0-100
-      photoPosition = {
-        x: Math.max(0, Math.min(100, x)),
-        y: Math.max(0, Math.min(100, y))
+        // Set up zoom slider
+        document.getElementById('zoom-slider').value = cropState.zoom;
+        document.getElementById('zoom-value').textContent = cropState.zoom + '%';
       };
-
-      updatePositionDisplay();
+      tempImg.src = photoSrc;
     }
 
-    function updatePositionDisplay() {
-      const crosshair = document.getElementById('position-crosshair');
-      const previewImg = document.getElementById('position-preview-img');
+    function updateCropDisplay() {
+      const viewport = document.getElementById('crop-viewport');
+      const cropImage = document.getElementById('crop-image');
+
+      if (!imageNaturalSize.width) return;
+
+      const viewportSize = 200; // Fixed viewport size
+      const zoom = cropState.zoom / 100;
+
+      // Calculate scaled image size to fill viewport at current zoom
+      // Image should be scaled so its smallest dimension fills the viewport, then zoomed
+      const aspectRatio = imageNaturalSize.width / imageNaturalSize.height;
+      let imgWidth, imgHeight;
+
+      if (aspectRatio > 1) {
+        // Landscape - height fits viewport
+        imgHeight = viewportSize * zoom;
+        imgWidth = imgHeight * aspectRatio;
+      } else {
+        // Portrait or square - width fits viewport
+        imgWidth = viewportSize * zoom;
+        imgHeight = imgWidth / aspectRatio;
+      }
+
+      // Calculate position with offset
+      const centerX = (viewportSize - imgWidth) / 2;
+      const centerY = (viewportSize - imgHeight) / 2;
+
+      // Apply offset as percentage of the excess space
+      const maxOffsetX = (imgWidth - viewportSize) / 2;
+      const maxOffsetY = (imgHeight - viewportSize) / 2;
+
+      const offsetX = centerX + (cropState.offsetX / 100) * maxOffsetX * 2;
+      const offsetY = centerY + (cropState.offsetY / 100) * maxOffsetY * 2;
+
+      cropImage.style.width = imgWidth + 'px';
+      cropImage.style.height = imgHeight + 'px';
+      cropImage.style.left = offsetX + 'px';
+      cropImage.style.top = offsetY + 'px';
+
+      // Update header preview
       const headerPreview = document.querySelector('#photo-preview-container .photo-preview');
-
-      // Update crosshair position
-      crosshair.style.left = photoPosition.x + '%';
-      crosshair.style.top = photoPosition.y + '%';
-
-      // Update preview image object-position
-      const pos = `${photoPosition.x}% ${photoPosition.y}%`;
-      previewImg.style.objectPosition = pos;
-
-      // Also update header preview if exists
       if (headerPreview) {
+        const pos = getCropPosition();
         headerPreview.style.objectPosition = pos;
       }
     }
 
-    function resetPosition() {
-      photoPosition = { x: 50, y: 50 };
-      updatePositionDisplay();
+    function resetCrop() {
+      cropState = { zoom: 100, offsetX: 0, offsetY: 0 };
+      document.getElementById('zoom-slider').value = 100;
+      document.getElementById('zoom-value').textContent = '100%';
+      updateCropDisplay();
     }
 
-    // Also update position tool when URL changes
+    function centerCrop() {
+      cropState.offsetX = 0;
+      cropState.offsetY = 0;
+      updateCropDisplay();
+    }
+
+    // Set up drag functionality
+    function initCropDrag() {
+      const viewport = document.getElementById('crop-viewport');
+
+      viewport.addEventListener('mousedown', startDrag);
+      viewport.addEventListener('touchstart', startDrag, { passive: false });
+
+      document.addEventListener('mousemove', doDrag);
+      document.addEventListener('touchmove', doDrag, { passive: false });
+
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+    }
+
+    function startDrag(e) {
+      e.preventDefault();
+      isDragging = true;
+      const pos = e.touches ? e.touches[0] : e;
+      dragStart = { x: pos.clientX, y: pos.clientY };
+    }
+
+    function doDrag(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+
+      const pos = e.touches ? e.touches[0] : e;
+      const deltaX = pos.clientX - dragStart.x;
+      const deltaY = pos.clientY - dragStart.y;
+
+      // Convert pixel movement to offset percentage
+      const sensitivity = 0.5; // Adjust for feel
+      cropState.offsetX = Math.max(-100, Math.min(100, cropState.offsetX + deltaX * sensitivity));
+      cropState.offsetY = Math.max(-100, Math.min(100, cropState.offsetY + deltaY * sensitivity));
+
+      dragStart = { x: pos.clientX, y: pos.clientY };
+      updateCropDisplay();
+    }
+
+    function endDrag() {
+      isDragging = false;
+    }
+
+    // Set up zoom slider
+    function initZoomSlider() {
+      const slider = document.getElementById('zoom-slider');
+      slider.addEventListener('input', function() {
+        cropState.zoom = parseInt(this.value);
+        document.getElementById('zoom-value').textContent = cropState.zoom + '%';
+        updateCropDisplay();
+      });
+    }
+
+    // Initialize crop controls when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      initCropDrag();
+      initZoomSlider();
+    });
+
+    // Handle photo URL changes
     function handlePhotoUrlChange() {
       const url = document.getElementById('edit-photo-url').value.trim();
       if (url) {
-        photoPosition = { x: 50, y: 50 };
-        showPositionTool(url);
+        cropState = { zoom: 100, offsetX: 0, offsetY: 0 };
+        showCropTool(url);
         updatePhotoPreview(url);
       } else {
-        document.getElementById('position-tool').classList.add('hidden');
+        document.getElementById('crop-tool').classList.add('hidden');
       }
     }
 
@@ -717,9 +856,6 @@
         photoValue = uploadedPhotoBase64;
       }
 
-      // Format position as CSS object-position value
-      const positionValue = `${Math.round(photoPosition.x)}% ${Math.round(photoPosition.y)}%`;
-
       const payload = {
         username: currentUser.username,
         pin: currentUser.pin,
@@ -727,7 +863,11 @@
         email: document.getElementById('edit-email').value.trim(),
         bio: document.getElementById('edit-bio').value.trim(),
         photo: photoValue,
-        photoPosition: positionValue
+        photoCrop: {
+          zoom: cropState.zoom,
+          offsetX: Math.round(cropState.offsetX),
+          offsetY: Math.round(cropState.offsetY)
+        }
       };
 
       try {

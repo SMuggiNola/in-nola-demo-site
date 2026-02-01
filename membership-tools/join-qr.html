@@ -108,12 +108,8 @@
     </div>
 
     <script>
-        const joinUrl = window.location.origin.replace('in-nola-demo-site.pages.dev', 'in-nola.org') + '/join.html';
-        // Use actual URL for now
-        const actualUrl = 'https://in-nola-demo-site.pages.dev/join.html';
-
         new QRCode(document.getElementById('qrcode'), {
-            text: actualUrl,
+            text: 'https://in-nola.org/join',
             width: 200,
             height: 200,
             colorDark: '#1a5f2a',

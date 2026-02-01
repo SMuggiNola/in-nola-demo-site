@@ -6,14 +6,718 @@
   <title>Our Village | Irish Network NOLA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../global.css">
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Uncial+Antiqua&display=swap" rel="stylesheet">
 
   <style>
-    /* Override default watermark for this page */
+    /* Override default watermark */
     body::after {
-      background: url('../assets/watermarks/aerial-view-village-1.jpg')
-                  center/cover no-repeat;
-      opacity: 0.15;
-      filter: grayscale(30%) brightness(0.6);
+      background: #0a1a0a;
+      opacity: 0.98;
+    }
+
+    .page-content {
+      max-width: 100%;
+      padding: 0.5rem 0;
+    }
+
+    .page-content > h1 {
+      font-family: 'Uncial Antiqua', 'IM Fell English', serif;
+      text-align: center;
+      margin-bottom: 0.25rem;
+      padding: 0 1rem;
+      color: #d4a84b;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+    }
+
+    .page-content > p {
+      text-align: center;
+      margin-bottom: 1rem;
+      padding: 0 1rem;
+      opacity: 0.85;
+      font-style: italic;
+      font-family: 'IM Fell English', serif;
+    }
+
+    /* Force page-content to allow full width */
+    #main-content,
+    .page-content {
+      max-width: 100% !important;
+      width: 100% !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Full-width Irish landscape map - with padding from edges */
+    .village-map {
+      position: relative;
+      width: calc(100vw - 80px);
+      max-width: calc(100vw - 80px);
+      height: 70vh;
+      min-height: 500px;
+      max-height: 750px;
+      margin-left: calc(-50vw + 50% + 40px);
+      margin-right: calc(-50vw + 50% + 40px);
+      margin-bottom: 1.5rem;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 8px 40px rgba(0, 0, 0, 0.5),
+        inset 0 0 150px rgba(0, 50, 0, 0.3);
+      border: 3px solid #2a4a2a;
+    }
+
+    /* Deep green Irish landscape background */
+    .map-landscape {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        /* Misty atmosphere */
+        radial-gradient(ellipse at 30% 20%, rgba(200, 220, 200, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 60%, rgba(150, 180, 150, 0.06) 0%, transparent 40%),
+        /* Rolling hills effect */
+        linear-gradient(180deg,
+          #1a3a2a 0%,
+          #1e4a30 8%,
+          #2a5a3a 20%,
+          #2d6040 35%,
+          #3a7048 50%,
+          #2d5a3a 65%,
+          #254a32 80%,
+          #1a3a28 100%);
+    }
+
+    /* Texture overlay for grass effect */
+    .map-landscape::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.06;
+      mix-blend-mode: overlay;
+    }
+
+    /* Vignette edges */
+    .map-landscape::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0 0 120px rgba(0, 20, 0, 0.5);
+      pointer-events: none;
+    }
+
+    /* SVG Map Layer */
+    .map-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Roads - country lanes */
+    .road-main {
+      fill: none;
+      stroke: #6a5a4a;
+      stroke-width: 16;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .road-outline {
+      fill: none;
+      stroke: #4a3a2a;
+      stroke-width: 20;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Lough Derg - the lake */
+    .lough {
+      fill: url(#loughGradient);
+      stroke: #3a5a6a;
+      stroke-width: 3;
+    }
+
+    .lough-waves {
+      fill: none;
+      stroke: rgba(255,255,255,0.15);
+      stroke-width: 1.5;
+    }
+
+    /* Holy Island */
+    .island {
+      fill: #3a5a3a;
+      stroke: #2a4a2a;
+      stroke-width: 2;
+    }
+
+    .island-trees {
+      fill: #2a4a2a;
+    }
+
+    /* Mountains/hills */
+    .hills {
+      fill: url(#hillGradient);
+    }
+
+    .hill-accent {
+      fill: none;
+      stroke: rgba(255,255,255,0.08);
+      stroke-width: 1;
+    }
+
+    /* Trees */
+    .tree-marker {
+      fill: #1a3a1a;
+    }
+
+    .tree-highlight {
+      fill: #3a6a3a;
+    }
+
+    /* Stone walls */
+    .stone-wall {
+      fill: none;
+      stroke: #5a5a5a;
+      stroke-width: 3;
+      stroke-dasharray: 6 3;
+      opacity: 0.4;
+    }
+
+    /* Compass Rose */
+    .compass {
+      opacity: 0.9;
+    }
+
+    .compass-ring {
+      fill: none;
+      stroke: #d4a84b;
+      stroke-width: 2;
+    }
+
+    .compass-point {
+      fill: #f5f5f0;
+    }
+
+    .compass-point-gold {
+      fill: #d4a84b;
+    }
+
+    .compass-text {
+      font-family: 'Uncial Antiqua', serif;
+      font-size: 14px;
+      fill: #d4a84b;
+    }
+
+    /* Celtic border decorations */
+    .celtic-corner {
+      fill: none;
+      stroke: #d4a84b;
+      stroke-width: 2;
+      opacity: 0.7;
+    }
+
+    /* ========== IRISH COTTAGE BUTTONS ========== */
+    .village-location {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      transition: transform 0.3s ease, filter 0.3s ease;
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    .village-location:hover {
+      transform: scale(1.15) translateY(-5px);
+      filter: brightness(1.15);
+    }
+
+    .cottage-icon {
+      width: 100px;
+      height: 85px;
+      position: relative;
+    }
+
+    .cottage-icon svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(3px 4px 6px rgba(0,0,0,0.5));
+    }
+
+    /* Whitewashed walls */
+    .cottage-wall {
+      fill: #f5f5e8;
+      stroke: #888;
+      stroke-width: 1;
+    }
+
+    /* Thatched roof */
+    .thatch-roof {
+      fill: url(#thatchGradient);
+      stroke: #5a4a2a;
+      stroke-width: 1.5;
+    }
+
+    /* Roof texture lines */
+    .thatch-line {
+      fill: none;
+      stroke: #4a3a1a;
+      stroke-width: 0.75;
+      opacity: 0.5;
+    }
+
+    /* Half-door (iconic Irish) */
+    .door-frame {
+      fill: #1a6b1a;
+      stroke: #0a4a0a;
+      stroke-width: 1;
+    }
+
+    .door-top {
+      fill: #2a8a2a;
+      stroke: #0a4a0a;
+      stroke-width: 1;
+    }
+
+    /* Windows with curtains */
+    .window-frame {
+      fill: #1a1a3a;
+      stroke: #f5f5e8;
+      stroke-width: 2;
+    }
+
+    .window-glow {
+      fill: #ffd700;
+      opacity: 0.6;
+    }
+
+    /* Chimney */
+    .chimney {
+      fill: #8a7a6a;
+      stroke: #5a4a3a;
+      stroke-width: 1;
+    }
+
+    /* Location labels - Irish pub sign style */
+    .location-label {
+      margin-top: 6px;
+      padding: 8px 16px;
+      background: linear-gradient(180deg, #1a4a1a 0%, #0a3a0a 100%);
+      color: #ffd700;
+      font-family: 'Uncial Antiqua', serif;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      border: 2px solid #d4a84b;
+      box-shadow:
+        2px 3px 8px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      letter-spacing: 1px;
+    }
+
+    /* Irish tricolor accent on labels */
+    .location-label::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(180deg, #169b62 33%, #fff 33%, #fff 66%, #ff883e 66%);
+      border-radius: 2px;
+    }
+
+    /* Location positions - spread ultra wide across the map */
+    .location-library {
+      top: 18%;
+      left: 4%;
+    }
+
+    .location-school {
+      top: 14%;
+      left: 22%;
+    }
+
+    .location-music {
+      top: 10%;
+      left: 42%;
+    }
+
+    .location-dancing {
+      top: 16%;
+      right: 35%;
+    }
+
+    .location-events {
+      bottom: 18%;
+      right: 25%;
+    }
+
+    .location-village-hall {
+      top: 42%;
+      left: 38%;
+    }
+
+    /* Village Announcement Board - upper right */
+    .announcement-board {
+      position: absolute;
+      top: 8%;
+      right: 5%;
+      z-index: 15;
+    }
+
+    .board-frame {
+      background: linear-gradient(180deg, #5c4023 0%, #3d2817 100%);
+      border: 6px solid #2a1a0a;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 4px 6px 20px rgba(0,0,0,0.6);
+    }
+
+    .board-inner {
+      background: linear-gradient(180deg, #f5ead5 0%, #e8dcc8 100%);
+      border: 3px solid #8b7355;
+      border-radius: 4px;
+      padding: 16px 20px;
+      min-width: 260px;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .board-header {
+      font-family: 'Uncial Antiqua', serif;
+      font-size: 1.1rem;
+      color: #3d2817;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #8b7355;
+      padding-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .board-event-name {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.2rem;
+      color: #1a4a1a;
+      font-weight: bold;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .board-event-date {
+      font-family: 'IM Fell English', serif;
+      font-size: 1rem;
+      color: #5c4023;
+      font-style: italic;
+      margin-bottom: 6px;
+    }
+
+    .board-event-location {
+      font-family: 'IM Fell English', serif;
+      font-size: 0.9rem;
+      color: #6b5a45;
+      font-style: italic;
+    }
+
+    .board-no-events {
+      font-family: 'IM Fell English', serif;
+      font-size: 1rem;
+      color: #5c4023;
+      font-style: italic;
+    }
+
+    .board-link {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: linear-gradient(180deg, #1a4a1a 0%, #0a3a0a 100%);
+      color: #ffd700;
+      font-family: 'IM Fell English', serif;
+      font-size: 0.85rem;
+      text-decoration: none;
+      border-radius: 4px;
+      border: 1px solid #d4a84b;
+    }
+
+    .board-link:hover {
+      background: linear-gradient(180deg, #2a5a2a 0%, #1a4a1a 100%);
+    }
+
+    /* Posts holding up the board */
+    .board-posts {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .board-post {
+      width: 14px;
+      height: 50px;
+      background: linear-gradient(90deg, #4a3020 0%, #5c4023 50%, #4a3020 100%);
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* Scale indicator */
+    .scale-bar {
+      position: absolute;
+      bottom: 20px;
+      right: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .scale-line {
+      width: 120px;
+      height: 10px;
+      background: repeating-linear-gradient(
+        90deg,
+        #d4a84b 0px,
+        #d4a84b 30px,
+        transparent 30px,
+        transparent 60px
+      );
+      border: 1px solid #d4a84b;
+      border-radius: 2px;
+    }
+
+    .scale-text {
+      font-family: 'IM Fell English', serif;
+      font-size: 12px;
+      color: #d4a84b;
+      margin-top: 4px;
+    }
+
+    /* Year marker */
+    .year-marker {
+      position: absolute;
+      bottom: 25px;
+      left: 160px;
+      font-family: 'IM Fell English', serif;
+      font-size: 14px;
+      color: #a8c4a8;
+      font-style: italic;
+    }
+
+    /* Back link styling */
+    .back-link {
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    .back-link a {
+      color: var(--gold-light);
+      opacity: 0.8;
+      transition: opacity 0.2s;
+      font-family: 'IM Fell English', serif;
+    }
+
+    .back-link a:hover {
+      opacity: 1;
+    }
+
+    /* Large screens */
+    @media (min-width: 1600px) {
+      .cottage-icon {
+        width: 130px;
+        height: 110px;
+      }
+
+      .location-label {
+        font-size: 1.1rem;
+        padding: 12px 24px;
+      }
+    }
+
+    /* Tablet/Medium screens */
+    @media (max-width: 1200px) {
+      .village-map {
+        height: 60vh;
+        min-height: 450px;
+      }
+
+      .cottage-icon {
+        width: 85px;
+        height: 72px;
+      }
+
+      .location-label {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+      }
+
+      .location-library {
+        top: 15%;
+        left: 3%;
+      }
+
+      .location-school {
+        top: 12%;
+        left: 20%;
+      }
+
+      .location-music {
+        top: 10%;
+        left: 40%;
+      }
+
+      .location-dancing {
+        top: 15%;
+        right: 30%;
+      }
+
+      .location-events {
+        bottom: 15%;
+        right: 20%;
+      }
+
+      .location-village-hall {
+        top: 38%;
+        left: 35%;
+      }
+
+      .announcement-board {
+        top: 6%;
+        right: 3%;
+      }
+
+      .board-inner {
+        min-width: 220px;
+        max-width: 260px;
+        padding: 12px 16px;
+      }
+
+      .board-header {
+        font-size: 0.95rem;
+      }
+
+      .board-event-name {
+        font-size: 1.05rem;
+      }
+
+      .board-event-date {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 700px) {
+      .village-map {
+        height: 75vh;
+        min-height: 500px;
+      }
+
+      .cottage-icon {
+        width: 70px;
+        height: 60px;
+      }
+
+      .location-label {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+      }
+
+      .location-library {
+        top: 8%;
+        left: 3%;
+      }
+
+      .location-school {
+        top: 22%;
+        left: 25%;
+      }
+
+      .location-music {
+        top: 36%;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .location-dancing {
+        top: 52%;
+        right: 5%;
+      }
+
+      .location-events {
+        bottom: 10%;
+        right: 8%;
+      }
+
+      .location-village-hall {
+        top: 68%;
+        left: 40%;
+      }
+
+      .announcement-board {
+        top: 4%;
+        right: 2%;
+        left: auto;
+        transform: none;
+      }
+
+      .board-frame {
+        padding: 8px;
+        border-width: 4px;
+      }
+
+      .board-inner {
+        min-width: 150px;
+        max-width: 180px;
+        padding: 10px 12px;
+      }
+
+      .board-header {
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+      }
+
+      .board-event-name {
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+      }
+
+      .board-event-date {
+        font-size: 0.75rem;
+      }
+
+      .board-event-location {
+        font-size: 0.7rem;
+      }
+
+      .board-link {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        margin-top: 8px;
+      }
+
+      .board-post {
+        height: 30px;
+        width: 10px;
+      }
+
+      .board-posts {
+        padding: 0 15px;
+      }
+
+      .page-content > h1 {
+        font-size: 1.6rem;
+      }
     }
   </style>
 </head>
@@ -26,28 +730,382 @@
     <main class="page-content">
 
       <h1>Our Village</h1>
-      <p>A living hub for community, culture, celebration, and connection.</p>
+      <p>A living hub for community, culture, celebration, and connection</p>
 
-      <!-- SUB-ORGANIZATION GRID -->
-      <div class="nav-stack">
+      <!-- IRISH LANDSCAPE MAP -->
+      <div class="village-map">
 
-        <a href="Our_Library/index.html" class="btn">
-          Our Library
+        <!-- Deep Green Landscape Background -->
+        <div class="map-landscape"></div>
+
+        <!-- SVG Map Elements -->
+        <svg class="map-svg" viewBox="0 0 2400 560" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <!-- Lake gradient -->
+            <linearGradient id="loughGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#4a7a8a"/>
+              <stop offset="50%" style="stop-color:#3a6a7a"/>
+              <stop offset="100%" style="stop-color:#2a5a6a"/>
+            </linearGradient>
+
+            <!-- Hill gradient -->
+            <linearGradient id="hillGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" style="stop-color:#2a4a3a"/>
+              <stop offset="100%" style="stop-color:#1a3a2a"/>
+            </linearGradient>
+
+            <!-- Thatched roof gradient -->
+            <linearGradient id="thatchGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#8a7a50"/>
+              <stop offset="50%" style="stop-color:#7a6a40"/>
+              <stop offset="100%" style="stop-color:#6a5a30"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Distant hills/mountains - ultra wide -->
+          <path class="hills" d="M 0 80 Q 250 30, 500 70 T 900 40 T 1300 65 T 1700 35 T 2100 60 T 2400 50 L 2400 0 L 0 0 Z"/>
+          <path class="hill-accent" d="M 120 70 Q 250 40, 400 65"/>
+          <path class="hill-accent" d="M 650 55 Q 800 30, 980 50"/>
+          <path class="hill-accent" d="M 1250 60 Q 1400 35, 1580 55"/>
+          <path class="hill-accent" d="M 1850 50 Q 2000 28, 2180 48"/>
+
+          <!-- Stone walls across fields -->
+          <path class="stone-wall" d="M 120 200 Q 320 190, 520 210 Q 720 230, 920 200"/>
+          <path class="stone-wall" d="M 1500 180 Q 1700 200, 1900 175"/>
+          <path class="stone-wall" d="M 280 400 L 280 520"/>
+          <path class="stone-wall" d="M 1350 380 L 1350 560"/>
+          <path class="stone-wall" d="M 750 420 L 750 560"/>
+
+          <!-- Lough Derg (lake) on the right side - larger -->
+          <ellipse class="lough" cx="2280" cy="300" rx="200" ry="300"/>
+
+          <!-- Lake waves -->
+          <path class="lough-waves" d="M 2120 220 Q 2170 212, 2220 220 T 2320 220"/>
+          <path class="lough-waves" d="M 2130 300 Q 2180 292, 2230 300 T 2330 300"/>
+          <path class="lough-waves" d="M 2120 380 Q 2170 372, 2220 380 T 2320 380"/>
+          <path class="lough-waves" d="M 2150 460 Q 2200 452, 2250 460"/>
+
+          <!-- Holy Island (Inis Cealtra) -->
+          <ellipse class="island" cx="2180" cy="280" rx="55" ry="38"/>
+          <circle class="island-trees" cx="2162" cy="272" r="13"/>
+          <circle class="island-trees" cx="2185" cy="280" r="11"/>
+          <circle class="island-trees" cx="2200" cy="270" r="9"/>
+          <!-- Round tower on island -->
+          <rect x="2175" y="255" width="9" height="28" fill="#6a6a6a" stroke="#4a4a4a" stroke-width="1"/>
+          <polygon points="2179.5,255 2170,264 2189,264" fill="#5a5a5a"/>
+
+          <!-- Main road through village (winding boreen) - stretches full width -->
+          <path class="road-outline" d="M -20 320 Q 280 260, 550 320 Q 850 400, 1200 300 Q 1550 200, 1850 280 Q 2000 330, 2080 360"/>
+          <path class="road-main" d="M -20 320 Q 280 260, 550 320 Q 850 400, 1200 300 Q 1550 200, 1850 280 Q 2000 330, 2080 360"/>
+
+          <!-- Side road going south -->
+          <path class="road-outline" d="M 550 320 Q 520 430, 600 510 Q 660 560, 720 570"/>
+          <path class="road-main" d="M 550 320 Q 520 430, 600 510 Q 660 560, 720 570"/>
+
+          <!-- Northern lane -->
+          <path class="road-outline" d="M 1200 300 Q 1280 210, 1420 170 Q 1560 130, 1720 165"/>
+          <path class="road-main" d="M 1200 300 Q 1280 210, 1420 170 Q 1560 130, 1720 165"/>
+
+          <!-- Path toward the lake -->
+          <path class="road-outline" d="M 1850 280 Q 1950 310, 2020 340 Q 2070 365, 2080 380"/>
+          <path class="road-main" d="M 1850 280 Q 1950 310, 2020 340 Q 2070 365, 2080 380"/>
+
+          <!-- Trees - darker clusters spread wide -->
+          <g class="tree-marker">
+            <circle cx="180" cy="250" r="20"/>
+            <circle cx="205" cy="262" r="15"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="420" cy="280" r="17"/>
+            <circle cx="442" cy="292" r="13"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="720" cy="350" r="18"/>
+            <circle cx="745" cy="362" r="14"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="1020" cy="260" r="19"/>
+            <circle cx="1045" cy="272" r="15"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="1380" cy="220" r="16"/>
+            <circle cx="1400" cy="232" r="12"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="1620" cy="190" r="15"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="1900" cy="300" r="17"/>
+            <circle cx="1925" cy="312" r="13"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="480" cy="470" r="16"/>
+            <circle cx="502" cy="482" r="12"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="640" cy="530" r="14"/>
+          </g>
+          <g class="tree-marker">
+            <circle cx="1100" cy="380" r="15"/>
+            <circle cx="1120" cy="392" r="11"/>
+          </g>
+
+          <!-- Celtic corner decorations -->
+          <path class="celtic-corner" d="M 30 30 L 110 30 M 30 30 L 30 110"/>
+          <circle cx="30" cy="30" r="8" fill="none" stroke="#d4a84b" stroke-width="2" opacity="0.7"/>
+
+          <path class="celtic-corner" d="M 2370 30 L 2290 30 M 2370 30 L 2370 110"/>
+          <circle cx="2370" cy="30" r="8" fill="none" stroke="#d4a84b" stroke-width="2" opacity="0.7"/>
+
+          <path class="celtic-corner" d="M 30 530 L 110 530 M 30 530 L 30 450"/>
+          <circle cx="30" cy="530" r="8" fill="none" stroke="#d4a84b" stroke-width="2" opacity="0.7"/>
+
+          <path class="celtic-corner" d="M 2370 530 L 2290 530 M 2370 530 L 2370 450"/>
+          <circle cx="2370" cy="530" r="8" fill="none" stroke="#d4a84b" stroke-width="2" opacity="0.7"/>
+
+          <!-- Compass Rose -->
+          <g class="compass" transform="translate(100, 480)">
+            <circle class="compass-ring" cx="0" cy="0" r="38"/>
+            <circle class="compass-ring" cx="0" cy="0" r="26"/>
+            <!-- N pointer (gold) -->
+            <polygon class="compass-point-gold" points="0,-35 -8,0 0,-13 8,0"/>
+            <!-- S pointer -->
+            <polygon class="compass-point" points="0,35 -8,0 0,13 8,0"/>
+            <!-- E pointer -->
+            <polygon class="compass-point" points="35,0 0,-8 13,0 0,8"/>
+            <!-- W pointer -->
+            <polygon class="compass-point" points="-35,0 0,-8 -13,0 0,8"/>
+            <!-- Direction labels -->
+            <text class="compass-text" x="0" y="-46" text-anchor="middle">N</text>
+            <text class="compass-text" x="0" y="56" text-anchor="middle">S</text>
+            <text class="compass-text" x="52" y="5" text-anchor="middle">E</text>
+            <text class="compass-text" x="-52" y="5" text-anchor="middle">W</text>
+          </g>
+
+          <!-- Lake label -->
+          <text x="2250" y="130" font-family="'Uncial Antiqua', serif" font-size="20" fill="#a8c4d4" text-anchor="middle">Lough Derg</text>
+
+          <!-- Island label -->
+          <text x="2180" y="335" font-family="'IM Fell English', serif" font-size="12" fill="#8aa88a" font-style="italic" text-anchor="middle">Inis Cealtra</text>
+
+        </svg>
+
+        <!-- Location: Our Library - Irish Cottage -->
+        <a href="Our_Library/index.html" class="village-location location-library">
+          <div class="cottage-icon">
+            <svg viewBox="0 0 100 85">
+              <defs>
+                <linearGradient id="thatch1" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#9a8a55"/>
+                  <stop offset="100%" style="stop-color:#6a5a30"/>
+                </linearGradient>
+              </defs>
+              <!-- Chimney -->
+              <rect class="chimney" x="65" y="8" width="10" height="20"/>
+              <!-- Thatched roof -->
+              <path class="thatch-roof" d="M 5 35 L 50 5 L 95 35 Z" fill="url(#thatch1)"/>
+              <path class="thatch-line" d="M 20 30 Q 50 12, 80 30"/>
+              <path class="thatch-line" d="M 12 33 Q 50 8, 88 33"/>
+              <!-- Whitewashed walls -->
+              <rect class="cottage-wall" x="12" y="35" width="76" height="45"/>
+              <!-- Windows -->
+              <rect class="window-frame" x="20" y="42" width="16" height="18" rx="2"/>
+              <rect class="window-glow" x="22" y="44" width="12" height="14" rx="1"/>
+              <rect class="window-frame" x="64" y="42" width="16" height="18" rx="2"/>
+              <rect class="window-glow" x="66" y="44" width="12" height="14" rx="1"/>
+              <!-- Half door (Irish!) -->
+              <rect class="door-frame" x="40" y="45" width="20" height="35"/>
+              <rect class="door-top" x="40" y="45" width="20" height="17"/>
+              <line x1="50" y1="45" x2="50" y2="80" stroke="#0a4a0a" stroke-width="1"/>
+              <circle cx="56" cy="65" r="1.5" fill="#d4a84b"/>
+            </svg>
+          </div>
+          <span class="location-label">The Library</span>
         </a>
 
-        <a href="./dancing.html" class="btn">
-          Dancing
+        <!-- Location: School - Irish Schoolhouse -->
+        <a href="https://muggsoflearning.net" target="_blank" class="village-location location-school">
+          <div class="cottage-icon">
+            <svg viewBox="0 0 100 85">
+              <!-- Bell tower -->
+              <rect x="42" y="2" width="16" height="20" fill="#f5f5e8" stroke="#888" stroke-width="1"/>
+              <polygon points="38,22 50,8 62,22" fill="#6a5a30" stroke="#5a4a2a" stroke-width="1"/>
+              <circle cx="50" cy="14" r="4" fill="#d4a84b"/>
+              <!-- Thatched roof -->
+              <path class="thatch-roof" d="M 5 38 L 50 12 L 95 38 Z"/>
+              <path class="thatch-line" d="M 18 33 Q 50 16, 82 33"/>
+              <path class="thatch-line" d="M 10 36 Q 50 12, 90 36"/>
+              <!-- Whitewashed walls -->
+              <rect class="cottage-wall" x="10" y="38" width="80" height="42"/>
+              <!-- Windows - row of 3 -->
+              <rect class="window-frame" x="16" y="45" width="14" height="16" rx="2"/>
+              <rect class="window-glow" x="18" y="47" width="10" height="12" rx="1"/>
+              <rect class="window-frame" x="43" y="45" width="14" height="16" rx="2"/>
+              <rect class="window-glow" x="45" y="47" width="10" height="12" rx="1"/>
+              <rect class="window-frame" x="70" y="45" width="14" height="16" rx="2"/>
+              <rect class="window-glow" x="72" y="47" width="10" height="12" rx="1"/>
+              <!-- Red door -->
+              <rect x="40" y="62" width="20" height="18" fill="#c41e3a" stroke="#8a1428" stroke-width="1"/>
+              <circle cx="55" cy="72" r="1.5" fill="#d4a84b"/>
+            </svg>
+          </div>
+          <span class="location-label">The School</span>
         </a>
 
-        <a href="./music.html" class="btn">
-          Music
+        <!-- Location: Music - Irish Cottage -->
+        <a href="./music.html" class="village-location location-music">
+          <div class="cottage-icon">
+            <svg viewBox="0 0 100 85">
+              <!-- Chimney -->
+              <rect class="chimney" x="70" y="10" width="9" height="18"/>
+              <!-- Thatched roof -->
+              <path class="thatch-roof" d="M 8 35 L 50 8 L 92 35 Z"/>
+              <path class="thatch-line" d="M 22 30 Q 50 14, 78 30"/>
+              <path class="thatch-line" d="M 14 33 Q 50 10, 86 33"/>
+              <!-- Whitewashed walls -->
+              <rect class="cottage-wall" x="15" y="35" width="70" height="45"/>
+              <!-- Windows -->
+              <rect class="window-frame" x="22" y="44" width="14" height="16" rx="2"/>
+              <rect class="window-glow" x="24" y="46" width="10" height="12" rx="1"/>
+              <rect class="window-frame" x="64" y="44" width="14" height="16" rx="2"/>
+              <rect class="window-glow" x="66" y="46" width="10" height="12" rx="1"/>
+              <!-- Half door -->
+              <rect class="door-frame" x="40" y="48" width="20" height="32"/>
+              <rect class="door-top" x="40" y="48" width="20" height="15"/>
+              <line x1="50" y1="48" x2="50" y2="80" stroke="#0a4a0a" stroke-width="1"/>
+              <circle cx="56" cy="68" r="1.5" fill="#d4a84b"/>
+              <!-- Harp symbol above door -->
+              <path d="M 46 38 Q 50 32, 54 38" fill="none" stroke="#d4a84b" stroke-width="2"/>
+              <line x1="50" y1="32" x2="50" y2="42" stroke="#d4a84b" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <span class="location-label">Music Hall</span>
         </a>
+
+        <!-- Location: Dancing - Larger Hall -->
+        <a href="https://muggivanirishdance.com/" target="_blank" class="village-location location-dancing">
+          <div class="cottage-icon">
+            <svg viewBox="0 0 100 85">
+              <!-- Chimney -->
+              <rect class="chimney" x="75" y="5" width="10" height="22"/>
+              <!-- Thatched roof - longer building -->
+              <path class="thatch-roof" d="M 2 32 L 50 2 L 98 32 Z"/>
+              <path class="thatch-line" d="M 18 27 Q 50 8, 82 27"/>
+              <path class="thatch-line" d="M 8 30 Q 50 5, 92 30"/>
+              <!-- Whitewashed walls -->
+              <rect class="cottage-wall" x="8" y="32" width="84" height="48"/>
+              <!-- Windows row -->
+              <rect class="window-frame" x="14" y="40" width="12" height="14" rx="2"/>
+              <rect class="window-glow" x="16" y="42" width="8" height="10" rx="1"/>
+              <rect class="window-frame" x="44" y="40" width="12" height="14" rx="2"/>
+              <rect class="window-glow" x="46" y="42" width="8" height="10" rx="1"/>
+              <rect class="window-frame" x="74" y="40" width="12" height="14" rx="2"/>
+              <rect class="window-glow" x="76" y="42" width="8" height="10" rx="1"/>
+              <!-- Double doors -->
+              <rect class="door-frame" x="30" y="55" width="24" height="25"/>
+              <line x1="42" y1="55" x2="42" y2="80" stroke="#0a4a0a" stroke-width="1"/>
+              <circle cx="36" cy="68" r="1.5" fill="#d4a84b"/>
+              <circle cx="48" cy="68" r="1.5" fill="#d4a84b"/>
+              <!-- Dancing figures hint -->
+              <circle cx="66" y="55" r="3" fill="#d4a84b" opacity="0.7"/>
+            </svg>
+          </div>
+          <span class="location-label">Dance Studio</span>
+        </a>
+
+        <!-- Location: Village Hall -->
+        <a href="Events-Page/index.html" class="village-location location-village-hall">
+          <div class="cottage-icon">
+            <svg viewBox="0 0 100 85">
+              <!-- Chimney -->
+              <rect class="chimney" x="75" y="3" width="12" height="22"/>
+              <!-- Large thatched roof -->
+              <path class="thatch-roof" d="M 0 32 L 50 0 L 100 32 Z"/>
+              <path class="thatch-line" d="M 15 27 Q 50 6, 85 27"/>
+              <path class="thatch-line" d="M 6 30 Q 50 3, 94 30"/>
+              <!-- Whitewashed walls - large building -->
+              <rect class="cottage-wall" x="5" y="32" width="90" height="48"/>
+              <!-- Windows row -->
+              <rect class="window-frame" x="10" y="40" width="12" height="14" rx="2"/>
+              <rect class="window-glow" x="12" y="42" width="8" height="10" rx="1"/>
+              <rect class="window-frame" x="28" y="40" width="12" height="14" rx="2"/>
+              <rect class="window-glow" x="30" y="42" width="8" height="10" rx="1"/>
+              <rect class="window-frame" x="60" y="40" width="12" height="14" rx="2"/>
+              <rect class="window-glow" x="62" y="42" width="8" height="10" rx="1"/>
+              <rect class="window-frame" x="78" y="40" width="12" height="14" rx="2"/>
+              <rect class="window-glow" x="80" y="42" width="8" height="10" rx="1"/>
+              <!-- Large arched double doors -->
+              <path d="M 42 80 L 42 58 Q 42 52, 50 52 Q 58 52, 58 58 L 58 80 Z" fill="#1a6b1a" stroke="#0a4a0a" stroke-width="1"/>
+              <line x1="50" y1="52" x2="50" y2="80" stroke="#0a4a0a" stroke-width="1"/>
+              <circle cx="46" cy="68" r="1.5" fill="#d4a84b"/>
+              <circle cx="54" cy="68" r="1.5" fill="#d4a84b"/>
+              <!-- Sign above door -->
+              <rect x="38" y="38" width="24" height="10" fill="#5c4023" stroke="#3d2817" stroke-width="0.5"/>
+              <text x="50" y="46" font-size="6" fill="#d4a84b" text-anchor="middle" font-family="serif">HALL</text>
+            </svg>
+          </div>
+          <span class="location-label">Village Hall</span>
+        </a>
+
+        <!-- Location: Events - Town Green Space / Bandstand -->
+        <a href="Events-Page/index.html" class="village-location location-events">
+          <div class="cottage-icon">
+            <svg viewBox="0 0 100 85">
+              <!-- Bandstand/Gazebo base -->
+              <ellipse cx="50" cy="78" rx="42" ry="8" fill="#5a7a5a" stroke="#3a5a3a" stroke-width="1"/>
+              <!-- Gazebo pillars -->
+              <rect x="18" y="35" width="4" height="43" fill="#f5f5e8" stroke="#888" stroke-width="0.5"/>
+              <rect x="78" y="35" width="4" height="43" fill="#f5f5e8" stroke="#888" stroke-width="0.5"/>
+              <rect x="46" y="35" width="4" height="43" fill="#f5f5e8" stroke="#888" stroke-width="0.5"/>
+              <!-- Gazebo roof -->
+              <polygon points="50,5 95,38 5,38" fill="#6a5a30" stroke="#5a4a2a" stroke-width="1.5"/>
+              <polygon points="50,12 85,35 15,35" fill="#7a6a40"/>
+              <!-- Decorative finial -->
+              <circle cx="50" cy="5" r="4" fill="#d4a84b" stroke="#b8963c" stroke-width="1"/>
+              <!-- Bunting decoration -->
+              <path d="M 22 42 L 35 50 L 50 42 L 65 50 L 78 42" fill="none" stroke="#169b62" stroke-width="2"/>
+              <!-- Shamrock in center -->
+              <g transform="translate(50, 58)" fill="#169b62">
+                <circle cx="-5" cy="-2" r="5"/>
+                <circle cx="5" cy="-2" r="5"/>
+                <circle cx="0" cy="-7" r="5"/>
+                <rect x="-1.5" y="0" width="3" height="10"/>
+              </g>
+            </svg>
+          </div>
+          <span class="location-label">Town Green</span>
+        </a>
+
+        <!-- Village Announcement Board -->
+        <div class="announcement-board">
+          <div class="board-frame">
+            <div class="board-inner">
+              <div class="board-header">Village Notice Board</div>
+              <div id="next-event-content">
+                <div class="board-no-events">Loading...</div>
+              </div>
+            </div>
+          </div>
+          <div class="board-posts">
+            <div class="board-post"></div>
+            <div class="board-post"></div>
+          </div>
+        </div>
+
+        <!-- Scale bar -->
+        <div class="scale-bar">
+          <div class="scale-line"></div>
+          <span class="scale-text">~ 100 paces</span>
+        </div>
+
+        <!-- Year marker -->
+        <div class="year-marker">Anno Domini MMXXV</div>
 
       </div>
 
       <!-- BACK TO HOME -->
-      <div class="back-link" style="margin-top:3rem;">
-        <a href="../index.html">← Return to Home</a>
+      <div class="back-link">
+        <a href="../index.html">&larr; Return to Home</a>
       </div>
 
     </main>
@@ -56,6 +1114,70 @@
   </div>
 
   <script src="../js/main.js"></script>
+
+  <script>
+    // Fetch and display the next upcoming event
+    // Data comes from the same /api/events endpoint that powers the Events page
+    async function loadNextEvent() {
+      const container = document.getElementById('next-event-content');
+
+      try {
+        const response = await fetch('/api/events');
+        if (!response.ok) throw new Error('Failed to fetch events');
+
+        const events = await response.json();
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Compare dates only
+
+        // Filter for upcoming events and sort by date
+        const upcomingEvents = events
+          .filter(event => new Date(event.date) >= now)
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        if (upcomingEvents.length > 0) {
+          const nextEvent = upcomingEvents[0];
+          const eventDate = new Date(nextEvent.date);
+          const formattedDate = eventDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+          });
+
+          let html = `
+            <div class="board-event-name">${nextEvent.name}</div>
+            <div class="board-event-date">${formattedDate}</div>
+          `;
+
+          if (nextEvent.location) {
+            html += `<div class="board-event-location">${nextEvent.location}</div>`;
+          }
+
+          html += `<a href="Events-Page/index.html" class="board-link">See All Events</a>`;
+
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = `
+            <div class="board-no-events">No upcoming events scheduled</div>
+            <a href="Events-Page/index.html" class="board-link">View Past Events</a>
+          `;
+        }
+      } catch (error) {
+        console.log('Could not load events:', error);
+        container.innerHTML = `
+          <div class="board-no-events">Visit our Events page for the latest happenings</div>
+          <a href="Events-Page/index.html" class="board-link">View Events</a>
+        `;
+      }
+    }
+
+    // Load on page ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadNextEvent);
+    } else {
+      loadNextEvent();
+    }
+  </script>
 
 </body>
 </html>

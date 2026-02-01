@@ -92,19 +92,89 @@ function generateMemberId(existingIds) {
   return id;
 }
 
-// Parse CSV data
+// Parse CSV line handling quoted values
+function parseCSVLine(line) {
+  const values = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (const char of line) {
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      values.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  values.push(current.trim());
+  return values;
+}
+
+// Parse date from various formats (Google Form timestamps, ISO dates, etc.)
+function parseDate(dateStr) {
+  if (!dateStr) return null;
+
+  // Try parsing as-is first (ISO format)
+  let date = new Date(dateStr);
+  if (!isNaN(date.getTime())) {
+    return date.toISOString().split('T')[0];
+  }
+
+  // Try MM/DD/YYYY format (Google Forms)
+  const parts = dateStr.split(/[\/\-]/);
+  if (parts.length === 3) {
+    // Assume M/D/Y format
+    const month = parseInt(parts[0], 10);
+    const day = parseInt(parts[1], 10);
+    let year = parseInt(parts[2], 10);
+    if (year < 100) year += 2000;
+
+    date = new Date(year, month - 1, day);
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0];
+    }
+  }
+
+  return dateStr; // Return as-is if we can't parse
+}
+
+// Extract year from membership column header (e.g., "Annual Membership 2026" -> 2026)
+function extractYearFromHeader(header) {
+  const match = header.match(/20\d{2}/);
+  return match ? parseInt(match[0], 10) : new Date().getFullYear();
+}
+
+// Parse CSV data - supports both standard format and Google Form export
 function parseCSV(csvText) {
   const lines = csvText.trim().split('\n');
   if (lines.length < 2) {
     throw new Error('CSV must have header row and at least one data row');
   }
 
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-  const required = ['name', 'email', 'membertype', 'joindate', 'expirationdate'];
+  const rawHeaders = parseCSVLine(lines[0]);
+  const headers = rawHeaders.map(h => h.trim().toLowerCase());
 
-  for (const req of required) {
-    if (!headers.includes(req)) {
-      throw new Error(`Missing required column: ${req}`);
+  // Detect format: Google Form vs Standard
+  const isGoogleForm = headers.some(h => h.includes('first name') || h === 'first name') &&
+                       headers.some(h => h.includes('last name') || h === 'last name');
+
+  const isStandardFormat = headers.includes('name') && headers.includes('membertype');
+
+  if (!isGoogleForm && !isStandardFormat) {
+    throw new Error('Unrecognized CSV format. Expected either Google Form export (Timestamp, Email, First Name, Last Name, Membership) or standard format (name, email, memberType, joinDate, expirationDate)');
+  }
+
+  // Find membership year from header if Google Form format
+  let membershipYear = new Date().getFullYear();
+  if (isGoogleForm) {
+    const membershipHeader = rawHeaders.find(h =>
+      h.toLowerCase().includes('membership') ||
+      h.toLowerCase().includes('annual')
+    );
+    if (membershipHeader) {
+      membershipYear = extractYearFromHeader(membershipHeader);
     }
   }
 
@@ -113,28 +183,70 @@ function parseCSV(csvText) {
     const line = lines[i].trim();
     if (!line) continue;
 
-    // Handle quoted values with commas
-    const values = [];
-    let current = '';
-    let inQuotes = false;
+    const values = parseCSVLine(line);
 
-    for (const char of line) {
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        values.push(current.trim());
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    values.push(current.trim());
-
-    const row = {};
+    const rawRow = {};
     headers.forEach((header, idx) => {
-      row[header] = values[idx] || '';
+      rawRow[header] = values[idx] || '';
     });
+
+    // Normalize to standard format
+    let row;
+    if (isGoogleForm) {
+      // Find the relevant columns (flexible matching)
+      const timestamp = rawRow['timestamp'] || rawRow['submitted'] || '';
+      const email = rawRow['email'] || rawRow['email address'] || '';
+      const firstName = rawRow['first name'] || '';
+      const lastName = rawRow['last name'] || '';
+
+      // Find membership type column (might have year in name)
+      let memberType = 'Individual';
+      for (const [key, value] of Object.entries(rawRow)) {
+        if (key.includes('membership') || key.includes('annual')) {
+          memberType = value || 'Individual';
+          break;
+        }
+      }
+
+      // Map common membership values
+      if (memberType.toLowerCase().includes('student')) {
+        memberType = 'Student';
+      } else if (memberType.toLowerCase().includes('adult')) {
+        memberType = 'Adult';
+      } else if (memberType.toLowerCase().includes('family')) {
+        memberType = 'Family';
+      } else if (memberType.toLowerCase().includes('lifetime')) {
+        memberType = 'Lifetime';
+      }
+
+      row = {
+        name: `${firstName} ${lastName}`.trim(),
+        email: email,
+        membertype: memberType,
+        joindate: parseDate(timestamp) || new Date().toISOString().split('T')[0],
+        expirationdate: `${membershipYear}-12-31`
+      };
+    } else {
+      // Standard format - just normalize keys
+      row = {
+        name: rawRow['name'] || '',
+        email: rawRow['email'] || '',
+        membertype: rawRow['membertype'] || 'Individual',
+        joindate: rawRow['joindate'] || new Date().toISOString().split('T')[0],
+        expirationdate: rawRow['expirationdate'] || `${new Date().getFullYear()}-12-31`
+      };
+    }
+
+    // Skip rows without required fields
+    if (!row.name || !row.email) {
+      continue;
+    }
+
     rows.push(row);
+  }
+
+  if (rows.length === 0) {
+    throw new Error('No valid member rows found in CSV');
   }
 
   return rows;

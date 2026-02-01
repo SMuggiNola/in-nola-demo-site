@@ -203,10 +203,21 @@
             <div id="importMessage" class="message"></div>
 
             <div class="csv-format">
-                <h3>CSV Format Required</h3>
+                <h3>Supported CSV Formats</h3>
+                <p style="margin-bottom: 10px; color: var(--text-secondary);">
+                    <strong style="color: var(--gold);">Google Form Export:</strong>
+                </p>
+                <code>Timestamp,Email,First Name,Last Name,Annual Membership 2026
+1/15/2026 10:30,john@example.com,John,Murphy,Adult
+2/20/2026 14:45,mary@example.com,Mary,O'Connor,Student</code>
+                <p style="margin: 12px 0 10px; color: var(--text-secondary);">
+                    <strong style="color: var(--gold);">Or Standard Format:</strong>
+                </p>
                 <code>name,email,memberType,joinDate,expirationDate
-John Murphy,john@example.com,Individual,2025-01-15,2027-01-15
-"Mary O'Connor",mary@example.com,Family,2025-02-20,2027-02-20</code>
+John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
+                <p style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
+                    Google Form exports auto-detect the membership year from the column header and set expiration to Dec 31.
+                </p>
             </div>
 
             <form id="importForm">

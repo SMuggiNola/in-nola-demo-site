@@ -202,6 +202,127 @@
       border-color: var(--gold-primary);
       background: rgba(212, 168, 75, 0.1);
     }
+
+    /* Photo Positioning Tool */
+    .position-tool {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--gold-muted);
+      border-radius: 8px;
+    }
+
+    .position-tool h4 {
+      margin: 0 0 0.75rem 0;
+      color: var(--gold-light);
+      font-size: 0.95rem;
+    }
+
+    .position-container {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .position-source {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .position-source p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .position-image-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: crosshair;
+      border: 2px solid var(--gold-muted);
+      border-radius: 4px;
+      overflow: hidden;
+      max-width: 100%;
+    }
+
+    .position-image-wrapper img {
+      display: block;
+      max-width: 300px;
+      max-height: 300px;
+    }
+
+    .position-crosshair {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--gold-primary);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .position-crosshair::before,
+    .position-crosshair::after {
+      content: '';
+      position: absolute;
+      background: var(--gold-primary);
+    }
+
+    .position-crosshair::before {
+      width: 2px;
+      height: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .position-crosshair::after {
+      width: 100%;
+      height: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .position-preview {
+      text-align: center;
+    }
+
+    .position-preview p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .preview-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--gold-primary);
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .preview-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .position-reset {
+      margin-top: 0.75rem;
+      padding: 0.4rem 0.8rem;
+      background: transparent;
+      color: var(--gold-light);
+      border: 1px solid var(--gold-muted);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .position-reset:hover {
+      border-color: var(--gold-primary);
+    }
   </style>
 </head>
 
@@ -283,7 +404,7 @@
             </div>
 
             <div id="url-input" class="form-group" style="margin-top: 1rem;">
-              <input type="url" id="edit-photo-url" placeholder="https://example.com/your-photo.jpg">
+              <input type="url" id="edit-photo-url" placeholder="https://example.com/your-photo.jpg" onchange="handlePhotoUrlChange()" onblur="handlePhotoUrlChange()">
               <small>Paste a link to your photo (from Google Drive, Dropbox, etc.)</small>
             </div>
 
@@ -295,6 +416,30 @@
               <input type="file" id="photo-file" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
               <div id="upload-preview" class="hidden" style="margin-top: 1rem;">
                 <img id="upload-preview-img" class="current-photo" alt="Preview">
+              </div>
+            </div>
+
+            <!-- Photo Position Tool -->
+            <div id="position-tool" class="position-tool hidden">
+              <h4>Set Photo Center Point</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Click on your image where you want the center of the circle to be.
+              </p>
+              <div class="position-container">
+                <div class="position-source">
+                  <p>Click to set center:</p>
+                  <div class="position-image-wrapper" id="position-wrapper" onclick="handlePositionClick(event)">
+                    <img id="position-source-img" src="" alt="Position source">
+                    <div class="position-crosshair" id="position-crosshair" style="left: 50%; top: 50%;"></div>
+                  </div>
+                  <button type="button" class="position-reset" onclick="resetPosition()">Reset to Center</button>
+                </div>
+                <div class="position-preview">
+                  <p>Preview:</p>
+                  <div class="preview-circle">
+                    <img id="position-preview-img" src="" alt="Preview" style="object-position: 50% 50%;">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -324,6 +469,7 @@
     let currentUser = null;
     let currentMemberData = null;
     let uploadedPhotoBase64 = null;
+    let photoPosition = { x: 50, y: 50 }; // Default center
 
     function showMessage(text, type) {
       const msg = document.getElementById('message');
@@ -369,6 +515,22 @@
         // Show photo preview if exists
         updatePhotoPreview(member.photo);
 
+        // Load saved photo position
+        if (member.photoPosition) {
+          const parts = member.photoPosition.split(' ');
+          photoPosition = {
+            x: parseFloat(parts[0]) || 50,
+            y: parseFloat(parts[1]) || 50
+          };
+        } else {
+          photoPosition = { x: 50, y: 50 };
+        }
+
+        // Show position tool if photo exists
+        if (member.photo) {
+          showPositionTool(member.photo);
+        }
+
         // Switch views
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('edit-section').classList.remove('hidden');
@@ -395,7 +557,8 @@
     function updatePhotoPreview(photoUrl) {
       const container = document.getElementById('photo-preview-container');
       if (photoUrl) {
-        container.innerHTML = `<img src="${photoUrl}" class="photo-preview" alt="Profile photo" onerror="this.style.display='none'">`;
+        const pos = `${photoPosition.x}% ${photoPosition.y}%`;
+        container.innerHTML = `<img src="${photoUrl}" class="photo-preview" alt="Profile photo" style="object-position: ${pos};" onerror="this.style.display='none'">`;
       } else {
         const initial = currentMemberData?.name?.charAt(0) || '?';
         container.innerHTML = `<div class="no-photo">${initial}</div>`;
@@ -435,8 +598,84 @@
         document.getElementById('file-upload-area').innerHTML = '<p>Image selected</p>';
 
         updatePhotoPreview(uploadedPhotoBase64);
+
+        // Show position tool for uploaded image
+        photoPosition = { x: 50, y: 50 }; // Reset to center for new image
+        showPositionTool(uploadedPhotoBase64);
       };
       reader.readAsDataURL(file);
+    }
+
+    function showPositionTool(photoSrc) {
+      const tool = document.getElementById('position-tool');
+      const sourceImg = document.getElementById('position-source-img');
+      const previewImg = document.getElementById('position-preview-img');
+
+      if (!photoSrc) {
+        tool.classList.add('hidden');
+        return;
+      }
+
+      sourceImg.src = photoSrc;
+      previewImg.src = photoSrc;
+      tool.classList.remove('hidden');
+
+      // Apply current position
+      updatePositionDisplay();
+    }
+
+    function handlePositionClick(event) {
+      const wrapper = document.getElementById('position-wrapper');
+      const img = document.getElementById('position-source-img');
+      const rect = img.getBoundingClientRect();
+
+      // Calculate click position as percentage
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+      // Clamp to 0-100
+      photoPosition = {
+        x: Math.max(0, Math.min(100, x)),
+        y: Math.max(0, Math.min(100, y))
+      };
+
+      updatePositionDisplay();
+    }
+
+    function updatePositionDisplay() {
+      const crosshair = document.getElementById('position-crosshair');
+      const previewImg = document.getElementById('position-preview-img');
+      const headerPreview = document.querySelector('#photo-preview-container .photo-preview');
+
+      // Update crosshair position
+      crosshair.style.left = photoPosition.x + '%';
+      crosshair.style.top = photoPosition.y + '%';
+
+      // Update preview image object-position
+      const pos = `${photoPosition.x}% ${photoPosition.y}%`;
+      previewImg.style.objectPosition = pos;
+
+      // Also update header preview if exists
+      if (headerPreview) {
+        headerPreview.style.objectPosition = pos;
+      }
+    }
+
+    function resetPosition() {
+      photoPosition = { x: 50, y: 50 };
+      updatePositionDisplay();
+    }
+
+    // Also update position tool when URL changes
+    function handlePhotoUrlChange() {
+      const url = document.getElementById('edit-photo-url').value.trim();
+      if (url) {
+        photoPosition = { x: 50, y: 50 };
+        showPositionTool(url);
+        updatePhotoPreview(url);
+      } else {
+        document.getElementById('position-tool').classList.add('hidden');
+      }
     }
 
     // Drag and drop support
@@ -478,13 +717,17 @@
         photoValue = uploadedPhotoBase64;
       }
 
+      // Format position as CSS object-position value
+      const positionValue = `${Math.round(photoPosition.x)}% ${Math.round(photoPosition.y)}%`;
+
       const payload = {
         username: currentUser.username,
         pin: currentUser.pin,
         name: document.getElementById('edit-name').value.trim(),
         email: document.getElementById('edit-email').value.trim(),
         bio: document.getElementById('edit-bio').value.trim(),
-        photo: photoValue
+        photo: photoValue,
+        photoPosition: positionValue
       };
 
       try {

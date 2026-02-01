@@ -206,12 +206,12 @@
   <script>
     // Fallback data in case API is unavailable
     const fallbackMembers = [
-      { id: 'shannon', name: 'Shannon Kelly', role: 'President', email: '', bio: 'Shannon Kelly is a passionate advocate for Irish culture...', photo: '' },
-      { id: 'erin', name: 'Erin Marjorie', role: 'Vice President', email: '', bio: 'Erin is a luxury travel advisor and small business owner...', photo: '' },
-      { id: 'andrew', name: 'Andrew Jones', role: 'Grant Manager', email: '', bio: 'Andrew Jones joined the board of Irish Network New Orleans in 2025...', photo: '' },
-      { id: 'joni', name: 'Joni Muggivan', role: 'Treasurer', email: '', bio: 'A lifelong resident of the Greater New Orleans area...', photo: '' },
-      { id: 'colm', name: 'Colm Kennedy', role: 'Event Coordinator', email: '', bio: 'Details about event planning experience...', photo: '' },
-      { id: 'sean', name: 'Seán Muggivan, LCSW', role: 'Data Manager & AI Strategist', email: 'muggs@muggsofdatasci.net', bio: 'Seán Muggivan, LCSW, is a Licensed Clinical Social Worker...', photo: '' }
+      { id: 'shannon', name: 'Shannon Kelly', role: 'President', email: '', bio: 'Shannon Kelly is a passionate advocate for Irish culture...', photo: '', photoPosition: '50% 50%' },
+      { id: 'erin', name: 'Erin Marjorie', role: 'Vice President', email: '', bio: 'Erin is a luxury travel advisor and small business owner...', photo: '', photoPosition: '50% 50%' },
+      { id: 'andrew', name: 'Andrew Jones', role: 'Grant Manager', email: '', bio: 'Andrew Jones joined the board of Irish Network New Orleans in 2025...', photo: '', photoPosition: '50% 50%' },
+      { id: 'joni', name: 'Joni Muggivan', role: 'Treasurer', email: '', bio: 'A lifelong resident of the Greater New Orleans area...', photo: '', photoPosition: '50% 50%' },
+      { id: 'colm', name: 'Colm Kennedy', role: 'Event Coordinator', email: '', bio: 'Details about event planning experience...', photo: '', photoPosition: '50% 50%' },
+      { id: 'sean', name: 'Seán Muggivan, LCSW', role: 'Data Manager & AI Strategist', email: 'muggs@muggsofdatasci.net', bio: 'Seán Muggivan, LCSW, is a Licensed Clinical Social Worker...', photo: '', photoPosition: '50% 50%' }
     ];
 
     function getInitials(name) {
@@ -225,8 +225,9 @@
 
     function renderMember(member) {
       const initials = getInitials(member.name);
+      const position = member.photoPosition || '50% 50%';
       const photoHtml = member.photo
-        ? `<img src="${member.photo}" alt="${member.name}" class="member-photo" onerror="this.outerHTML='<div class=\\'member-initials\\'>${initials}</div>'">`
+        ? `<img src="${member.photo}" alt="${member.name}" class="member-photo" style="object-position: ${position};" onerror="this.outerHTML='<div class=\\'member-initials\\'>${initials}</div>'">`
         : `<div class="member-initials">${initials}</div>`;
 
       const emailHtml = member.email

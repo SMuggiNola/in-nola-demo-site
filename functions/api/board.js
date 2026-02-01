@@ -199,6 +199,7 @@ export async function onRequestPut(context) {
       email: body.email?.trim() ?? existingMember.email,
       bio: body.bio?.trim() || existingMember.bio,
       photo: body.photo ?? existingMember.photo,
+      photoPosition: body.photoPosition ?? existingMember.photoPosition ?? '50% 50%',
       updatedAt: new Date().toISOString()
     };
 

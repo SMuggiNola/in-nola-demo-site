@@ -80,6 +80,13 @@
       box-shadow: 0 4px 12px rgba(212, 168, 75, 0.4);
     }
 
+    .btn-sign-in {
+      width: 100%;
+      padding: 1rem 2rem;
+      font-size: 1.15rem;
+      margin-top: 0.5rem;
+    }
+
     .btn-secondary {
       background: transparent;
       color: var(--gold-light);
@@ -374,20 +381,32 @@
         <!-- Login Form -->
         <div id="login-section" class="login-form">
           <h2>Sign In</h2>
-          <p>Enter your board member credentials to edit your profile.</p>
+          <p>Enter admin credentials to edit a board profile.</p>
 
           <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" placeholder="Your first name (lowercase)" autocomplete="username">
-            <small>Use your first name in lowercase (e.g., shannon, erin, andrew)</small>
+            <input type="text" id="username" placeholder="Enter username" autocomplete="username">
           </div>
 
           <div class="form-group">
-            <label for="pin">PIN</label>
-            <input type="password" id="pin" placeholder="Your 6-digit PIN" autocomplete="current-password">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
           </div>
 
-          <button type="button" class="btn-primary" onclick="login()">Sign In</button>
+          <div class="form-group">
+            <label for="member-select">Board Member to Edit</label>
+            <select id="member-select" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gold-muted); border-radius: 4px; background: rgba(255,255,255,0.95); color: #1a1a1a; font-size: 1rem;">
+              <option value="">-- Select member --</option>
+              <option value="shannon">Shannon Kelly - President</option>
+              <option value="erin">Erin Marjorie - Vice President</option>
+              <option value="andrew">Andrew Jones - Grant Manager</option>
+              <option value="joni">Joni Muggivan - Treasurer</option>
+              <option value="colm">Colm Kennedy - Event Coordinator</option>
+              <option value="sean">Seán Muggivan - Data Manager</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn-primary btn-sign-in" onclick="login()">Sign In</button>
         </div>
 
         <!-- Edit Form (hidden until logged in) -->
@@ -500,6 +519,9 @@
   <script src="../js/main.js"></script>
 
   <script>
+    const ADMIN_USERNAME = 'boardmember';
+    const ADMIN_PASSWORD = 'innola2026!';
+
     let currentUser = null;
     let currentMemberData = null;
     let uploadedPhotoBase64 = null;
@@ -526,27 +548,38 @@
 
     async function login() {
       const username = document.getElementById('username').value.toLowerCase().trim();
-      const pin = document.getElementById('pin').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const memberId = document.getElementById('member-select').value;
 
-      if (!username || !pin) {
-        showMessage('Please enter both username and PIN', 'error');
+      if (!username || !password) {
+        showMessage('Please enter both username and password', 'error');
+        return;
+      }
+
+      if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+        showMessage('Invalid username or password', 'error');
+        return;
+      }
+
+      if (!memberId) {
+        showMessage('Please select a board member to edit', 'error');
         return;
       }
 
       try {
-        // Fetch board data to verify credentials work and get member data
+        // Fetch board data to get member data
         const response = await fetch('/api/board');
         const data = await response.json();
 
         // Find the member
-        const member = data.members?.find(m => m.id === username);
+        const member = data.members?.find(m => m.id === memberId);
         if (!member) {
-          showMessage('Username not found', 'error');
+          showMessage('Member not found', 'error');
           return;
         }
 
-        // Store credentials (we'll verify with the server on save)
-        currentUser = { username, pin };
+        // Store credentials
+        currentUser = { memberId, password };
         currentMemberData = member;
 
         // Populate form
@@ -594,7 +627,8 @@
       uploadedPhotoBase64 = null;
 
       document.getElementById('username').value = '';
-      document.getElementById('pin').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('member-select').value = '';
       document.getElementById('login-section').classList.remove('hidden');
       document.getElementById('edit-section').classList.add('hidden');
     }
@@ -857,8 +891,8 @@
       }
 
       const payload = {
-        username: currentUser.username,
-        pin: currentUser.pin,
+        adminPassword: currentUser.password,
+        memberId: currentUser.memberId,
         name: document.getElementById('edit-name').value.trim(),
         email: document.getElementById('edit-email').value.trim(),
         bio: document.getElementById('edit-bio').value.trim(),

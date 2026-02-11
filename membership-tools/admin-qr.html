@@ -192,17 +192,21 @@
             <p class="subtitle">QR Code Generator</p>
         </header>
 
-        <!-- PIN Entry -->
+        <!-- Admin Login -->
         <div id="pinSection" class="celtic-border card no-print">
             <div id="pinMessage" class="message"></div>
 
             <form id="pinForm" class="pin-entry">
                 <div class="form-group">
-                    <label for="pin">Enter Admin PIN</label>
-                    <input type="password" id="pin" name="pin"
-                           pattern="[0-9]*" inputmode="numeric"
-                           maxlength="6" required
-                           placeholder="******" autocomplete="off">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" name="adminUsername"
+                           required placeholder="Enter username" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" name="adminPassword"
+                           required placeholder="Enter password" autocomplete="off">
                 </div>
 
                 <button type="submit" class="btn btn-primary">Access QR Generator</button>
@@ -253,9 +257,13 @@
     </div>
 
     <script>
-        let adminPin = '';
+        let adminPassword = '';
         let members = [];
         let selectedIds = new Set();
+
+        // Shared admin credentials
+        const ADMIN_USERNAME = 'boardmember';
+        const ADMIN_PASSWORD = 'innola2026!';
 
         const pinSection = document.getElementById('pinSection');
         const selectSection = document.getElementById('selectSection');
@@ -268,9 +276,9 @@
         const qrGrid = document.getElementById('qrGrid');
 
         // Check session
-        const savedPin = sessionStorage.getItem('innola_admin_pin');
-        if (savedPin) {
-            adminPin = savedPin;
+        const savedPassword = sessionStorage.getItem('innola_admin_password');
+        if (savedPassword) {
+            adminPassword = savedPassword;
             showSelectSection();
         }
 
@@ -282,40 +290,28 @@
         async function showSelectSection() {
             pinSection.style.display = 'none';
             selectSection.style.display = 'block';
-            sessionStorage.setItem('innola_admin_pin', adminPin);
+            sessionStorage.setItem('innola_admin_password', adminPassword);
             await loadMembers();
         }
 
-        // PIN form
+        // Login form
         pinForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const pin = document.getElementById('pin').value;
+            const username = document.getElementById('adminUsername').value.toLowerCase().trim();
+            const password = document.getElementById('adminPassword').value.trim();
 
-            try {
-                const response = await fetch('/api/members?adminPin=' + encodeURIComponent(pin));
-                if (response.ok) {
-                    adminPin = pin;
-                    showMessage(pinMessage, 'Access granted!', 'success');
-                    setTimeout(showSelectSection, 500);
-                } else {
-                    showMessage(pinMessage, 'Invalid PIN', 'error');
-                }
-            } catch (err) {
-                // Fallback for local dev
-                const validPins = ['101010', '202020', '303030', '404040', '505050', '606060'];
-                if (validPins.includes(pin)) {
-                    adminPin = pin;
-                    showMessage(pinMessage, 'Access granted!', 'success');
-                    setTimeout(showSelectSection, 500);
-                } else {
-                    showMessage(pinMessage, 'Invalid PIN', 'error');
-                }
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                adminPassword = password;
+                showMessage(pinMessage, 'Access granted!', 'success');
+                setTimeout(showSelectSection, 500);
+            } else {
+                showMessage(pinMessage, 'Invalid username or password', 'error');
             }
         });
 
         async function loadMembers() {
             try {
-                const response = await fetch('/api/members?adminPin=' + encodeURIComponent(adminPin));
+                const response = await fetch('/api/members?adminPassword=' + encodeURIComponent(adminPassword));
                 if (!response.ok) throw new Error('Failed to load');
 
                 const data = await response.json();
@@ -376,7 +372,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        adminPin: adminPin,
+                        adminPassword: adminPassword,
                         memberIds: Array.from(selectedIds)
                     })
                 });

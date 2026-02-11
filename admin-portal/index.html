@@ -104,10 +104,10 @@
 
         <form id="loginForm" class="login-form">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" placeholder="Your first name (lowercase)" required>
+          <input type="text" id="username" name="username" placeholder="Enter username" required>
 
-          <label for="password">PIN</label>
-          <input type="password" id="password" name="password" placeholder="Your 6-digit PIN" maxlength="6" required>
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Admin password" required>
 
           <button type="submit" class="btn btn-gold">Sign In</button>
         </form>
@@ -124,15 +124,9 @@
 
   <script src="/js/main.js"></script>
   <script>
-    // Board member credentials - unified across the site
-    const BOARD_MEMBERS = {
-      'shannon': '101010',
-      'erin': '202020',
-      'andrew': '303030',
-      'joni': '404040',
-      'colm': '505050',
-      'sean': '606060'
-    };
+    // Shared admin credentials
+    const ADMIN_USERNAME = 'boardmember';
+    const ADMIN_PASSWORD = 'innola2026!';
 
     const form = document.getElementById('loginForm');
     const errorMessage = document.getElementById('errorMessage');
@@ -143,12 +137,12 @@
       const username = document.getElementById('username').value.toLowerCase().trim();
       const password = document.getElementById('password').value.trim();
 
-      if (BOARD_MEMBERS[username] && BOARD_MEMBERS[username] === password) {
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
         sessionStorage.setItem('boardAuth', 'true');
         sessionStorage.setItem('boardUser', username);
         window.location.href = 'dashboard.html';
       } else {
-        errorMessage.textContent = 'Invalid username or PIN';
+        errorMessage.textContent = 'Invalid username or password';
         errorMessage.classList.add('show');
       }
     });

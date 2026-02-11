@@ -181,17 +181,21 @@
             <p class="subtitle">Member Import</p>
         </header>
 
-        <!-- PIN Entry -->
+        <!-- Admin Login -->
         <div id="pinSection" class="celtic-border card">
             <div id="pinMessage" class="message"></div>
 
             <form id="pinForm" class="pin-entry">
                 <div class="form-group">
-                    <label for="pin">Enter Admin PIN</label>
-                    <input type="password" id="pin" name="pin"
-                           pattern="[0-9]*" inputmode="numeric"
-                           maxlength="6" required
-                           placeholder="******" autocomplete="off">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" name="adminUsername"
+                           required placeholder="Enter username" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPasswordField">Password</label>
+                    <input type="password" id="adminPasswordField" name="adminPassword"
+                           required placeholder="Enter password" autocomplete="off">
                 </div>
 
                 <button type="submit" class="btn btn-primary">Access Import</button>
@@ -270,8 +274,12 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
     </div>
 
     <script>
-        let adminPin = '';
+        let adminPassword = '';
         let csvContent = '';
+
+        // Shared admin credentials
+        const ADMIN_USERNAME = 'boardmember';
+        const ADMIN_PASSWORD = 'innola2026!';
 
         const pinSection = document.getElementById('pinSection');
         const importSection = document.getElementById('importSection');
@@ -288,9 +296,9 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
         const resultsSection = document.getElementById('resultsSection');
 
         // Check session
-        const savedPin = sessionStorage.getItem('innola_admin_pin');
-        if (savedPin) {
-            adminPin = savedPin;
+        const savedPassword = sessionStorage.getItem('innola_admin_password');
+        if (savedPassword) {
+            adminPassword = savedPassword;
             showImportSection();
         }
 
@@ -306,34 +314,21 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
         function showImportSection() {
             pinSection.style.display = 'none';
             importSection.style.display = 'block';
-            sessionStorage.setItem('innola_admin_pin', adminPin);
+            sessionStorage.setItem('innola_admin_password', adminPassword);
         }
 
-        // PIN form
+        // Login form
         pinForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const pin = document.getElementById('pin').value;
+            const username = document.getElementById('adminUsername').value.toLowerCase().trim();
+            const password = document.getElementById('adminPasswordField').value.trim();
 
-            // Validate PIN by attempting a list call
-            try {
-                const response = await fetch('/api/members?adminPin=' + encodeURIComponent(pin));
-                if (response.ok) {
-                    adminPin = pin;
-                    showMessage(pinMessage, 'Access granted!', 'success');
-                    setTimeout(showImportSection, 500);
-                } else {
-                    showMessage(pinMessage, 'Invalid PIN', 'error');
-                }
-            } catch (err) {
-                // Fallback for local development - check known PINs
-                const validPins = ['101010', '202020', '303030', '404040', '505050', '606060'];
-                if (validPins.includes(pin)) {
-                    adminPin = pin;
-                    showMessage(pinMessage, 'Access granted!', 'success');
-                    setTimeout(showImportSection, 500);
-                } else {
-                    showMessage(pinMessage, 'Invalid PIN', 'error');
-                }
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                adminPassword = password;
+                showMessage(pinMessage, 'Access granted!', 'success');
+                setTimeout(showImportSection, 500);
+            } else {
+                showMessage(pinMessage, 'Invalid username or password', 'error');
             }
         });
 
@@ -395,7 +390,7 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        adminPin: adminPin,
+                        adminPassword: adminPassword,
                         csv: csvContent
                     })
                 });

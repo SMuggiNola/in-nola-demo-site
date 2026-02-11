@@ -4,19 +4,8 @@
 
 const EVENTS_KEY = 'all_events';
 
-// Board member PINs - unified across the site
-// Each board member can add/edit events
-const BOARD_MEMBER_PINS = {
-  'shannon': '101010',
-  'erin': '202020',
-  'andrew': '303030',
-  'joni': '404040',
-  'colm': '505050',
-  'sean': '606060'
-};
-
-// Accept any board member PIN for admin actions
-const ADMIN_PINS = Object.values(BOARD_MEMBER_PINS);
+// Shared admin password for all board member actions
+const ADMIN_PASSWORD = 'innola2026!';
 
 export async function onRequestGet(context) {
   // GET /api/events - Return all events
@@ -100,10 +89,10 @@ export async function onRequestPost(context) {
 
     const body = await request.json();
 
-    // Check admin PIN
-    if (!body.adminPin || !ADMIN_PINS.includes(body.adminPin)) {
+    // Check admin password
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
       return new Response(JSON.stringify({
-        error: 'Invalid admin PIN'
+        error: 'Invalid admin password'
       }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -187,8 +176,8 @@ export async function onRequestPut(context) {
     const body = await request.json();
 
     // Check admin PIN
-    if (!body.adminPin || !ADMIN_PINS.includes(body.adminPin)) {
-      return new Response(JSON.stringify({ error: 'Invalid admin PIN' }), {
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -275,8 +264,8 @@ export async function onRequestDelete(context) {
     const body = await request.json();
 
     // Check admin PIN
-    if (!body.adminPin || !ADMIN_PINS.includes(body.adminPin)) {
-      return new Response(JSON.stringify({ error: 'Invalid admin PIN' }), {
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
       });

@@ -439,8 +439,8 @@
         <input type="hidden" id="editEventId">
 
         <div class="form-group">
-          <label for="editPin">Admin PIN</label>
-          <input type="password" id="editPin" required placeholder="••••••" maxlength="6">
+          <label for="editPassword">Admin Password</label>
+          <input type="password" id="editPassword" required placeholder="Enter admin password">
         </div>
 
         <div class="form-group">
@@ -511,8 +511,8 @@
       <p class="delete-warning">Are you sure you want to delete "<span id="deleteEventTitle"></span>"? This cannot be undone.</p>
 
       <div class="form-group">
-        <label for="deletePin">Admin PIN</label>
-        <input type="password" id="deletePin" required placeholder="••••••" maxlength="6">
+        <label for="deletePassword">Admin Password</label>
+        <input type="password" id="deletePassword" required placeholder="Enter admin password">
       </div>
       <input type="hidden" id="deleteEventId">
 
@@ -748,7 +748,7 @@
       document.getElementById('editNotes').value = event.notes || '';
       document.getElementById('editFacebook').value = event.facebook || '';
       document.getElementById('editInstagram').value = event.instagram || '';
-      document.getElementById('editPin').value = '';
+      document.getElementById('editPassword').value = '';
 
       document.getElementById('editModal').classList.add('active');
     }
@@ -761,7 +761,7 @@
     function openDeleteModal(eventId, eventTitle) {
       document.getElementById('deleteEventId').value = eventId;
       document.getElementById('deleteEventTitle').textContent = eventTitle;
-      document.getElementById('deletePin').value = '';
+      document.getElementById('deletePassword').value = '';
 
       document.getElementById('deleteModal').classList.add('active');
     }
@@ -775,10 +775,10 @@
       e.preventDefault();
 
       const eventId = document.getElementById('editEventId').value;
-      const pin = document.getElementById('editPin').value;
+      const password = document.getElementById('editPassword').value;
 
       const updateData = {
-        adminPin: pin,
+        adminPassword: password,
         eventId: eventId,
         title: document.getElementById('editTitle').value,
         date: document.getElementById('editDate').value,
@@ -815,10 +815,10 @@
     // Handle delete confirmation
     async function confirmDelete() {
       const eventId = document.getElementById('deleteEventId').value;
-      const pin = document.getElementById('deletePin').value;
+      const password = document.getElementById('deletePassword').value;
 
-      if (!pin) {
-        alert('Please enter admin PIN');
+      if (!password) {
+        alert('Please enter admin password');
         return;
       }
 
@@ -826,7 +826,7 @@
         const response = await fetch('/api/events', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adminPin: pin, eventId: eventId })
+          body: JSON.stringify({ adminPassword: password, eventId: eventId })
         });
 
         const result = await response.json();

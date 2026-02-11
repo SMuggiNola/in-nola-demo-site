@@ -3,7 +3,7 @@
 // This migrates the existing hardcoded events to the KV store
 
 const EVENTS_KEY = 'all_events';
-const ADMIN_PINS = ['112233', '445566', '778899'];
+const ADMIN_PASSWORD = 'innola2026!';
 
 const SEED_EVENTS = [
   // Upcoming events
@@ -90,10 +90,10 @@ export async function onRequestPost(context) {
 
     const body = await request.json();
 
-    // Check admin PIN
-    if (!body.adminPin || !ADMIN_PINS.includes(body.adminPin)) {
+    // Check admin password
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
       return new Response(JSON.stringify({
-        error: 'Invalid admin PIN'
+        error: 'Invalid admin password'
       }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -139,7 +139,7 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   return new Response(JSON.stringify({
-    message: 'POST to this endpoint with { "adminPin": "XXXXXX" } to seed initial events'
+    message: 'POST to this endpoint with { "adminPassword": "YOUR_PASSWORD" } to seed initial events'
   }), {
     headers: { 'Content-Type': 'application/json' }
   });

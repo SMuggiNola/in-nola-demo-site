@@ -15,17 +15,21 @@
             <p class="subtitle">Admin Verification Scanner</p>
         </header>
 
-        <!-- PIN Entry -->
+        <!-- Admin Login -->
         <div id="pinSection" class="celtic-border card">
             <div id="pinMessage" class="message"></div>
 
             <form id="pinForm" class="pin-entry">
                 <div class="form-group">
-                    <label for="pin">Enter Admin PIN</label>
-                    <input type="password" id="pin" name="pin"
-                           pattern="[0-9]*" inputmode="numeric"
-                           maxlength="6" required
-                           placeholder="••••••" autocomplete="off">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" name="adminUsername"
+                           required placeholder="Enter username" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" name="adminPassword"
+                           required placeholder="Enter password" autocomplete="off">
                 </div>
 
                 <button type="submit" class="btn btn-primary">Access Scanner</button>
@@ -80,8 +84,9 @@
         const pinForm = document.getElementById('pinForm');
         const pinMessage = document.getElementById('pinMessage');
 
-        // Board member PINs for scanner access
-        const ADMIN_PINS = ['101010', '202020', '303030', '404040', '505050', '606060'];
+        // Shared admin credentials
+        const ADMIN_USERNAME = 'boardmember';
+        const ADMIN_PASSWORD = 'innola2026!';
 
         // Check if already authenticated (session storage for scanner)
         const scannerAuth = sessionStorage.getItem('innola_scanner_auth');
@@ -105,21 +110,23 @@
             sessionStorage.removeItem('innola_scanner_auth');
             pinSection.style.display = 'block';
             scannerSection.style.display = 'none';
-            document.getElementById('pin').value = '';
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminPassword').value = '';
         }
 
         pinForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const pin = document.getElementById('pin').value;
+            const username = document.getElementById('adminUsername').value.toLowerCase().trim();
+            const password = document.getElementById('adminPassword').value.trim();
 
-            if (ADMIN_PINS.includes(pin)) {
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
                 showMessage('Access granted!', 'success');
                 setTimeout(showScanner, 500);
             } else {
-                showMessage('Invalid PIN. Please try again.', 'error');
-                document.getElementById('pin').value = '';
-                document.getElementById('pin').focus();
+                showMessage('Invalid username or password. Please try again.', 'error');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
             }
         });
     </script>

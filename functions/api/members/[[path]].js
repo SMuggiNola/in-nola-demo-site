@@ -5,16 +5,8 @@
 
 const MEMBERS_KEY = 'all_members';
 
-// Board member PINs - unified across the site (same as events.js)
-const BOARD_MEMBER_PINS = {
-  'shannon': '101010',
-  'erin': '202020',
-  'andrew': '303030',
-  'joni': '404040',
-  'colm': '505050',
-  'sean': '606060'
-};
-const ADMIN_PINS = Object.values(BOARD_MEMBER_PINS);
+// Shared admin password for all board member actions
+const ADMIN_PASSWORD = 'innola2026!';
 
 // CORS headers helper
 const corsHeaders = {
@@ -309,9 +301,9 @@ async function handleImport(request, env) {
 
     const body = await request.json();
 
-    // Verify admin PIN
-    if (!body.adminPin || !ADMIN_PINS.includes(body.adminPin)) {
-      return new Response(JSON.stringify({ error: 'Invalid admin PIN' }), {
+    // Verify admin password
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
         status: 401,
         headers: corsHeaders
       });
@@ -593,7 +585,7 @@ async function handleVerify(request, env) {
   }
 }
 
-// GET /api/members?adminPin=123456 - List all members (admin only)
+// GET /api/members?adminPassword=xxx - List all members (admin only)
 async function handleList(request, env) {
   try {
     if (!env.MEMBERS_KV) {
@@ -604,10 +596,10 @@ async function handleList(request, env) {
     }
 
     const url = new URL(request.url);
-    const adminPin = url.searchParams.get('adminPin');
+    const adminPassword = url.searchParams.get('adminPassword');
 
-    if (!adminPin || !ADMIN_PINS.includes(adminPin)) {
-      return new Response(JSON.stringify({ error: 'Invalid admin PIN' }), {
+    if (!adminPassword || adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
         status: 401,
         headers: corsHeaders
       });
@@ -659,8 +651,8 @@ async function handleBatchQR(request, env) {
 
     const body = await request.json();
 
-    if (!body.adminPin || !ADMIN_PINS.includes(body.adminPin)) {
-      return new Response(JSON.stringify({ error: 'Invalid admin PIN' }), {
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
         status: 401,
         headers: corsHeaders
       });

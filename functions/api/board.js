@@ -4,16 +4,8 @@
 
 const BOARD_KEY = 'board_members';
 
-// Board member credentials - username: PIN
-// Each member can only edit their own bio
-const MEMBER_CREDENTIALS = {
-  'shannon': '101010',
-  'erin': '202020',
-  'andrew': '303030',
-  'joni': '404040',
-  'colm': '505050',
-  'sean': '606060'
-};
+// Shared admin password for all board member actions
+const ADMIN_PASSWORD = 'innola2026!';
 
 // Default board member data (used to initialize)
 const DEFAULT_MEMBERS = [
@@ -143,12 +135,12 @@ export async function onRequestPut(context) {
     const body = await request.json();
 
     // Validate credentials
-    const username = body.username?.toLowerCase()?.trim();
-    const pin = body.pin?.trim();
+    const adminPassword = body.adminPassword?.trim();
+    const memberId = body.memberId?.toLowerCase()?.trim();
 
-    if (!username || !pin) {
+    if (!adminPassword) {
       return new Response(JSON.stringify({
-        error: 'Username and PIN required'
+        error: 'Admin password required'
       }), {
         status: 400,
         headers: {
@@ -158,10 +150,9 @@ export async function onRequestPut(context) {
       });
     }
 
-    // Check if username exists and PIN matches
-    if (!MEMBER_CREDENTIALS[username] || MEMBER_CREDENTIALS[username] !== pin) {
+    if (adminPassword !== ADMIN_PASSWORD) {
       return new Response(JSON.stringify({
-        error: 'Invalid username or PIN'
+        error: 'Invalid admin password'
       }), {
         status: 401,
         headers: {
@@ -177,8 +168,8 @@ export async function onRequestPut(context) {
       boardData = { members: DEFAULT_MEMBERS };
     }
 
-    // Find the member to update (can only update own profile)
-    const memberIndex = boardData.members.findIndex(m => m.id === username);
+    // Find the member to update
+    const memberIndex = boardData.members.findIndex(m => m.id === memberId);
     if (memberIndex === -1) {
       return new Response(JSON.stringify({
         error: 'Member not found'

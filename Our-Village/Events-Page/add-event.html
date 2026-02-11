@@ -192,9 +192,9 @@
 
         <div class="pin-group">
           <div class="form-group" style="margin-bottom: 0;">
-            <label for="adminPin">Board Member PIN *</label>
-            <input type="password" id="adminPin" name="adminPin" required placeholder="••••••" maxlength="6" pattern="[0-9]{6}">
-            <p class="hint">6-digit admin PIN required to post events</p>
+            <label for="adminPassword">Admin Password *</label>
+            <input type="password" id="adminPassword" name="adminPassword" required placeholder="Enter admin password">
+            <p class="hint">Admin password required to post events</p>
           </div>
         </div>
 
@@ -315,7 +315,7 @@
 
       // Gather form data
       const eventData = {
-        adminPin: document.getElementById('adminPin').value.trim(),
+        adminPassword: document.getElementById('adminPassword').value.trim(),
         title: document.getElementById('eventTitle').value.trim(),
         date: document.getElementById('eventDate').value,
         time: document.getElementById('eventTime').value.trim(),

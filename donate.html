@@ -22,38 +22,46 @@
         <!-- $5 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$5</p>
-          <form action="https://in-nola.org/donate/" method="get">
-            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="Donate Now">
-            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-          </form>
+          <div id="paypal-button-5" class="paypal-button-container">
+            <p class="coming-soon">PayPal button coming soon</p>
+          </div>
         </div>
 
-        <!-- $20 Donation (Mock) -->
+        <!-- $20 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$20</p>
-          <form action="https://in-nola.org/donate/" method="get">
-            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="Donate Now">
-            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-          </form>
+          <div id="paypal-button-20" class="paypal-button-container">
+            <p class="coming-soon">PayPal button coming soon</p>
+          </div>
         </div>
 
-        <!-- $50 Donation (Mock) -->
+        <!-- $50 Donation -->
         <div class="donation-option">
-          <form action="https://in-nola.org/donate/" method="get">
-            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="Donate Now">
-            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-          </form>
-        </div>
-
-        <!-- Custom Amount Donation -->
-        <div class="donation-option">
-          <p class="donation-amount">Custom Amount</p>
-          <form action="https://in-nola.org/donate/" method="get">
-            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="Donate Now">
-            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-          </form>
+          <p class="donation-amount">$50</p>
+          <div id="paypal-button-50" class="paypal-button-container">
+            <p class="coming-soon">PayPal button coming soon</p>
+          </div>
         </div>
       </div>
+
+      <!-- PayPal SDK -->
+      <script src="https://www.paypal.com/sdk/js?client-id=BAAPQ3CJHzBkceb4WBXiMmpDp6jW2G2J4oRhaBgit47LXFOoOjihj1CoTyXUvYzER2qroCHDJ48_afKnxY&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
+      <script>
+        // =====================================================
+        // TO ACTIVATE: Replace each YOUR_BUTTON_ID_HERE with
+        // the hostedButtonId from your PayPal dashboard, then
+        // delete the "coming soon" <p> tags above.
+        // =====================================================
+
+        // $5 button
+        // paypal.HostedButtons({ hostedButtonId: "YOUR_BUTTON_ID_HERE" }).render("#paypal-button-5");
+
+        // $20 button
+        // paypal.HostedButtons({ hostedButtonId: "YOUR_BUTTON_ID_HERE" }).render("#paypal-button-20");
+
+        // $50 button
+        // paypal.HostedButtons({ hostedButtonId: "YOUR_BUTTON_ID_HERE" }).render("#paypal-button-50");
+      </script>
 
       <div class="back-link" style="margin-top:2rem;">
         <a href="/index.html">← Return to Home</a>

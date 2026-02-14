@@ -2,42 +2,31 @@
 
 ## How It Works
 - Form submits to `/api/contact` (Cloudflare Pages Function)
-- Function sends email via MailChannels API (free for CF Workers/Pages)
+- Function sends email via Resend API
 - Email delivered to configured recipient
 
 ## Environment Variables (Cloudflare Dashboard)
 
 Set these in **Pages > Settings > Environment Variables**:
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `CONTACT_TO_EMAIL` | Where to receive emails | `sean.muggivan@gmail.com` |
-| `CONTACT_TO_NAME` | Recipient display name | `Irish Network NOLA` |
-| `CONTACT_FROM_EMAIL` | Sender address | `noreply@in-nola.org` |
-| `CONTACT_FROM_NAME` | Sender display name | `IN-NOLA Contact Form` |
+| Variable | Description | Current Value |
+|----------|-------------|---------------|
+| `RESEND_API_KEY` | Resend API key for sending emails | (set in dashboard) |
+| `CONTACT_TO_EMAIL` | Where to receive emails | `irishnetworknola@gmail.com` |
 
-## DNS Records for Email Deliverability
+## DNS Records
 
-Once you have the `in-nola.org` domain in Cloudflare, add these DNS records:
+Resend requires domain verification. The following records should be set in Cloudflare DNS for `in-nola.org`:
 
-### 1. SPF Record (Required)
-Authorizes MailChannels to send on behalf of your domain.
+- **SPF** — Resend's SPF include (check Resend dashboard for current record)
+- **DKIM** — CNAME records provided by Resend during domain verification
+- **DMARC** — Optional but recommended for deliverability
 
-| Type | Name | Content |
-|------|------|---------|
-| TXT | `@` | `v=spf1 include:_spf.mx.cloudflare.net include:relay.mailchannels.net ~all` |
+## Email Routing
 
-### 2. Domain Lockdown TXT Record (Required for MailChannels)
-Tells MailChannels which CF worker/pages project can send from your domain.
-
-| Type | Name | Content |
-|------|------|---------|
-| TXT | `_mailchannels` | `v=mc1 cfid=YOUR-PAGES-PROJECT-NAME` |
-
-Replace `YOUR-PAGES-PROJECT-NAME` with your actual Cloudflare Pages project name (e.g., `in-nola-demo`).
-
-### 3. DKIM Record (Recommended)
-Improves deliverability. Generate via MailChannels dashboard or use Cloudflare's Email Routing DKIM.
+- `contact@in-nola.org` is set up via Cloudflare Email Routing
+- Outbound email sends from `IN-NOLA Contact <contact@in-nola.org>` via Resend
+- Reply-to is set to the form submitter's email address
 
 ## Testing
 
@@ -48,13 +37,6 @@ Improves deliverability. Generate via MailChannels dashboard or use Cloudflare's
 
 ## Troubleshooting
 
-- **Emails going to spam**: Add SPF and DKIM records
-- **"Failed to send"**: Check Cloudflare Pages function logs
+- **Emails going to spam**: Verify DNS records in Resend dashboard
+- **"Failed to send"**: Check Cloudflare Pages function logs (`console.error` output)
 - **CORS errors**: The function handles OPTIONS requests automatically
-
-## Future: Custom Domain Email
-
-Once domain transfers:
-1. Set up Cloudflare Email Routing
-2. Create `contact@in-nola.org` → forwards to Gmail
-3. Update `CONTACT_TO_EMAIL` environment variable

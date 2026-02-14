@@ -119,11 +119,7 @@ Sent via IN-NOLA Contact Form
       console.error('Resend error:', response.status, result);
 
       return new Response(JSON.stringify({
-        error: 'Failed to send message. Please try again later.',
-        debug: {
-          status: response.status,
-          response: result
-        }
+        error: 'Failed to send message. Please try again later.'
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }

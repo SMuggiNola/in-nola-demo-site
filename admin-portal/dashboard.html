@@ -349,118 +349,66 @@
     // Task data with owner assignments
     // owner: "board" = needs board member input, "treasurer" = needs treasurer, "tech" = Sean handles it
     const phases = [
+      // ── ACTIVE ──
       {
-        title: "High Priority",
-        description: "Critical items blocking other work. Domain transfer is the main blocker right now.",
+        title: "Membership Pipeline",
+        description: "Goal: every member — current and future — gets access to a membership portal with their member-in-good-standing certificate and QR code. The backend infrastructure (KV database, login API, CSV import, QR system) is built. Now it's about getting real members through the pipeline.",
         tasks: [
-          { done: true, text: "<strong>Test contact form</strong> - Verified working", owner: "tech" },
-          { done: true, text: "<strong>Secure API credentials</strong> - Moved to environment variables", owner: "tech" },
-          { done: false, text: "<strong>Create IN-NOLA Cloudflare account</strong> - Organization account so infrastructure stays with IN-NOLA", owner: "board" },
-          { done: false, text: "<strong>Complete in-nola.org domain transfer</strong>", owner: "board", subtasks: [
-            { done: false, text: "Unlock domain at WordPress", owner: "board" },
-            { done: false, text: "Get Authorization Code from WordPress", owner: "board" },
-            { done: false, text: "Verify domain eligibility (60+ days old)", owner: "board" },
-            { done: false, text: "Copy existing DNS records", owner: "tech" },
-            { done: false, text: "Initiate transfer in Cloudflare", owner: "tech" },
-            { done: false, text: "Pay for 1 year renewal", owner: "board" },
-            { done: false, text: "Approve transfer via email", owner: "board" },
-            { done: false, text: "Wait for transfer to complete (1-7 days)", owner: "tech" }
+          { done: false, text: "<strong>Phase 1: Current Members</strong> - Import existing roster from Google Sheet", owner: "tech", subtasks: [
+            { done: true, text: "Member database built (Cloudflare KV)", owner: "tech" },
+            { done: true, text: "CSV import tool built", owner: "tech" },
+            { done: true, text: "Member login system built (username + PIN)", owner: "tech" },
+            { done: true, text: "Membership certificate page built", owner: "tech" },
+            { done: true, text: "QR code generation and scanning built", owner: "tech" },
+            { done: false, text: "Create MEMBERS_KV namespace in production", owner: "tech" },
+            { done: false, text: "Add MEMBER_SECRET environment variable", owner: "tech" },
+            { done: false, text: "Send current membership roster for import", owner: "board" },
+            { done: false, text: "Import roster and distribute login credentials", owner: "tech" }
+          ]},
+          { done: false, text: "<strong>Phase 2: Google Form Enrollment</strong> - New members sign up via Google Form, get imported into system", owner: "tech", subtasks: [
+            { done: false, text: "Define workflow: Form \u2192 Sheet \u2192 CSV export \u2192 Import", owner: "tech" },
+            { done: false, text: "Send welcome email with login credentials", owner: "tech" },
+            { done: false, text: "Document import process for board members", owner: "tech" }
+          ]},
+          { done: false, text: "<strong>Phase 3: Website Enrollment</strong> - Members sign up and pay directly on in-nola.org", owner: "tech", subtasks: [
+            { done: false, text: "Membership signup page with tier selection", owner: "tech" },
+            { done: false, text: "PayPal payment integration", owner: "tech" },
+            { done: false, text: "Automatic member creation after payment", owner: "tech" },
+            { done: false, text: "Welcome email with login credentials", owner: "tech" },
+            { done: false, text: "Member self-service (renewal, profile updates)", owner: "tech" }
           ]}
         ]
       },
       {
-        title: "Post-Domain Transfer",
-        description: "These tasks unlock once we own in-nola.org. Sets up professional email and domain.",
+        title: "Administration Tools & Capabilities",
+        description: "Tools for board members to manage the site, events, and membership from a unified admin portal.",
         tasks: [
-          { done: false, text: "<strong>Add custom domain</strong> - Connect in-nola.org to website", owner: "tech" },
-          { done: false, text: "<strong>Set up email routing</strong> - Create contact@in-nola.org", owner: "tech" },
-          { done: false, text: "<strong>Configure email sending</strong> - Send from in-nola.org domain", owner: "tech" }
-        ]
-      },
-      {
-        title: "Cleanup Tasks",
-        description: "Housekeeping items to tidy up temporary configurations and documentation.",
-        tasks: [
-          { done: false, text: "<strong>Remove debug output</strong> - Clean up contact form logging", owner: "tech" },
-          { done: false, text: "<strong>Remove old DNS records</strong> - Clean up unused email configuration", owner: "tech" },
-          { done: false, text: "<strong>Update documentation</strong> - Reflect current email setup", owner: "tech" }
-        ]
-      },
-      {
-        title: "Phase 1: PayPal Setup",
-        description: "Configure PayPal to accept membership dues. Need business account access and pricing decisions.",
-        tasks: [
-          { done: false, text: "<strong>PayPal Business account</strong> - Log in or upgrade to business", owner: "board" },
-          { done: false, text: "<strong>Developer credentials</strong> - Create app for payment processing", owner: "tech" },
-          { done: false, text: "<strong>Set membership pricing tiers</strong>", owner: "board", subtasks: [
-            { done: false, text: "Individual membership ($XX/year)", owner: "board" },
-            { done: false, text: "Family membership ($XX/year)", owner: "board" },
-            { done: false, text: "Lifetime membership ($XXX one-time)", owner: "board" }
+          { done: true, text: "<strong>Unified admin login</strong> - Single sign-in across all admin pages", owner: "tech" },
+          { done: true, text: "<strong>Board dashboard</strong> - Task tracking with color-coded ownership", owner: "tech" },
+          { done: true, text: "<strong>Event management</strong> - Add, edit, and delete events from admin", owner: "tech" },
+          { done: true, text: "<strong>Member CSV import</strong> - Bulk import from spreadsheet", owner: "tech" },
+          { done: true, text: "<strong>QR code generator</strong> - Printable member QR codes", owner: "tech" },
+          { done: true, text: "<strong>QR verification scanner</strong> - Scan and verify member status", owner: "tech" },
+          { done: true, text: "<strong>Site QR code</strong> - Permanent high-res QR linking to in-nola.org, accessible from homepage", owner: "tech" },
+          { done: true, text: "<strong>Landing page quick-access buttons</strong> - Member Login, Admin Scanner, Board Portal, QR Download", owner: "tech" },
+          { done: true, text: "<strong>Dynamic next event banner</strong> - Auto-loads upcoming event from API on homepage", owner: "tech" },
+          { done: true, text: "<strong>Member login portal</strong> - Username + PIN login page for members", owner: "tech" },
+          { done: false, text: "<strong>Ticketing system</strong> - Board members submit requests, track completed work", owner: "tech", subtasks: [
+            { done: false, text: "Submit new request form (title, description, priority)", owner: "tech" },
+            { done: false, text: "View open and completed tickets", owner: "tech" },
+            { done: false, text: "Status updates and comments on tickets", owner: "tech" },
+            { done: false, text: "KV storage for ticket data", owner: "tech" }
           ]},
-          { done: false, text: "<strong>Configure payment notifications</strong> - Webhook setup", owner: "tech" }
+          { done: false, text: "<strong>Member management</strong> - Edit and remove individual members", owner: "tech" },
+          { done: false, text: "<strong>Export member list</strong> - CSV download of roster", owner: "tech" },
+          { done: false, text: "<strong>Renewal reminders</strong> - Automated email notifications", owner: "tech" },
+          { done: false, text: "<strong>Spam protection</strong> - Add CAPTCHA/Turnstile to contact form", owner: "tech" },
+          { done: false, text: "<strong>Contact form confirmation</strong> - Email confirmation to submitter", owner: "tech" },
+          { done: false, text: "<strong>Rate limiting</strong> - Prevent form abuse", owner: "tech" }
         ]
       },
       {
-        title: "Phase 2: Database Setup",
-        description: "Create secure storage for member records. Technical work - no board input needed.",
-        tasks: [
-          { done: false, text: "<strong>Choose storage solution</strong> - Database for member records", owner: "tech" },
-          { done: false, text: "<strong>Design member data structure</strong>", owner: "tech", subtasks: [
-            { done: false, text: "Member ID, Name, Email", owner: "tech" },
-            { done: false, text: "Username and PIN", owner: "tech" },
-            { done: false, text: "Membership type and dates", owner: "tech" },
-            { done: false, text: "Payment transaction reference", owner: "tech" },
-            { done: false, text: "Status (active, expired, pending)", owner: "tech" }
-          ]},
-          { done: false, text: "<strong>Create database</strong> - Set up tables", owner: "tech" },
-          { done: false, text: "<strong>Connect to website</strong> - Database integration", owner: "tech" }
-        ]
-      },
-      {
-        title: "Phase 3: Enrollment Flow",
-        description: "Build the new member signup experience - from selecting a tier to receiving login credentials.",
-        tasks: [
-          { done: false, text: "<strong>Create signup page</strong>", owner: "tech", subtasks: [
-            { done: false, text: "Membership tier selection", owner: "tech" },
-            { done: false, text: "Personal info form (name, email, phone)", owner: "tech" },
-            { done: false, text: "Terms & conditions checkbox", owner: "tech" }
-          ]},
-          { done: false, text: "<strong>Build enrollment backend</strong>", owner: "tech", subtasks: [
-            { done: false, text: "Payment initiation", owner: "tech" },
-            { done: false, text: "Payment confirmation handling", owner: "tech" },
-            { done: false, text: "Return page after payment" , owner: "tech" }
-          ]},
-          { done: false, text: "<strong>Add PayPal checkout button</strong>", owner: "tech" },
-          { done: false, text: "<strong>Generate member credentials</strong> - Username and PIN", owner: "tech" },
-          { done: false, text: "<strong>Store new members</strong> - Save to database after payment", owner: "tech" },
-          { done: false, text: "<strong>Send welcome email</strong> - Include login credentials", owner: "tech" }
-        ]
-      },
-      {
-        title: "Phase 4: Member Portal Updates",
-        description: "Connect the existing member login and certificate pages to real member data.",
-        tasks: [
-          { done: false, text: "<strong>Update login system</strong> - Connect to real database", owner: "tech" },
-          { done: false, text: "<strong>Replace demo data</strong> - Use actual member records", owner: "tech" },
-          { done: false, text: "<strong>Build authentication endpoint</strong> - Login verification", owner: "tech" },
-          { done: false, text: "<strong>Update certificate page</strong> - Pull real member data", owner: "tech" },
-          { done: false, text: "<strong>Update QR scanner</strong> - Verify against database", owner: "tech" }
-        ]
-      },
-      {
-        title: "Phase 5: Admin Features",
-        description: "Tools for board members to manage membership - view roster, export lists, send reminders.",
-        tasks: [
-          { done: false, text: "<strong>Admin dashboard</strong> - View all members", owner: "tech" },
-          { done: false, text: "<strong>Member management</strong> - Add, edit, remove members", owner: "tech" },
-          { done: false, text: "<strong>Export member list</strong> - CSV download", owner: "tech" },
-          { done: false, text: "<strong>Renewal reminders</strong> - Automated emails", owner: "tech" },
-          { done: false, text: "<strong>Payment history</strong> - View transaction records", owner: "tech" },
-          { done: false, text: "<strong>Send current membership roster</strong> - Need existing member list to import", owner: "board" }
-        ]
-      },
-      {
-        title: "Phase 6: QuickBooks Integration",
+        title: "QuickBooks Integration",
         description: "Sync new members to QuickBooks automatically. Treasurer needs to set up QB side first.",
         tasks: [
           { done: true, text: "<strong>Integration approach decided</strong> - Website syncs to QuickBooks automatically", owner: "tech" },
@@ -482,12 +430,55 @@
         ]
       },
       {
-        title: "Future Improvements",
-        description: "Nice-to-have enhancements after core functionality is complete. Low priority for now.",
+        title: "Website Logistics",
+        description: "Site structure, navigation flow, content cleanup, and general polish. Parking lot for things that need attention when there's bandwidth.",
         tasks: [
-          { done: false, text: "<strong>Spam protection</strong> - Add CAPTCHA to contact form", owner: "tech" },
-          { done: false, text: "<strong>Email confirmation</strong> - Confirm contact form submissions", owner: "tech" },
-          { done: false, text: "<strong>Rate limiting</strong> - Prevent form abuse", owner: "tech" }
+          { done: false, text: "<strong>Review site navigation flow</strong> - Make sure paths between pages make sense", owner: "tech" },
+          { done: false, text: "<strong>Consistent page structure</strong> - Headers, footers, back links across all pages", owner: "tech" },
+          { done: false, text: "<strong>CSS cleanup</strong> - Reduce duplication across stylesheets", owner: "tech" },
+          { done: false, text: "<strong>Mobile responsiveness audit</strong> - Test all pages on phone/tablet", owner: "tech" },
+          { done: false, text: "<strong>Content Security Policy</strong> - Add security headers", owner: "tech" },
+          { done: false, text: "<strong>Add .gitignore and package.json</strong> - Standard project housekeeping", owner: "tech" }
+        ]
+      },
+      // ── COMPLETE ──
+      {
+        title: "Complete: Migration to New Website",
+        description: "Domain transfer from WordPress, Cloudflare infrastructure setup, email configuration, and cleanup.",
+        tasks: [
+          { done: true, text: "<strong>Create IN-NOLA Cloudflare account</strong> - Organization account", owner: "board" },
+          { done: true, text: "<strong>Complete in-nola.org domain transfer</strong>", owner: "board", subtasks: [
+            { done: true, text: "Unlock domain at WordPress", owner: "board" },
+            { done: true, text: "Get Authorization Code from WordPress", owner: "board" },
+            { done: true, text: "Verify domain eligibility (60+ days old)", owner: "board" },
+            { done: true, text: "Copy existing DNS records", owner: "tech" },
+            { done: true, text: "Initiate transfer in Cloudflare", owner: "tech" },
+            { done: true, text: "Pay for 1 year renewal", owner: "board" },
+            { done: true, text: "Approve transfer via email", owner: "board" },
+            { done: true, text: "Wait for transfer to complete", owner: "tech" }
+          ]},
+          { done: true, text: "<strong>Add custom domain</strong> - Connect in-nola.org to website", owner: "tech" },
+          { done: true, text: "<strong>Set up email routing</strong> - Create contact@in-nola.org", owner: "tech" },
+          { done: true, text: "<strong>Configure email sending</strong> - Send from in-nola.org via Resend", owner: "tech" },
+          { done: true, text: "<strong>Test contact form</strong> - Verified working", owner: "tech" },
+          { done: true, text: "<strong>Secure API credentials</strong> - Moved to environment variables", owner: "tech" },
+          { done: true, text: "<strong>Remove debug output</strong> - Cleaned up contact form error responses", owner: "tech" },
+          { done: true, text: "<strong>Update documentation</strong> - Reflect current Resend email setup", owner: "tech" },
+          { done: false, text: "<strong>Remove old MailChannels DNS records</strong> - Clean up unused email config in Cloudflare", owner: "tech" }
+        ]
+      },
+      {
+        title: "Complete: PayPal Setup",
+        description: "PayPal configured to accept membership dues and donations.",
+        tasks: [
+          { done: true, text: "<strong>PayPal Business account</strong> - Upgraded to business", owner: "board" },
+          { done: true, text: "<strong>Developer credentials</strong> - App created for payment processing", owner: "tech" },
+          { done: true, text: "<strong>Set membership pricing tiers</strong>", owner: "board", subtasks: [
+            { done: true, text: "Individual membership", owner: "board" },
+            { done: true, text: "Family membership", owner: "board" },
+            { done: true, text: "Lifetime membership", owner: "board" }
+          ]},
+          { done: true, text: "<strong>Configure payment notifications</strong> - Webhook setup", owner: "tech" }
         ]
       }
     ];

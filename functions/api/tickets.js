@@ -156,7 +156,7 @@ export async function onRequestPost(context) {
 
     // Send email notification
     const RESEND_API_KEY = env.RESEND_API_KEY;
-    const NOTIFY_EMAIL = 'sean.muggivan@gmail.com';
+    const NOTIFY_EMAIL = 'tech@in-nola.org';
     if (RESEND_API_KEY) {
       try {
         const priorityLabel = priority.charAt(0).toUpperCase() + priority.slice(1);

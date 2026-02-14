@@ -19,10 +19,16 @@ function getAdminPassword() {
   return sessionStorage.getItem('adminPassword') || '';
 }
 
+/** Return the logged-in user's role ('admin' or 'board'). */
+function getUserRole() {
+  return sessionStorage.getItem('userRole');
+}
+
 /** Clear all admin session data and redirect to login. */
 function adminLogout() {
   sessionStorage.removeItem('boardAuth');
   sessionStorage.removeItem('boardUser');
+  sessionStorage.removeItem('userRole');
   sessionStorage.removeItem('adminPassword');
   window.location.href = '/admin-portal/index.html';
 }

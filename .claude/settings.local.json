@@ -3,7 +3,14 @@
     "allow": [
       "Bash(git -C \"C:\\\\in-nola-demo\" add -A)",
       "Bash(git -C \"C:\\\\in-nola-demo\" commit -m \"$\\(cat <<''EOF''\nSwitch contact form to Resend API\n\n- Replace MailChannels with Resend for email delivery\n- Simpler setup, no DNS records required\n- Sends HTML and plain text versions\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git -C \"C:\\\\in-nola-demo\" push)"
+      "Bash(git -C \"C:\\\\in-nola-demo\" push)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(where:*)",
+      "Bash(git restore:*)",
+      "Bash(curl:*)",
+      "Bash(python:*)"
     ]
   }
 }

@@ -519,9 +519,6 @@
   <script src="../js/main.js"></script>
 
   <script>
-    const ADMIN_USERNAME = 'boardmember';
-    const ADMIN_PASSWORD = 'innola2026!';
-
     let currentUser = null;
     let currentMemberData = null;
     let uploadedPhotoBase64 = null;
@@ -556,17 +553,26 @@
         return;
       }
 
-      if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-        showMessage('Invalid username or password', 'error');
-        return;
-      }
-
       if (!memberId) {
         showMessage('Please select a board member to edit', 'error');
         return;
       }
 
       try {
+        // Authenticate via backend
+        const authResponse = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const authData = await authResponse.json();
+
+        if (!authResponse.ok || !authData.success) {
+          showMessage(authData.error || 'Invalid username or password', 'error');
+          return;
+        }
+
         // Fetch board data to get member data
         const response = await fetch('/api/board');
         const data = await response.json();
@@ -578,8 +584,8 @@
           return;
         }
 
-        // Store credentials
-        currentUser = { memberId, password };
+        // Store credentials — use apiToken from backend for API calls
+        currentUser = { memberId, password: authData.apiToken };
         currentMemberData = member;
 
         // Populate form

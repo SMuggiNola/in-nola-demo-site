@@ -138,9 +138,7 @@
       padding: 0.6rem 0.5rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 6px;
-      cursor: pointer;
       transition: background 0.2s ease;
-      text-decoration: none;
     }
 
     .task-item:hover {
@@ -156,6 +154,12 @@
       font-size: 1.1rem;
       flex-shrink: 0;
       margin-top: 0.1rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .task-checkbox:hover {
+      transform: scale(1.2);
     }
 
     .task-checkbox.done {
@@ -166,6 +170,7 @@
       color: var(--text-secondary);
       font-size: 0.95rem;
       line-height: 1.4;
+      text-decoration: none;
     }
 
     .task-text.done {
@@ -176,6 +181,10 @@
     .task-text strong {
       color: var(--text-primary);
       font-weight: 600;
+    }
+
+    a.task-text:hover {
+      color: var(--text-primary);
     }
 
     .owner-tag {
@@ -346,142 +355,8 @@
       adminLogout();
     });
 
-    // Task data with owner assignments
-    // owner: "board" = needs board member input, "treasurer" = needs treasurer, "tech" = Sean handles it
-    const phases = [
-      // ── ACTIVE ──
-      {
-        title: "Membership Pipeline",
-        description: "Goal: every member — current and future — gets access to a membership portal with their member-in-good-standing certificate and QR code. The backend infrastructure (KV database, login API, CSV import, QR system) is built. Now it's about getting real members through the pipeline.",
-        tasks: [
-          { done: false, text: "<strong>Phase 1: Current Members</strong> - Import existing roster from Google Sheet", owner: "tech", subtasks: [
-            { done: true, text: "Member database built (Cloudflare KV)", owner: "tech" },
-            { done: true, text: "CSV import tool built", owner: "tech" },
-            { done: true, text: "Member login system built (username + PIN)", owner: "tech" },
-            { done: true, text: "Membership certificate page built", owner: "tech" },
-            { done: true, text: "QR code generation and scanning built", owner: "tech" },
-            { done: false, text: "Create MEMBERS_KV namespace in production", owner: "tech" },
-            { done: false, text: "Add MEMBER_SECRET environment variable", owner: "tech" },
-            { done: false, text: "Send current membership roster for import", owner: "board" },
-            { done: false, text: "Import roster and distribute login credentials", owner: "tech" }
-          ]},
-          { done: false, text: "<strong>Phase 2: Google Form Enrollment</strong> - New members sign up via Google Form, get imported into system", owner: "tech", subtasks: [
-            { done: false, text: "Define workflow: Form \u2192 Sheet \u2192 CSV export \u2192 Import", owner: "tech" },
-            { done: false, text: "Send welcome email with login credentials", owner: "tech" },
-            { done: false, text: "Document import process for board members", owner: "tech" }
-          ]},
-          { done: false, text: "<strong>Phase 3: Website Enrollment</strong> - Members sign up and pay directly on in-nola.org", owner: "tech", subtasks: [
-            { done: false, text: "Membership signup page with tier selection", owner: "tech" },
-            { done: false, text: "PayPal payment integration", owner: "tech" },
-            { done: false, text: "Automatic member creation after payment", owner: "tech" },
-            { done: false, text: "Welcome email with login credentials", owner: "tech" },
-            { done: false, text: "Member self-service (renewal, profile updates)", owner: "tech" }
-          ]}
-        ]
-      },
-      {
-        title: "Administration Tools & Capabilities",
-        description: "Tools for board members to manage the site, events, and membership from a unified admin portal.",
-        tasks: [
-          { done: true, text: "<strong>Unified admin login</strong> - Single sign-in across all admin pages", owner: "tech" },
-          { done: true, text: "<strong>Board dashboard</strong> - Task tracking with color-coded ownership", owner: "tech" },
-          { done: true, text: "<strong>Event management</strong> - Add, edit, and delete events from admin", owner: "tech" },
-          { done: true, text: "<strong>Member CSV import</strong> - Bulk import from spreadsheet", owner: "tech" },
-          { done: true, text: "<strong>QR code generator</strong> - Printable member QR codes", owner: "tech" },
-          { done: true, text: "<strong>QR verification scanner</strong> - Scan and verify member status", owner: "tech" },
-          { done: true, text: "<strong>Site QR code</strong> - Permanent high-res QR linking to in-nola.org, accessible from homepage", owner: "tech" },
-          { done: true, text: "<strong>Landing page quick-access buttons</strong> - Member Login, Admin Scanner, Board Portal, QR Download", owner: "tech" },
-          { done: true, text: "<strong>Dynamic next event banner</strong> - Auto-loads upcoming event from API on homepage", owner: "tech" },
-          { done: true, text: "<strong>Member login portal</strong> - Username + PIN login page for members", owner: "tech" },
-          { done: true, text: "<strong>Ticketing system</strong> - Board members submit requests, track completed work", owner: "tech", subtasks: [
-            { done: true, text: "Submit new request form (title, description, priority)", owner: "tech" },
-            { done: true, text: "View open and completed tickets", owner: "tech" },
-            { done: true, text: "Status updates and comments on tickets", owner: "tech" },
-            { done: true, text: "KV storage for ticket data", owner: "tech" }
-          ]},
-          { done: false, text: "<strong>Member management</strong> - Edit and remove individual members", owner: "tech" },
-          { done: false, text: "<strong>Export member list</strong> - CSV download of roster", owner: "tech" },
-          { done: false, text: "<strong>Renewal reminders</strong> - Automated email notifications", owner: "tech" },
-          { done: false, text: "<strong>Spam protection</strong> - Add CAPTCHA/Turnstile to contact form", owner: "tech" },
-          { done: false, text: "<strong>Contact form confirmation</strong> - Email confirmation to submitter", owner: "tech" },
-          { done: false, text: "<strong>Rate limiting</strong> - Prevent form abuse", owner: "tech" }
-        ]
-      },
-      {
-        title: "QuickBooks Integration",
-        description: "Sync new members to QuickBooks automatically. Treasurer needs to set up QB side first.",
-        tasks: [
-          { done: true, text: "<strong>Integration approach decided</strong> - Website syncs to QuickBooks automatically", owner: "tech" },
-          { done: false, text: "<strong>QuickBooks setup</strong>", owner: "treasurer", subtasks: [
-            { done: false, text: "Ensure QuickBooks Online subscription (Plus or Advanced)", owner: "treasurer" },
-            { done: false, text: "Set up Customer list structure for members", owner: "treasurer" },
-            { done: false, text: "Create Products/Services for membership tiers", owner: "treasurer" },
-            { done: false, text: "Set up recurring invoices template", owner: "treasurer" },
-            { done: false, text: "Decide: QuickBooks Payments vs PayPal vs both", owner: "board" }
-          ]},
-          { done: false, text: "<strong>QuickBooks API setup</strong> - Developer portal credentials", owner: "tech" },
-          { done: false, text: "<strong>Build sync endpoints</strong> - Connect website to QuickBooks", owner: "tech" },
-          { done: false, text: "<strong>Map data fields</strong>", owner: "tech", subtasks: [
-            { done: false, text: "Member Name to Customer DisplayName", owner: "tech" },
-            { done: false, text: "Email to PrimaryEmailAddr", owner: "tech" },
-            { done: false, text: "Membership Type to custom field", owner: "tech" },
-            { done: false, text: "Expiration Date to custom field", owner: "tech" }
-          ]}
-        ]
-      },
-      {
-        title: "Website Logistics",
-        description: "Site structure, navigation flow, content cleanup, and general polish. Parking lot for things that need attention when there's bandwidth.",
-        tasks: [
-          { done: false, text: "<strong>Review site navigation flow</strong> - Make sure paths between pages make sense", owner: "tech" },
-          { done: false, text: "<strong>Consistent page structure</strong> - Headers, footers, back links across all pages", owner: "tech" },
-          { done: false, text: "<strong>CSS cleanup</strong> - Reduce duplication across stylesheets", owner: "tech" },
-          { done: false, text: "<strong>Mobile responsiveness audit</strong> - Test all pages on phone/tablet", owner: "tech" },
-          { done: false, text: "<strong>Content Security Policy</strong> - Add security headers", owner: "tech" },
-          { done: false, text: "<strong>Add .gitignore and package.json</strong> - Standard project housekeeping", owner: "tech" }
-        ]
-      },
-      // ── COMPLETE ──
-      {
-        title: "Complete: Migration to New Website",
-        description: "Domain transfer from WordPress, Cloudflare infrastructure setup, email configuration, and cleanup.",
-        tasks: [
-          { done: true, text: "<strong>Create IN-NOLA Cloudflare account</strong> - Organization account", owner: "board" },
-          { done: true, text: "<strong>Complete in-nola.org domain transfer</strong>", owner: "board", subtasks: [
-            { done: true, text: "Unlock domain at WordPress", owner: "board" },
-            { done: true, text: "Get Authorization Code from WordPress", owner: "board" },
-            { done: true, text: "Verify domain eligibility (60+ days old)", owner: "board" },
-            { done: true, text: "Copy existing DNS records", owner: "tech" },
-            { done: true, text: "Initiate transfer in Cloudflare", owner: "tech" },
-            { done: true, text: "Pay for 1 year renewal", owner: "board" },
-            { done: true, text: "Approve transfer via email", owner: "board" },
-            { done: true, text: "Wait for transfer to complete", owner: "tech" }
-          ]},
-          { done: true, text: "<strong>Add custom domain</strong> - Connect in-nola.org to website", owner: "tech" },
-          { done: true, text: "<strong>Set up email routing</strong> - Create contact@in-nola.org", owner: "tech" },
-          { done: true, text: "<strong>Configure email sending</strong> - Send from in-nola.org via Resend", owner: "tech" },
-          { done: true, text: "<strong>Test contact form</strong> - Verified working", owner: "tech" },
-          { done: true, text: "<strong>Secure API credentials</strong> - Moved to environment variables", owner: "tech" },
-          { done: true, text: "<strong>Remove debug output</strong> - Cleaned up contact form error responses", owner: "tech" },
-          { done: true, text: "<strong>Update documentation</strong> - Reflect current Resend email setup", owner: "tech" },
-          { done: false, text: "<strong>Remove old MailChannels DNS records</strong> - Clean up unused email config in Cloudflare", owner: "tech" }
-        ]
-      },
-      {
-        title: "Complete: PayPal Setup",
-        description: "PayPal configured to accept membership dues and donations.",
-        tasks: [
-          { done: true, text: "<strong>PayPal Business account</strong> - Upgraded to business", owner: "board" },
-          { done: true, text: "<strong>Developer credentials</strong> - App created for payment processing", owner: "tech" },
-          { done: true, text: "<strong>Set membership pricing tiers</strong>", owner: "board", subtasks: [
-            { done: true, text: "Individual membership", owner: "board" },
-            { done: true, text: "Family membership", owner: "board" },
-            { done: true, text: "Lifetime membership", owner: "board" }
-          ]},
-          { done: true, text: "<strong>Configure payment notifications</strong> - Webhook setup", owner: "tech" }
-        ]
-      }
-    ];
+    // Task data loaded from API
+    let phases = [];
 
     // Email config
     const BOARD_EMAIL = 'sean.muggivan@gmail.com';
@@ -504,12 +379,115 @@
       return owner ? `<span class="owner-tag ${owner}">${labels[owner] || owner}</span>` : '';
     }
 
-    // Render phases
+    // Toggle task done/undone via API
+    async function toggleTask(taskId, currentDone) {
+      const newDone = !currentDone;
+
+      // Optimistic update — flip checkbox immediately
+      const checkbox = document.querySelector(`[data-task-id="${taskId}"] .task-checkbox`);
+      const textEl = document.querySelector(`[data-task-id="${taskId}"] .task-text`);
+      if (checkbox) {
+        checkbox.classList.toggle('done');
+        checkbox.innerHTML = newDone ? '&#10003;' : '&#9675;';
+      }
+      if (textEl) {
+        textEl.classList.toggle('done');
+      }
+
+      // Update local data
+      for (const phase of phases) {
+        for (const task of phase.tasks) {
+          if (task.id === taskId) { task.done = newDone; break; }
+          if (task.subtasks) {
+            for (const sub of task.subtasks) {
+              if (sub.id === taskId) { sub.done = newDone; break; }
+            }
+          }
+        }
+      }
+
+      // Update progress cards from local data
+      updateProgressCards();
+
+      // Persist to API
+      try {
+        const res = await fetch('/api/tasks', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminPassword: getAdminPassword(),
+            taskId: taskId,
+            field: 'done',
+            value: newDone
+          })
+        });
+        if (!res.ok) throw new Error('API error');
+      } catch (err) {
+        // Revert on failure
+        if (checkbox) {
+          checkbox.classList.toggle('done');
+          checkbox.innerHTML = currentDone ? '&#10003;' : '&#9675;';
+        }
+        if (textEl) {
+          textEl.classList.toggle('done');
+        }
+        // Revert local data
+        for (const phase of phases) {
+          for (const task of phase.tasks) {
+            if (task.id === taskId) { task.done = currentDone; break; }
+            if (task.subtasks) {
+              for (const sub of task.subtasks) {
+                if (sub.id === taskId) { sub.done = currentDone; break; }
+              }
+            }
+          }
+        }
+        updateProgressCards();
+        console.error('Failed to toggle task:', err);
+      }
+    }
+
+    // Update progress summary cards from current local data
+    function updateProgressCards() {
+      let totalTasks = 0, completedTasks = 0, boardTasks = 0;
+      phases.forEach(phase => {
+        phase.tasks.forEach(task => {
+          totalTasks++;
+          if (task.done) completedTasks++;
+          if (!task.done && (task.owner === 'board' || task.owner === 'treasurer')) boardTasks++;
+          if (task.subtasks) {
+            task.subtasks.forEach(sub => {
+              totalTasks++;
+              if (sub.done) completedTasks++;
+              if (!sub.done && (sub.owner === 'board' || sub.owner === 'treasurer')) boardTasks++;
+            });
+          }
+        });
+      });
+      document.getElementById('totalTasks').textContent = totalTasks;
+      document.getElementById('completedTasks').textContent = completedTasks;
+      document.getElementById('remainingTasks').textContent = totalTasks - completedTasks;
+      document.getElementById('boardTasks').textContent = boardTasks;
+
+      // Also update phase counts in headers
+      phases.forEach((phase, index) => {
+        let phaseDone = 0, phaseTotal = 0;
+        phase.tasks.forEach(task => {
+          phaseTotal++;
+          if (task.done) phaseDone++;
+          if (task.subtasks) {
+            task.subtasks.forEach(sub => { phaseTotal++; if (sub.done) phaseDone++; });
+          }
+        });
+        const countEl = document.querySelector(`.phase-header[data-index="${index}"] .phase-count`);
+        if (countEl) countEl.textContent = `${phaseDone}/${phaseTotal}`;
+      });
+    }
+
+    // Render phases into DOM
     function renderPhases() {
       const container = document.getElementById('phasesContainer');
-      let totalTasks = 0;
-      let completedTasks = 0;
-      let boardTasks = 0;
+      container.innerHTML = '';
 
       phases.forEach((phase, index) => {
         const phaseEl = document.createElement('div');
@@ -522,18 +500,13 @@
         phase.tasks.forEach(task => {
           phaseTotal++;
           if (task.done) phaseDone++;
-          if (!task.done && (task.owner === 'board' || task.owner === 'treasurer')) boardTasks++;
           if (task.subtasks) {
             task.subtasks.forEach(sub => {
               phaseTotal++;
               if (sub.done) phaseDone++;
-              if (!sub.done && (sub.owner === 'board' || sub.owner === 'treasurer')) boardTasks++;
             });
           }
         });
-
-        totalTasks += phaseTotal;
-        completedTasks += phaseDone;
 
         // Build task HTML
         let tasksHtml = '';
@@ -545,10 +518,10 @@
           const mailtoLink = createMailtoLink(task.text, phase.title);
 
           tasksHtml += `
-            <a href="${mailtoLink}" class="task-item ${ownerClass}" title="Click to email info about this task">
-              <span class="task-checkbox ${checkClass}">${checkIcon}</span>
-              <span class="task-text ${checkClass}">${task.text}${ownerTag}</span>
-            </a>
+            <div class="task-item ${ownerClass}" data-task-id="${task.id}">
+              <span class="task-checkbox ${checkClass}" onclick="event.stopPropagation(); toggleTask('${task.id}', ${task.done})" title="Click to toggle done">${checkIcon}</span>
+              <a href="${mailtoLink}" class="task-text ${checkClass}" title="Click to email info about this task">${task.text}${ownerTag}</a>
+            </div>
           `;
 
           if (task.subtasks) {
@@ -559,10 +532,10 @@
               const subOwnerClass = sub.owner ? `owner-${sub.owner}` : '';
               const subMailtoLink = createMailtoLink(sub.text, phase.title);
               tasksHtml += `
-                <a href="${subMailtoLink}" class="task-item ${subOwnerClass}" style="padding-left: 1.5rem;" title="Click to email info about this task">
-                  <span class="task-checkbox ${subCheckClass}">${subCheckIcon}</span>
-                  <span class="task-text ${subCheckClass}">${sub.text}${subOwnerTag}</span>
-                </a>
+                <div class="task-item ${subOwnerClass}" data-task-id="${sub.id}" style="padding-left: 1.5rem;">
+                  <span class="task-checkbox ${subCheckClass}" onclick="event.stopPropagation(); toggleTask('${sub.id}', ${sub.done})" title="Click to toggle done">${subCheckIcon}</span>
+                  <a href="${subMailtoLink}" class="task-text ${subCheckClass}" title="Click to email info about this task">${sub.text}${subOwnerTag}</a>
+                </div>
               `;
             });
           }
@@ -589,11 +562,8 @@
         container.appendChild(phaseEl);
       });
 
-      // Update summary
-      document.getElementById('totalTasks').textContent = totalTasks;
-      document.getElementById('completedTasks').textContent = completedTasks;
-      document.getElementById('remainingTasks').textContent = totalTasks - completedTasks;
-      document.getElementById('boardTasks').textContent = boardTasks;
+      // Update summary cards
+      updateProgressCards();
     }
 
     // Toggle phase dropdowns
@@ -608,8 +578,30 @@
       }
     });
 
+    // Load tasks from API
+    async function loadTasks() {
+      const container = document.getElementById('phasesContainer');
+      container.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 2rem;">Loading tasks...</p>';
+
+      try {
+        const res = await fetch('/api/tasks?adminPassword=' + encodeURIComponent(getAdminPassword()));
+        if (!res.ok) throw new Error('API returned ' + res.status);
+        const data = await res.json();
+        phases = data.phases || [];
+        renderPhases();
+      } catch (err) {
+        console.error('Failed to load tasks:', err);
+        container.innerHTML = `
+          <div style="text-align:center; padding: 2rem; color: var(--text-secondary);">
+            <p>Could not load tasks from server.</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Check your connection or try refreshing the page.</p>
+          </div>
+        `;
+      }
+    }
+
     // Initialize
-    renderPhases();
+    loadTasks();
   </script>
 
 </body>

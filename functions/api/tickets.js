@@ -154,6 +154,43 @@ export async function onRequestPost(context) {
     // Save back to KV
     await env.TICKETS_KV.put(TICKETS_KEY, JSON.stringify(ticketsData));
 
+    // Send email notification
+    const RESEND_API_KEY = env.RESEND_API_KEY;
+    const NOTIFY_EMAIL = env.CONTACT_TO_EMAIL || 'irishnetworknola@gmail.com';
+    if (RESEND_API_KEY) {
+      try {
+        const priorityLabel = priority.charAt(0).toUpperCase() + priority.slice(1);
+        const submitterName = newTicket.submittedBy || 'Unknown';
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'IN-NOLA Tech Requests <contact@in-nola.org>',
+            to: [NOTIFY_EMAIL],
+            subject: `[Tech Request] ${newTicket.title} (${priorityLabel})`,
+            html: `
+              <h2>New Tech Request</h2>
+              <p><strong>Title:</strong> ${escapeHtml(newTicket.title)}</p>
+              <p><strong>Priority:</strong> ${priorityLabel}</p>
+              <p><strong>Submitted by:</strong> ${escapeHtml(submitterName)}</p>
+              <hr>
+              <p><strong>Description:</strong></p>
+              <p>${escapeHtml(newTicket.description).replace(/\n/g, '<br>')}</p>
+              <hr>
+              <p style="color: #666; font-size: 12px;">View and manage at <a href="https://in-nola.org/admin-portal/tickets.html">Admin Portal</a></p>
+            `,
+            text: `New Tech Request\n\nTitle: ${newTicket.title}\nPriority: ${priorityLabel}\nSubmitted by: ${submitterName}\n\nDescription:\n${newTicket.description}\n\n---\nView at https://in-nola.org/admin-portal/tickets.html`,
+          }),
+        });
+      } catch (emailErr) {
+        // Don't fail the ticket creation if email fails
+        console.error('Failed to send ticket notification:', emailErr);
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
       ticket: sanitizeTicket(newTicket),

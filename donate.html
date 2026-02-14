@@ -18,108 +18,98 @@
       <h1>Support Irish Network NOLA</h1>
       <p>Your generous contribution helps us promote and preserve Irish heritage and culture in New Orleans. Thank you for your support!</p>
 
+      <!-- Thank you message (shown after returning from PayPal) -->
+      <div id="thank-you-banner" style="display:none; background:var(--green); color:#fff; padding:1.2rem; border-radius:8px; margin-bottom:2rem; text-align:center; font-size:1.1rem;">
+        Thank you for your generous donation! Your support means the world to Irish Network NOLA.
+      </div>
+
       <div class="donation-options">
         <!-- $5 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$5</p>
-          <div id="paypal-button-5" class="paypal-button-container"></div>
-          <p id="paypal-button-5-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+            <input type="hidden" name="cmd" value="_donations">
+            <input type="hidden" name="business" value="irishnetworknola@gmail.com">
+            <input type="hidden" name="item_name" value="Donation to Irish Network NOLA">
+            <input type="hidden" name="currency_code" value="USD">
+            <input type="hidden" name="amount" value="5.00">
+            <input type="hidden" name="no_note" value="1">
+            <input type="hidden" name="no_shipping" value="1">
+            <input type="hidden" name="return" value="https://in-nola.org/donate.html?thanks=1">
+            <button type="submit" class="paypal-donate-btn">Donate with PayPal</button>
+          </form>
         </div>
 
         <!-- $20 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$20</p>
-          <div id="paypal-button-20" class="paypal-button-container"></div>
-          <p id="paypal-button-20-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+            <input type="hidden" name="cmd" value="_donations">
+            <input type="hidden" name="business" value="irishnetworknola@gmail.com">
+            <input type="hidden" name="item_name" value="Donation to Irish Network NOLA">
+            <input type="hidden" name="currency_code" value="USD">
+            <input type="hidden" name="amount" value="20.00">
+            <input type="hidden" name="no_note" value="1">
+            <input type="hidden" name="no_shipping" value="1">
+            <input type="hidden" name="return" value="https://in-nola.org/donate.html?thanks=1">
+            <button type="submit" class="paypal-donate-btn">Donate with PayPal</button>
+          </form>
         </div>
 
         <!-- $50 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$50</p>
-          <div id="paypal-button-50" class="paypal-button-container"></div>
-          <p id="paypal-button-50-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+            <input type="hidden" name="cmd" value="_donations">
+            <input type="hidden" name="business" value="irishnetworknola@gmail.com">
+            <input type="hidden" name="item_name" value="Donation to Irish Network NOLA">
+            <input type="hidden" name="currency_code" value="USD">
+            <input type="hidden" name="amount" value="50.00">
+            <input type="hidden" name="no_note" value="1">
+            <input type="hidden" name="no_shipping" value="1">
+            <input type="hidden" name="return" value="https://in-nola.org/donate.html?thanks=1">
+            <button type="submit" class="paypal-donate-btn">Donate with PayPal</button>
+          </form>
         </div>
 
         <!-- Custom Amount -->
         <div class="donation-option">
           <p class="donation-amount">Custom</p>
-          <div style="display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-bottom:1rem;">
-            <span style="font-size:1.5rem; color:var(--gold);">$</span>
-            <input type="number" id="custom-amount" class="donation-input" placeholder="Amount" min="1" step="0.01" style="margin-bottom:0;">
-          </div>
-          <div id="paypal-button-custom" class="paypal-button-container"></div>
-          <p id="paypal-button-custom-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
+          <form id="custom-donate-form" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+            <input type="hidden" name="cmd" value="_donations">
+            <input type="hidden" name="business" value="irishnetworknola@gmail.com">
+            <input type="hidden" name="item_name" value="Donation to Irish Network NOLA">
+            <input type="hidden" name="currency_code" value="USD">
+            <input type="hidden" name="amount" id="custom-amount-hidden" value="">
+            <input type="hidden" name="no_note" value="1">
+            <input type="hidden" name="no_shipping" value="1">
+            <input type="hidden" name="return" value="https://in-nola.org/donate.html?thanks=1">
+            <div style="display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-bottom:1rem;">
+              <span style="font-size:1.5rem; color:var(--gold);">$</span>
+              <input type="number" id="custom-amount" class="donation-input" placeholder="Amount" min="1" step="0.01" style="margin-bottom:0;">
+            </div>
+            <button type="submit" class="paypal-donate-btn">Donate with PayPal</button>
+          </form>
         </div>
       </div>
 
-      <!-- PayPal SDK -->
-      <script src="https://www.paypal.com/sdk/js?client-id=BAAPQ3CJHzBkceb4WBXiMmpDp6jW2G2J4oRhaBgit47LXFOoOjihj1CoTyXUvYzER2qroCHDJ48_afKnxY&enable-funding=venmo&currency=USD"></script>
       <script>
-        function createDonateButton(containerId, amount) {
-          paypal.Buttons({
-            style: {
-              layout: 'vertical',
-              color:  'gold',
-              shape:  'rect',
-              label:  'donate'
-            },
-            createOrder: function(data, actions) {
-              return actions.order.create({
-                purchase_units: [{
-                  amount: { value: amount },
-                  description: 'Donation to Irish Network NOLA'
-                }]
-              });
-            },
-            onApprove: function(data, actions) {
-              return actions.order.capture().then(function(details) {
-                var name = details.payer.name.given_name;
-                document.getElementById(containerId.replace('#', '') + '-msg').style.display = 'block';
-              });
-            },
-            onError: function(err) {
-              console.error('PayPal error:', err);
-              alert('Something went wrong with the payment. Please try again.');
-            }
-          }).render(containerId);
+        // Show thank-you banner if returning from PayPal
+        if (new URLSearchParams(window.location.search).get('thanks') === '1') {
+          document.getElementById('thank-you-banner').style.display = 'block';
         }
 
-        createDonateButton('#paypal-button-5',  '5.00');
-        createDonateButton('#paypal-button-20', '20.00');
-        createDonateButton('#paypal-button-50', '50.00');
-
-        // Custom amount button
-        paypal.Buttons({
-          style: {
-            layout: 'vertical',
-            color:  'gold',
-            shape:  'rect',
-            label:  'donate'
-          },
-          createOrder: function(data, actions) {
-            var input = document.getElementById('custom-amount');
-            var amount = parseFloat(input.value).toFixed(2);
-            if (!amount || isNaN(amount) || amount < 1) {
-              alert('Please enter an amount of at least $1.00');
-              return;
-            }
-            return actions.order.create({
-              purchase_units: [{
-                amount: { value: amount },
-                description: 'Donation to Irish Network NOLA'
-              }]
-            });
-          },
-          onApprove: function(data, actions) {
-            return actions.order.capture().then(function(details) {
-              document.getElementById('paypal-button-custom-msg').style.display = 'block';
-            });
-          },
-          onError: function(err) {
-            console.error('PayPal error:', err);
-            alert('Something went wrong with the payment. Please try again.');
+        // Custom amount: copy input value to hidden field before submit
+        document.getElementById('custom-donate-form').addEventListener('submit', function(e) {
+          var input = document.getElementById('custom-amount');
+          var amount = parseFloat(input.value);
+          if (!amount || isNaN(amount) || amount < 1) {
+            e.preventDefault();
+            alert('Please enter an amount of at least $1.00');
+            return;
           }
-        }).render('#paypal-button-custom');
+          document.getElementById('custom-amount-hidden').value = amount.toFixed(2);
+        });
       </script>
 
       <div class="back-link" style="margin-top:2rem;">

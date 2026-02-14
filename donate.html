@@ -22,45 +22,104 @@
         <!-- $5 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$5</p>
-          <div id="paypal-button-5" class="paypal-button-container">
-            <p class="coming-soon">PayPal button coming soon</p>
-          </div>
+          <div id="paypal-button-5" class="paypal-button-container"></div>
+          <p id="paypal-button-5-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
         </div>
 
         <!-- $20 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$20</p>
-          <div id="paypal-button-20" class="paypal-button-container">
-            <p class="coming-soon">PayPal button coming soon</p>
-          </div>
+          <div id="paypal-button-20" class="paypal-button-container"></div>
+          <p id="paypal-button-20-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
         </div>
 
         <!-- $50 Donation -->
         <div class="donation-option">
           <p class="donation-amount">$50</p>
-          <div id="paypal-button-50" class="paypal-button-container">
-            <p class="coming-soon">PayPal button coming soon</p>
+          <div id="paypal-button-50" class="paypal-button-container"></div>
+          <p id="paypal-button-50-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
+        </div>
+
+        <!-- Custom Amount -->
+        <div class="donation-option">
+          <p class="donation-amount">Custom</p>
+          <div style="display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-bottom:1rem;">
+            <span style="font-size:1.5rem; color:var(--gold);">$</span>
+            <input type="number" id="custom-amount" class="donation-input" placeholder="Amount" min="1" step="0.01" style="margin-bottom:0;">
           </div>
+          <div id="paypal-button-custom" class="paypal-button-container"></div>
+          <p id="paypal-button-custom-msg" class="donation-thanks" style="display:none;">Thank you for your donation!</p>
         </div>
       </div>
 
       <!-- PayPal SDK -->
-      <script src="https://www.paypal.com/sdk/js?client-id=BAAPQ3CJHzBkceb4WBXiMmpDp6jW2G2J4oRhaBgit47LXFOoOjihj1CoTyXUvYzER2qroCHDJ48_afKnxY&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
+      <script src="https://www.paypal.com/sdk/js?client-id=BAAPQ3CJHzBkceb4WBXiMmpDp6jW2G2J4oRhaBgit47LXFOoOjihj1CoTyXUvYzER2qroCHDJ48_afKnxY&enable-funding=venmo&currency=USD"></script>
       <script>
-        // =====================================================
-        // TO ACTIVATE: Replace each YOUR_BUTTON_ID_HERE with
-        // the hostedButtonId from your PayPal dashboard, then
-        // delete the "coming soon" <p> tags above.
-        // =====================================================
+        function createDonateButton(containerId, amount) {
+          paypal.Buttons({
+            style: {
+              layout: 'vertical',
+              color:  'gold',
+              shape:  'rect',
+              label:  'donate'
+            },
+            createOrder: function(data, actions) {
+              return actions.order.create({
+                purchase_units: [{
+                  amount: { value: amount },
+                  description: 'Donation to Irish Network NOLA'
+                }]
+              });
+            },
+            onApprove: function(data, actions) {
+              return actions.order.capture().then(function(details) {
+                var name = details.payer.name.given_name;
+                document.getElementById(containerId.replace('#', '') + '-msg').style.display = 'block';
+              });
+            },
+            onError: function(err) {
+              console.error('PayPal error:', err);
+              alert('Something went wrong with the payment. Please try again.');
+            }
+          }).render(containerId);
+        }
 
-        // $5 button
-        // paypal.HostedButtons({ hostedButtonId: "YOUR_BUTTON_ID_HERE" }).render("#paypal-button-5");
+        createDonateButton('#paypal-button-5',  '5.00');
+        createDonateButton('#paypal-button-20', '20.00');
+        createDonateButton('#paypal-button-50', '50.00');
 
-        // $20 button
-        // paypal.HostedButtons({ hostedButtonId: "YOUR_BUTTON_ID_HERE" }).render("#paypal-button-20");
-
-        // $50 button
-        // paypal.HostedButtons({ hostedButtonId: "YOUR_BUTTON_ID_HERE" }).render("#paypal-button-50");
+        // Custom amount button
+        paypal.Buttons({
+          style: {
+            layout: 'vertical',
+            color:  'gold',
+            shape:  'rect',
+            label:  'donate'
+          },
+          createOrder: function(data, actions) {
+            var input = document.getElementById('custom-amount');
+            var amount = parseFloat(input.value).toFixed(2);
+            if (!amount || isNaN(amount) || amount < 1) {
+              alert('Please enter an amount of at least $1.00');
+              return;
+            }
+            return actions.order.create({
+              purchase_units: [{
+                amount: { value: amount },
+                description: 'Donation to Irish Network NOLA'
+              }]
+            });
+          },
+          onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+              document.getElementById('paypal-button-custom-msg').style.display = 'block';
+            });
+          },
+          onError: function(err) {
+            console.error('PayPal error:', err);
+            alert('Something went wrong with the payment. Please try again.');
+          }
+        }).render('#paypal-button-custom');
       </script>
 
       <div class="back-link" style="margin-top:2rem;">

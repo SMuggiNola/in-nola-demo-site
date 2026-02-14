@@ -410,7 +410,7 @@ p {
 ====================================================== */
 .donation-options {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-top: 2rem;
   width: 100%;
@@ -429,6 +429,13 @@ p {
   color: var(--text-secondary);
   font-style: italic;
   opacity: 0.7;
+}
+
+.donation-thanks {
+  font-size: 0.95rem;
+  color: var(--gold);
+  margin-top: 0.75rem;
+  font-style: italic;
 }
 
 .donation-option {

@@ -53,7 +53,7 @@ export async function onRequestPost(context) {
 
   // Configuration (set in Cloudflare Pages Environment Variables)
   const RESEND_API_KEY = env.RESEND_API_KEY;
-  const TO_EMAIL = env.CONTACT_TO_EMAIL || 'sean.muggivan@gmail.com';
+  const TO_EMAIL = env.CONTACT_TO_EMAIL || 'irishnetworknola@gmail.com';
 
   if (!RESEND_API_KEY) {
     console.error('RESEND_API_KEY environment variable not set');

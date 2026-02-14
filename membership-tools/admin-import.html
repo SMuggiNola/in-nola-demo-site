@@ -181,29 +181,8 @@
             <p class="subtitle">Member Import</p>
         </header>
 
-        <!-- Admin Login -->
-        <div id="pinSection" class="celtic-border card">
-            <div id="pinMessage" class="message"></div>
-
-            <form id="pinForm" class="pin-entry">
-                <div class="form-group">
-                    <label for="adminUsername">Username</label>
-                    <input type="text" id="adminUsername" name="adminUsername"
-                           required placeholder="Enter username" autocomplete="off">
-                </div>
-
-                <div class="form-group">
-                    <label for="adminPasswordField">Password</label>
-                    <input type="password" id="adminPasswordField" name="adminPassword"
-                           required placeholder="Enter password" autocomplete="off">
-                </div>
-
-                <button type="submit" class="btn btn-primary">Access Import</button>
-            </form>
-        </div>
-
         <!-- Import Section -->
-        <div id="importSection" class="celtic-border card" style="display: none;">
+        <div id="importSection" class="celtic-border card">
             <div id="importMessage" class="message"></div>
 
             <div class="csv-format">
@@ -273,19 +252,11 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
         </div>
     </div>
 
+    <script src="/js/admin-auth.js"></script>
     <script>
-        let adminPassword = '';
         let csvContent = '';
 
-        // Shared admin credentials
-        const ADMIN_USERNAME = 'boardmember';
-        const ADMIN_PASSWORD = 'innola2026!';
-
-        const pinSection = document.getElementById('pinSection');
-        const importSection = document.getElementById('importSection');
-        const pinForm = document.getElementById('pinForm');
         const importForm = document.getElementById('importForm');
-        const pinMessage = document.getElementById('pinMessage');
         const importMessage = document.getElementById('importMessage');
         const csvFile = document.getElementById('csvFile');
         const fileUpload = document.getElementById('fileUpload');
@@ -295,13 +266,6 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
         const loading = document.getElementById('loading');
         const resultsSection = document.getElementById('resultsSection');
 
-        // Check session
-        const savedPassword = sessionStorage.getItem('innola_admin_password');
-        if (savedPassword) {
-            adminPassword = savedPassword;
-            showImportSection();
-        }
-
         function showMessage(el, text, type) {
             el.textContent = text;
             el.className = 'message ' + type + ' show';
@@ -310,27 +274,6 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
         function hideMessage(el) {
             el.className = 'message';
         }
-
-        function showImportSection() {
-            pinSection.style.display = 'none';
-            importSection.style.display = 'block';
-            sessionStorage.setItem('innola_admin_password', adminPassword);
-        }
-
-        // Login form
-        pinForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const username = document.getElementById('adminUsername').value.toLowerCase().trim();
-            const password = document.getElementById('adminPasswordField').value.trim();
-
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                adminPassword = password;
-                showMessage(pinMessage, 'Access granted!', 'success');
-                setTimeout(showImportSection, 500);
-            } else {
-                showMessage(pinMessage, 'Invalid username or password', 'error');
-            }
-        });
 
         // File upload
         csvFile.addEventListener('change', function(e) {
@@ -390,7 +333,7 @@ John Murphy,john@example.com,Adult,2026-01-15,2026-12-31</code>
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        adminPassword: adminPassword,
+                        adminPassword: getAdminPassword(),
                         csv: csvContent
                     })
                 });

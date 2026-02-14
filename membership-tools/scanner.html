@@ -15,35 +15,8 @@
             <p class="subtitle">Admin Verification Scanner</p>
         </header>
 
-        <!-- Admin Login -->
-        <div id="pinSection" class="celtic-border card">
-            <div id="pinMessage" class="message"></div>
-
-            <form id="pinForm" class="pin-entry">
-                <div class="form-group">
-                    <label for="adminUsername">Username</label>
-                    <input type="text" id="adminUsername" name="adminUsername"
-                           required placeholder="Enter username" autocomplete="off">
-                </div>
-
-                <div class="form-group">
-                    <label for="adminPassword">Password</label>
-                    <input type="password" id="adminPassword" name="adminPassword"
-                           required placeholder="Enter password" autocomplete="off">
-                </div>
-
-                <button type="submit" class="btn btn-primary">Access Scanner</button>
-            </form>
-
-            <p style="text-align: center; margin-top: 20px;">
-                <a href="index.html" style="color: var(--celtic-gold); font-size: 0.85rem;">
-                    ← Back to Member Login
-                </a>
-            </p>
-        </div>
-
-        <!-- Scanner Section (hidden until PIN verified) -->
-        <div id="scannerSection" class="scanner-container" style="display: none;">
+        <!-- Scanner Section -->
+        <div id="scannerSection" class="scanner-container">
             <div class="celtic-border card">
                 <div class="scanner-header">
                     <h2 style="color: var(--celtic-gold); margin-bottom: 15px;">Scan Member QR Code</h2>
@@ -77,58 +50,13 @@
         </div>
     </div>
 
+    <script src="/js/admin-auth.js"></script>
     <script src="js/scanner.js"></script>
     <script>
-        const pinSection = document.getElementById('pinSection');
-        const scannerSection = document.getElementById('scannerSection');
-        const pinForm = document.getElementById('pinForm');
-        const pinMessage = document.getElementById('pinMessage');
-
-        // Shared admin credentials
-        const ADMIN_USERNAME = 'boardmember';
-        const ADMIN_PASSWORD = 'innola2026!';
-
-        // Check if already authenticated (session storage for scanner)
-        const scannerAuth = sessionStorage.getItem('innola_scanner_auth');
-        if (scannerAuth === 'true') {
-            showScanner();
-        }
-
-        function showMessage(text, type) {
-            pinMessage.textContent = text;
-            pinMessage.className = 'message ' + type + ' show';
-        }
-
-        function showScanner() {
-            pinSection.style.display = 'none';
-            scannerSection.style.display = 'block';
-            sessionStorage.setItem('innola_scanner_auth', 'true');
-        }
-
         function exitScanner() {
             window.Scanner.stopScanner();
-            sessionStorage.removeItem('innola_scanner_auth');
-            pinSection.style.display = 'block';
-            scannerSection.style.display = 'none';
-            document.getElementById('adminUsername').value = '';
-            document.getElementById('adminPassword').value = '';
+            adminLogout();
         }
-
-        pinForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const username = document.getElementById('adminUsername').value.toLowerCase().trim();
-            const password = document.getElementById('adminPassword').value.trim();
-
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                showMessage('Access granted!', 'success');
-                setTimeout(showScanner, 500);
-            } else {
-                showMessage('Invalid username or password. Please try again.', 'error');
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('adminPassword').focus();
-            }
-        });
     </script>
 </body>
 </html>

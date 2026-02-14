@@ -154,23 +154,6 @@
       color: var(--gold);
     }
 
-    .pin-group {
-      background: rgba(212, 167, 38, 0.05);
-      border: 1px solid rgba(212, 167, 38, 0.2);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .pin-group label {
-      color: var(--gold);
-    }
-
-    .pin-group input {
-      text-align: center;
-      letter-spacing: 0.3em;
-      font-size: 1.2rem;
-    }
   </style>
 </head>
 
@@ -189,14 +172,6 @@
       </div>
 
       <form class="event-form" id="eventForm">
-
-        <div class="pin-group">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label for="adminPassword">Admin Password *</label>
-            <input type="password" id="adminPassword" name="adminPassword" required placeholder="Enter admin password">
-            <p class="hint">Admin password required to post events</p>
-          </div>
-        </div>
 
         <div class="form-group">
           <label for="eventTitle">Event Title *</label>
@@ -274,6 +249,7 @@
   </div>
 
   <script src="../../js/main.js"></script>
+  <script src="/js/admin-auth.js"></script>
 
   <script>
     const form = document.getElementById('eventForm');
@@ -315,7 +291,7 @@
 
       // Gather form data
       const eventData = {
-        adminPassword: document.getElementById('adminPassword').value.trim(),
+        adminPassword: getAdminPassword(),
         title: document.getElementById('eventTitle').value.trim(),
         date: document.getElementById('eventDate').value,
         time: document.getElementById('eventTime').value.trim(),

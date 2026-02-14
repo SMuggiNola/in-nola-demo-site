@@ -124,7 +124,13 @@
 
   <script src="/js/main.js"></script>
   <script>
-    // Shared admin credentials
+    // If already logged in, go straight to dashboard (or return URL)
+    if (sessionStorage.getItem('boardAuth') === 'true') {
+      const params = new URLSearchParams(window.location.search);
+      const returnUrl = params.get('return');
+      window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'dashboard.html';
+    }
+
     const ADMIN_USERNAME = 'boardmember';
     const ADMIN_PASSWORD = 'innola2026!';
 
@@ -140,7 +146,12 @@
       if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
         sessionStorage.setItem('boardAuth', 'true');
         sessionStorage.setItem('boardUser', username);
-        window.location.href = 'dashboard.html';
+        sessionStorage.setItem('adminPassword', password);
+
+        // Redirect to return URL if present, otherwise dashboard
+        const params = new URLSearchParams(window.location.search);
+        const returnUrl = params.get('return');
+        window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'dashboard.html';
       } else {
         errorMessage.textContent = 'Invalid username or password';
         errorMessage.classList.add('show');

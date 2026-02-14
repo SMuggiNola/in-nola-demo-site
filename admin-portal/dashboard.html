@@ -339,16 +339,11 @@
   </div>
 
   <script src="/js/main.js"></script>
+  <script src="/js/admin-auth.js"></script>
   <script>
-    // Check authentication
-    if (sessionStorage.getItem('boardAuth') !== 'true') {
-      window.location.href = 'index.html';
-    }
-
     // Logout handler
     document.getElementById('logoutBtn').addEventListener('click', function() {
-      sessionStorage.removeItem('boardAuth');
-      window.location.href = 'index.html';
+      adminLogout();
     });
 
     // Task data with owner assignments

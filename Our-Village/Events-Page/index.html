@@ -439,11 +439,6 @@
         <input type="hidden" id="editEventId">
 
         <div class="form-group">
-          <label for="editPassword">Admin Password</label>
-          <input type="password" id="editPassword" required placeholder="Enter admin password">
-        </div>
-
-        <div class="form-group">
           <label for="editTitle">Title</label>
           <input type="text" id="editTitle" required>
         </div>
@@ -510,10 +505,6 @@
       <h2>Delete Event</h2>
       <p class="delete-warning">Are you sure you want to delete "<span id="deleteEventTitle"></span>"? This cannot be undone.</p>
 
-      <div class="form-group">
-        <label for="deletePassword">Admin Password</label>
-        <input type="password" id="deletePassword" required placeholder="Enter admin password">
-      </div>
       <input type="hidden" id="deleteEventId">
 
       <div class="modal-actions">
@@ -748,8 +739,6 @@
       document.getElementById('editNotes').value = event.notes || '';
       document.getElementById('editFacebook').value = event.facebook || '';
       document.getElementById('editInstagram').value = event.instagram || '';
-      document.getElementById('editPassword').value = '';
-
       document.getElementById('editModal').classList.add('active');
     }
 
@@ -761,7 +750,6 @@
     function openDeleteModal(eventId, eventTitle) {
       document.getElementById('deleteEventId').value = eventId;
       document.getElementById('deleteEventTitle').textContent = eventTitle;
-      document.getElementById('deletePassword').value = '';
 
       document.getElementById('deleteModal').classList.add('active');
     }
@@ -775,10 +763,9 @@
       e.preventDefault();
 
       const eventId = document.getElementById('editEventId').value;
-      const password = document.getElementById('editPassword').value;
 
       const updateData = {
-        adminPassword: password,
+        adminPassword: sessionStorage.getItem('adminPassword') || '',
         eventId: eventId,
         title: document.getElementById('editTitle').value,
         date: document.getElementById('editDate').value,
@@ -815,12 +802,7 @@
     // Handle delete confirmation
     async function confirmDelete() {
       const eventId = document.getElementById('deleteEventId').value;
-      const password = document.getElementById('deletePassword').value;
-
-      if (!password) {
-        alert('Please enter admin password');
-        return;
-      }
+      const password = sessionStorage.getItem('adminPassword') || '';
 
       try {
         const response = await fetch('/api/events', {

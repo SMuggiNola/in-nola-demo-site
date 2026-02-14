@@ -192,29 +192,8 @@
             <p class="subtitle">QR Code Generator</p>
         </header>
 
-        <!-- Admin Login -->
-        <div id="pinSection" class="celtic-border card no-print">
-            <div id="pinMessage" class="message"></div>
-
-            <form id="pinForm" class="pin-entry">
-                <div class="form-group">
-                    <label for="adminUsername">Username</label>
-                    <input type="text" id="adminUsername" name="adminUsername"
-                           required placeholder="Enter username" autocomplete="off">
-                </div>
-
-                <div class="form-group">
-                    <label for="adminPassword">Password</label>
-                    <input type="password" id="adminPassword" name="adminPassword"
-                           required placeholder="Enter password" autocomplete="off">
-                </div>
-
-                <button type="submit" class="btn btn-primary">Access QR Generator</button>
-            </form>
-        </div>
-
         <!-- Member Selection Section -->
-        <div id="selectSection" class="celtic-border card no-print" style="display: none;">
+        <div id="selectSection" class="celtic-border card no-print">
             <h2 style="color: var(--gold); margin-bottom: 16px;">
                 Select Members
                 <span class="count-badge" id="selectedCount">0</span>
@@ -256,62 +235,24 @@
         </div>
     </div>
 
+    <script src="/js/admin-auth.js"></script>
     <script>
-        let adminPassword = '';
         let members = [];
         let selectedIds = new Set();
 
-        // Shared admin credentials
-        const ADMIN_USERNAME = 'boardmember';
-        const ADMIN_PASSWORD = 'innola2026!';
-
-        const pinSection = document.getElementById('pinSection');
         const selectSection = document.getElementById('selectSection');
         const qrSection = document.getElementById('qrSection');
-        const pinForm = document.getElementById('pinForm');
-        const pinMessage = document.getElementById('pinMessage');
         const memberList = document.getElementById('memberList');
         const generateBtn = document.getElementById('generateBtn');
         const loading = document.getElementById('loading');
         const qrGrid = document.getElementById('qrGrid');
 
-        // Check session
-        const savedPassword = sessionStorage.getItem('innola_admin_password');
-        if (savedPassword) {
-            adminPassword = savedPassword;
-            showSelectSection();
-        }
-
-        function showMessage(el, text, type) {
-            el.textContent = text;
-            el.className = 'message ' + type + ' show';
-        }
-
-        async function showSelectSection() {
-            pinSection.style.display = 'none';
-            selectSection.style.display = 'block';
-            sessionStorage.setItem('innola_admin_password', adminPassword);
-            await loadMembers();
-        }
-
-        // Login form
-        pinForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const username = document.getElementById('adminUsername').value.toLowerCase().trim();
-            const password = document.getElementById('adminPassword').value.trim();
-
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                adminPassword = password;
-                showMessage(pinMessage, 'Access granted!', 'success');
-                setTimeout(showSelectSection, 500);
-            } else {
-                showMessage(pinMessage, 'Invalid username or password', 'error');
-            }
-        });
+        // Load members immediately (auth already verified by admin-auth.js)
+        loadMembers();
 
         async function loadMembers() {
             try {
-                const response = await fetch('/api/members?adminPassword=' + encodeURIComponent(adminPassword));
+                const response = await fetch('/api/members?adminPassword=' + encodeURIComponent(getAdminPassword()));
                 if (!response.ok) throw new Error('Failed to load');
 
                 const data = await response.json();
@@ -372,7 +313,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        adminPassword: adminPassword,
+                        adminPassword: getAdminPassword(),
                         memberIds: Array.from(selectedIds)
                     })
                 });

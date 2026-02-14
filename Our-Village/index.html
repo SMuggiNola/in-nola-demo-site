@@ -345,17 +345,17 @@
 
     /* Location positions - spread ultra wide across the map */
     .location-library {
-      top: 18%;
+      top: 42%;
       left: 4%;
     }
 
     .location-school {
-      top: 14%;
+      top: 36%;
       left: 22%;
     }
 
     .location-music {
-      top: 10%;
+      top: 30%;
       left: 42%;
     }
 
@@ -364,91 +364,93 @@
       right: 35%;
     }
 
-    .location-events {
-      bottom: 18%;
-      right: 25%;
+    .location-pub {
+      top: 18%;
+      left: 52%;
     }
 
     .location-village-hall {
       top: 42%;
-      left: 38%;
+      right: 25%;
     }
 
-    /* Village Announcement Board - upper right */
+    /* Village Announcement Board - lower right */
     .announcement-board {
       position: absolute;
-      top: 8%;
+      bottom: 14%;
       right: 5%;
       z-index: 15;
+      transform: scale(0.9);
+      transform-origin: bottom right;
     }
 
     .board-frame {
       background: linear-gradient(180deg, #5c4023 0%, #3d2817 100%);
-      border: 6px solid #2a1a0a;
-      border-radius: 8px;
-      padding: 12px;
-      box-shadow: 4px 6px 20px rgba(0,0,0,0.6);
+      border: 5px solid #2a1a0a;
+      border-radius: 6px;
+      padding: 8px;
+      box-shadow: 3px 4px 14px rgba(0,0,0,0.6);
     }
 
     .board-inner {
       background: linear-gradient(180deg, #f5ead5 0%, #e8dcc8 100%);
-      border: 3px solid #8b7355;
+      border: 2px solid #8b7355;
       border-radius: 4px;
-      padding: 16px 20px;
-      min-width: 260px;
-      max-width: 300px;
+      padding: 10px 14px;
+      min-width: 200px;
+      max-width: 230px;
       text-align: center;
     }
 
     .board-header {
       font-family: 'Uncial Antiqua', serif;
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       color: #3d2817;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       border-bottom: 2px solid #8b7355;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
       letter-spacing: 1px;
     }
 
     .board-event-name {
       font-family: 'IM Fell English', serif;
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: #1a4a1a;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       line-height: 1.3;
     }
 
     .board-event-date {
       font-family: 'IM Fell English', serif;
-      font-size: 1rem;
+      font-size: 0.85rem;
       color: #5c4023;
       font-style: italic;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .board-event-location {
       font-family: 'IM Fell English', serif;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: #6b5a45;
       font-style: italic;
     }
 
     .board-no-events {
       font-family: 'IM Fell English', serif;
-      font-size: 1rem;
+      font-size: 0.85rem;
       color: #5c4023;
       font-style: italic;
     }
 
     .board-link {
       display: inline-block;
-      margin-top: 12px;
-      padding: 6px 14px;
+      margin-top: 8px;
+      padding: 4px 10px;
       background: linear-gradient(180deg, #1a4a1a 0%, #0a3a0a 100%);
       color: #ffd700;
       font-family: 'IM Fell English', serif;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       text-decoration: none;
       border-radius: 4px;
       border: 1px solid #d4a84b;
@@ -462,12 +464,12 @@
     .board-posts {
       display: flex;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 15px;
     }
 
     .board-post {
-      width: 14px;
-      height: 50px;
+      width: 10px;
+      height: 35px;
       background: linear-gradient(90deg, #4a3020 0%, #5c4023 50%, #4a3020 100%);
       border-radius: 0 0 4px 4px;
     }
@@ -562,17 +564,17 @@
       }
 
       .location-library {
-        top: 15%;
+        top: 40%;
         left: 3%;
       }
 
       .location-school {
-        top: 12%;
+        top: 34%;
         left: 20%;
       }
 
       .location-music {
-        top: 10%;
+        top: 28%;
         left: 40%;
       }
 
@@ -581,37 +583,19 @@
         right: 30%;
       }
 
-      .location-events {
-        bottom: 15%;
-        right: 20%;
+      .location-pub {
+        top: 16%;
+        left: 50%;
       }
 
       .location-village-hall {
         top: 38%;
-        left: 35%;
+        right: 22%;
       }
 
       .announcement-board {
-        top: 6%;
+        bottom: 12%;
         right: 3%;
-      }
-
-      .board-inner {
-        min-width: 220px;
-        max-width: 260px;
-        padding: 12px 16px;
-      }
-
-      .board-header {
-        font-size: 0.95rem;
-      }
-
-      .board-event-name {
-        font-size: 1.05rem;
-      }
-
-      .board-event-date {
-        font-size: 0.9rem;
       }
     }
 
@@ -633,17 +617,17 @@
       }
 
       .location-library {
-        top: 8%;
+        top: 28%;
         left: 3%;
       }
 
       .location-school {
-        top: 22%;
+        top: 38%;
         left: 25%;
       }
 
       .location-music {
-        top: 36%;
+        top: 48%;
         left: 50%;
         transform: translateX(-50%);
       }
@@ -653,66 +637,21 @@
         right: 5%;
       }
 
-      .location-events {
-        bottom: 10%;
-        right: 8%;
+      .location-pub {
+        top: 14%;
+        left: 45%;
       }
 
       .location-village-hall {
         top: 68%;
-        left: 40%;
+        right: 10%;
       }
 
       .announcement-board {
-        top: 4%;
+        bottom: 8%;
         right: 2%;
-        left: auto;
-        transform: none;
-      }
-
-      .board-frame {
-        padding: 8px;
-        border-width: 4px;
-      }
-
-      .board-inner {
-        min-width: 150px;
-        max-width: 180px;
-        padding: 10px 12px;
-      }
-
-      .board-header {
-        font-size: 0.8rem;
-        margin-bottom: 8px;
-        padding-bottom: 6px;
-      }
-
-      .board-event-name {
-        font-size: 0.85rem;
-        margin-bottom: 5px;
-      }
-
-      .board-event-date {
-        font-size: 0.75rem;
-      }
-
-      .board-event-location {
-        font-size: 0.7rem;
-      }
-
-      .board-link {
-        font-size: 0.75rem;
-        padding: 4px 10px;
-        margin-top: 8px;
-      }
-
-      .board-post {
-        height: 30px;
-        width: 10px;
-      }
-
-      .board-posts {
-        padding: 0 15px;
+        transform: scale(0.7);
+        transform-origin: bottom right;
       }
 
       .page-content > h1 {
@@ -891,7 +830,7 @@
         </svg>
 
         <!-- Location: Our Library - Irish Cottage -->
-        <a href="Our_Library/index.html" class="village-location location-library">
+        <a href="Our_Library/index.html" class="village-location location-library" data-location="library">
           <div class="cottage-icon">
             <svg viewBox="0 0 100 85">
               <defs>
@@ -924,7 +863,7 @@
         </a>
 
         <!-- Location: School - Irish Schoolhouse -->
-        <a href="https://muggsoflearning.net" target="_blank" class="village-location location-school">
+        <a href="https://muggsoflearning.net" target="_blank" class="village-location location-school" data-location="school">
           <div class="cottage-icon">
             <svg viewBox="0 0 100 85">
               <!-- Bell tower -->
@@ -953,7 +892,7 @@
         </a>
 
         <!-- Location: Music - Irish Cottage -->
-        <a href="./music.html" class="village-location location-music">
+        <a href="./music.html" class="village-location location-music" data-location="music">
           <div class="cottage-icon">
             <svg viewBox="0 0 100 85">
               <!-- Chimney -->
@@ -983,7 +922,7 @@
         </a>
 
         <!-- Location: Dancing - Larger Hall -->
-        <a href="https://muggivanirishdance.com/" target="_blank" class="village-location location-dancing">
+        <a href="https://muggivanirishdance.com/" target="_blank" class="village-location location-dancing" data-location="dancing">
           <div class="cottage-icon">
             <svg viewBox="0 0 100 85">
               <!-- Chimney -->
@@ -1013,8 +952,41 @@
           <span class="location-label">Dance Studio</span>
         </a>
 
+        <!-- Location: The Pub -->
+        <div class="village-location location-pub" data-location="pub">
+          <div class="cottage-icon">
+            <svg viewBox="0 0 100 85">
+              <!-- Chimney with smoke -->
+              <rect class="chimney" x="68" y="6" width="10" height="22"/>
+              <path d="M 73 6 Q 70 -2, 75 -6 Q 80 -10, 76 -16" fill="none" stroke="#aaa" stroke-width="1.5" opacity="0.4"/>
+              <!-- Thatched roof -->
+              <path class="thatch-roof" d="M 3 32 L 50 2 L 97 32 Z"/>
+              <path class="thatch-line" d="M 18 27 Q 50 8, 82 27"/>
+              <path class="thatch-line" d="M 8 30 Q 50 4, 92 30"/>
+              <!-- Whitewashed walls -->
+              <rect class="cottage-wall" x="10" y="32" width="80" height="48"/>
+              <!-- Windows with warm glow -->
+              <rect class="window-frame" x="16" y="40" width="14" height="16" rx="2"/>
+              <rect x="18" y="42" width="10" height="12" rx="1" fill="#ffaa22" opacity="0.8"/>
+              <rect class="window-frame" x="70" y="40" width="14" height="16" rx="2"/>
+              <rect x="72" y="42" width="10" height="12" rx="1" fill="#ffaa22" opacity="0.8"/>
+              <!-- Pub door - dark wood -->
+              <rect x="38" y="48" width="24" height="32" fill="#3d2817" stroke="#2a1a0a" stroke-width="1" rx="1"/>
+              <rect x="38" y="48" width="24" height="4" fill="#5c4023"/>
+              <circle cx="56" cy="66" r="1.5" fill="#d4a84b"/>
+              <!-- Hanging pub sign -->
+              <line x1="14" y1="34" x2="14" y2="52" stroke="#5c4023" stroke-width="2"/>
+              <line x1="14" y1="42" x2="4" y2="42" stroke="#5c4023" stroke-width="1.5"/>
+              <rect x="-4" y="38" width="16" height="12" rx="2" fill="#1a4a1a" stroke="#d4a84b" stroke-width="1"/>
+              <!-- Pint glass on sign -->
+              <path d="M 1 41 L 1 47 Q 4 48, 7 47 L 7 41 Z" fill="#d4a84b" opacity="0.8"/>
+            </svg>
+          </div>
+          <span class="location-label">The Pub</span>
+        </div>
+
         <!-- Location: Village Hall -->
-        <a href="Events-Page/index.html" class="village-location location-village-hall">
+        <a href="Events-Page/index.html" class="village-location location-village-hall" data-location="village-hall">
           <div class="cottage-icon">
             <svg viewBox="0 0 100 85">
               <!-- Chimney -->
@@ -1045,35 +1017,6 @@
             </svg>
           </div>
           <span class="location-label">Village Hall</span>
-        </a>
-
-        <!-- Location: Events - Town Green Space / Bandstand -->
-        <a href="Events-Page/index.html" class="village-location location-events">
-          <div class="cottage-icon">
-            <svg viewBox="0 0 100 85">
-              <!-- Bandstand/Gazebo base -->
-              <ellipse cx="50" cy="78" rx="42" ry="8" fill="#5a7a5a" stroke="#3a5a3a" stroke-width="1"/>
-              <!-- Gazebo pillars -->
-              <rect x="18" y="35" width="4" height="43" fill="#f5f5e8" stroke="#888" stroke-width="0.5"/>
-              <rect x="78" y="35" width="4" height="43" fill="#f5f5e8" stroke="#888" stroke-width="0.5"/>
-              <rect x="46" y="35" width="4" height="43" fill="#f5f5e8" stroke="#888" stroke-width="0.5"/>
-              <!-- Gazebo roof -->
-              <polygon points="50,5 95,38 5,38" fill="#6a5a30" stroke="#5a4a2a" stroke-width="1.5"/>
-              <polygon points="50,12 85,35 15,35" fill="#7a6a40"/>
-              <!-- Decorative finial -->
-              <circle cx="50" cy="5" r="4" fill="#d4a84b" stroke="#b8963c" stroke-width="1"/>
-              <!-- Bunting decoration -->
-              <path d="M 22 42 L 35 50 L 50 42 L 65 50 L 78 42" fill="none" stroke="#169b62" stroke-width="2"/>
-              <!-- Shamrock in center -->
-              <g transform="translate(50, 58)" fill="#169b62">
-                <circle cx="-5" cy="-2" r="5"/>
-                <circle cx="5" cy="-2" r="5"/>
-                <circle cx="0" cy="-7" r="5"/>
-                <rect x="-1.5" y="0" width="3" height="10"/>
-              </g>
-            </svg>
-          </div>
-          <span class="location-label">Town Green</span>
         </a>
 
         <!-- Village Announcement Board -->
@@ -1177,6 +1120,318 @@
     } else {
       loadNextEvent();
     }
+  </script>
+
+  <!-- Village Layout Editor (admin drag-and-drop) -->
+  <script>
+  (function() {
+    const map = document.querySelector('.village-map');
+    const cottages = document.querySelectorAll('.village-location[data-location]');
+    let savedPositions = {};
+    let editMode = false;
+    let dragTarget = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    // ── Load saved positions (all visitors) ──────────────────────────
+    async function loadPositions() {
+      try {
+        const res = await fetch('/api/village-positions');
+        if (!res.ok) return;
+        const positions = await res.json();
+        if (positions && Object.keys(positions).length > 0) {
+          savedPositions = positions;
+          applyPositions(positions);
+        }
+      } catch (e) {
+        // Silently fail — CSS defaults apply
+      }
+    }
+
+    function applyPositions(positions) {
+      cottages.forEach(function(el) {
+        var key = el.dataset.location;
+        if (positions[key]) {
+          el.style.top = positions[key].top || '';
+          el.style.left = positions[key].left || '';
+          // Clear right positioning when left is set (CSS uses right for some cottages)
+          if (positions[key].left) {
+            el.style.right = 'auto';
+          }
+        }
+      });
+    }
+
+    function getCurrentPositions() {
+      var positions = {};
+      var mapRect = map.getBoundingClientRect();
+      cottages.forEach(function(el) {
+        var key = el.dataset.location;
+        var rect = el.getBoundingClientRect();
+        var topPct = ((rect.top - mapRect.top) / mapRect.height * 100).toFixed(1) + '%';
+        var leftPct = ((rect.left - mapRect.left) / mapRect.width * 100).toFixed(1) + '%';
+        positions[key] = { top: topPct, left: leftPct };
+      });
+      return positions;
+    }
+
+    function revertPositions() {
+      // Remove inline styles
+      cottages.forEach(function(el) {
+        el.style.top = '';
+        el.style.left = '';
+        el.style.right = '';
+      });
+      // Re-apply saved positions if any
+      if (Object.keys(savedPositions).length > 0) {
+        applyPositions(savedPositions);
+      }
+    }
+
+    // ── Admin-only: Edit Layout button ───────────────────────────────
+    var isAdmin = sessionStorage.getItem('boardAuth') === 'true';
+
+    if (isAdmin) {
+      // Edit Layout button
+      var editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit Layout';
+      editBtn.id = 'village-edit-btn';
+      Object.assign(editBtn.style, {
+        position: 'absolute',
+        bottom: '16px',
+        left: '16px',
+        zIndex: '100',
+        padding: '8px 18px',
+        background: 'linear-gradient(180deg, #1a4a1a 0%, #0a3a0a 100%)',
+        color: '#ffd700',
+        fontFamily: "'IM Fell English', serif",
+        fontSize: '0.9rem',
+        border: '2px solid #d4a84b',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        boxShadow: '2px 3px 8px rgba(0,0,0,0.4)',
+        letterSpacing: '1px'
+      });
+      map.appendChild(editBtn);
+
+      // Save / Cancel toolbar (hidden initially)
+      var toolbar = document.createElement('div');
+      toolbar.id = 'village-edit-toolbar';
+      Object.assign(toolbar.style, {
+        position: 'absolute',
+        bottom: '16px',
+        left: '16px',
+        zIndex: '100',
+        display: 'none',
+        gap: '10px',
+        alignItems: 'center'
+      });
+
+      var saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save Layout';
+      Object.assign(saveBtn.style, {
+        padding: '8px 18px',
+        background: 'linear-gradient(180deg, #1a4a1a 0%, #0a3a0a 100%)',
+        color: '#ffd700',
+        fontFamily: "'IM Fell English', serif",
+        fontSize: '0.9rem',
+        border: '2px solid #d4a84b',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        boxShadow: '2px 3px 8px rgba(0,0,0,0.4)',
+        letterSpacing: '1px'
+      });
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      Object.assign(cancelBtn.style, {
+        padding: '8px 18px',
+        background: 'linear-gradient(180deg, #4a2a2a 0%, #3a1a1a 100%)',
+        color: '#ffd700',
+        fontFamily: "'IM Fell English', serif",
+        fontSize: '0.9rem',
+        border: '2px solid #d4a84b',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        boxShadow: '2px 3px 8px rgba(0,0,0,0.4)',
+        letterSpacing: '1px'
+      });
+
+      var statusMsg = document.createElement('span');
+      Object.assign(statusMsg.style, {
+        color: '#ffd700',
+        fontFamily: "'IM Fell English', serif",
+        fontSize: '0.85rem',
+        fontStyle: 'italic',
+        textShadow: '1px 1px 3px rgba(0,0,0,0.6)'
+      });
+
+      toolbar.appendChild(saveBtn);
+      toolbar.appendChild(cancelBtn);
+      toolbar.appendChild(statusMsg);
+      map.appendChild(toolbar);
+
+      // ── Enter / Exit edit mode ──────────────────────────────────────
+      editBtn.addEventListener('click', function() {
+        enterEditMode();
+      });
+
+      cancelBtn.addEventListener('click', function() {
+        revertPositions();
+        exitEditMode();
+      });
+
+      saveBtn.addEventListener('click', async function() {
+        var positions = getCurrentPositions();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        try {
+          var adminPassword = sessionStorage.getItem('adminPassword') || '';
+          var res = await fetch('/api/village-positions', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminPassword: adminPassword, positions: positions })
+          });
+          var data = await res.json();
+          if (data.success) {
+            savedPositions = positions;
+            statusMsg.textContent = 'Saved!';
+            setTimeout(function() { statusMsg.textContent = ''; }, 2000);
+            exitEditMode();
+          } else {
+            statusMsg.textContent = 'Error: ' + (data.error || 'Save failed');
+          }
+        } catch (e) {
+          statusMsg.textContent = 'Network error';
+        }
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Layout';
+      });
+
+      function enterEditMode() {
+        editMode = true;
+        editBtn.style.display = 'none';
+        toolbar.style.display = 'flex';
+
+        cottages.forEach(function(el) {
+          el.style.outline = '2px dashed rgba(212,168,75,0.6)';
+          el.style.outlineOffset = '4px';
+          el.style.cursor = 'grab';
+          // Disable hover scale during drag (would conflict)
+          el.style.transition = 'none';
+        });
+      }
+
+      function exitEditMode() {
+        editMode = false;
+        editBtn.style.display = '';
+        toolbar.style.display = 'none';
+        dragTarget = null;
+
+        cottages.forEach(function(el) {
+          el.style.outline = '';
+          el.style.outlineOffset = '';
+          el.style.cursor = 'pointer';
+          el.style.transition = '';
+        });
+      }
+
+      // ── Drag handling (mouse + touch) ───────────────────────────────
+      function startDrag(el, clientX, clientY) {
+        dragTarget = el;
+        var rect = el.getBoundingClientRect();
+        dragOffsetX = clientX - rect.left;
+        dragOffsetY = clientY - rect.top;
+        el.style.cursor = 'grabbing';
+        el.style.zIndex = '50';
+      }
+
+      function moveDrag(clientX, clientY) {
+        if (!dragTarget) return;
+        var mapRect = map.getBoundingClientRect();
+        var newLeft = clientX - mapRect.left - dragOffsetX;
+        var newTop = clientY - mapRect.top - dragOffsetY;
+
+        // Clamp within map bounds
+        newLeft = Math.max(0, Math.min(newLeft, mapRect.width - dragTarget.offsetWidth));
+        newTop = Math.max(0, Math.min(newTop, mapRect.height - dragTarget.offsetHeight));
+
+        var leftPct = (newLeft / mapRect.width * 100).toFixed(1) + '%';
+        var topPct = (newTop / mapRect.height * 100).toFixed(1) + '%';
+
+        dragTarget.style.top = topPct;
+        dragTarget.style.left = leftPct;
+        dragTarget.style.right = 'auto';
+      }
+
+      function endDrag() {
+        if (dragTarget) {
+          dragTarget.style.cursor = 'grab';
+          dragTarget.style.zIndex = '10';
+          dragTarget = null;
+        }
+      }
+
+      // Mouse events
+      map.addEventListener('mousedown', function(e) {
+        if (!editMode) return;
+        var cottage = e.target.closest('.village-location[data-location]');
+        if (!cottage) return;
+        e.preventDefault();
+        startDrag(cottage, e.clientX, e.clientY);
+      });
+
+      window.addEventListener('mousemove', function(e) {
+        if (!editMode || !dragTarget) return;
+        e.preventDefault();
+        moveDrag(e.clientX, e.clientY);
+      });
+
+      window.addEventListener('mouseup', function() {
+        if (!editMode) return;
+        endDrag();
+      });
+
+      // Touch events
+      map.addEventListener('touchstart', function(e) {
+        if (!editMode) return;
+        var cottage = e.target.closest('.village-location[data-location]');
+        if (!cottage) return;
+        e.preventDefault();
+        var touch = e.touches[0];
+        startDrag(cottage, touch.clientX, touch.clientY);
+      }, { passive: false });
+
+      window.addEventListener('touchmove', function(e) {
+        if (!editMode || !dragTarget) return;
+        e.preventDefault();
+        var touch = e.touches[0];
+        moveDrag(touch.clientX, touch.clientY);
+      }, { passive: false });
+
+      window.addEventListener('touchend', function() {
+        if (!editMode) return;
+        endDrag();
+      });
+
+      // Prevent navigation clicks while in edit mode
+      cottages.forEach(function(el) {
+        el.addEventListener('click', function(e) {
+          if (editMode) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+      });
+    }
+
+    // Load positions on page ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadPositions);
+    } else {
+      loadPositions();
+    }
+  })();
   </script>
 
 </body>

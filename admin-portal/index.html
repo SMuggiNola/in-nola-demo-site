@@ -3,7 +3,7 @@
 <head>
   <link rel="icon" type="image/png" href="../assets/in_logo.png">
   <meta charset="UTF-8">
-  <title>Board Portal | Irish Network NOLA</title>
+  <title>Admin Portal | Irish Network NOLA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/global.css">
   <style>
@@ -97,7 +97,7 @@
     <main class="page-content">
 
       <div class="login-container">
-        <h1>Board Portal</h1>
+        <h1>Admin Portal</h1>
         <p>Access for IN-NOLA board members</p>
 
         <div id="errorMessage" class="error-message"></div>
@@ -128,7 +128,7 @@
     if (sessionStorage.getItem('boardAuth') === 'true') {
       const params = new URLSearchParams(window.location.search);
       const returnUrl = params.get('return');
-      window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'dashboard.html';
+      window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'home.html';
     }
 
     const ADMIN_USERNAME = 'boardmember';
@@ -151,7 +151,7 @@
         // Redirect to return URL if present, otherwise dashboard
         const params = new URLSearchParams(window.location.search);
         const returnUrl = params.get('return');
-        window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'dashboard.html';
+        window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'home.html';
       } else {
         errorMessage.textContent = 'Invalid username or password';
         errorMessage.classList.add('show');

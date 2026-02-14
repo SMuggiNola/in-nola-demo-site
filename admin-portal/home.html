@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>Admin Portal | Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/global.css">
+  <style>
+    .portal-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .portal-header h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .portal-header p {
+      color: var(--text-secondary);
+    }
+
+    .portal-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      max-width: 750px;
+      margin: 0 auto 2rem;
+    }
+
+    .portal-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      text-decoration: none;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .portal-card:hover {
+      background: var(--glass-hover);
+      border-color: rgba(212, 167, 38, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .portal-card-icon {
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .portal-card-title {
+      display: block;
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--gold);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .portal-card-desc {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .portal-card.coming-soon {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .portal-card.coming-soon:hover {
+      transform: none;
+      box-shadow: none;
+      background: var(--glass);
+      border-color: var(--glass-border);
+    }
+
+    .coming-soon-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      background: rgba(100, 116, 139, 0.2);
+      color: #94a3b8;
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      margin-top: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .portal-footer {
+      text-align: center;
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .portal-footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .portal-footer a:hover {
+      color: var(--gold);
+    }
+
+    .logout-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <main class="page-content" style="max-width: 800px;">
+
+      <div class="portal-header">
+        <h1>Admin Portal</h1>
+        <p>Tools for IN-NOLA board members</p>
+        <button id="logoutBtn" class="btn btn-gold logout-btn" style="margin-top: 1rem;">Sign Out</button>
+      </div>
+
+      <div class="portal-cards">
+        <a href="/membership-tools/scanner.html" class="portal-card">
+          <span class="portal-card-icon">📷</span>
+          <span class="portal-card-title">Admin Scanner</span>
+          <span class="portal-card-desc">Scan and verify member QR codes at events</span>
+        </a>
+
+        <div class="portal-card coming-soon">
+          <span class="portal-card-icon">🎫</span>
+          <span class="portal-card-title">Tech Requests</span>
+          <span class="portal-card-desc">Submit and track requests for the website</span>
+          <span class="coming-soon-tag">Coming Soon</span>
+        </div>
+
+        <a href="dashboard.html" class="portal-card">
+          <span class="portal-card-icon">📋</span>
+          <span class="portal-card-title">Task Dashboard</span>
+          <span class="portal-card-desc">Project tasks and progress tracking</span>
+        </a>
+      </div>
+
+      <div class="portal-footer">
+        <a href="/index.html">Return to Home</a>
+        <a href="/Our-Village/Events-Page/add-event.html">Add Event</a>
+        <a href="/membership-tools/admin-import.html">Import Members</a>
+        <a href="/membership-tools/admin-qr.html">Generate QR Codes</a>
+      </div>
+
+    </main>
+
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/admin-auth.js"></script>
+  <script>
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      adminLogout();
+    });
+  </script>
+
+</body>
+</html>

@@ -32,6 +32,14 @@
     </div>
   </section>
 
+  <!-- Next Event Banner -->
+  <div id="next-event-wrapper" class="next-event-wrapper" style="display:none;">
+    <span class="next-event-label">Our Next Event</span>
+    <a id="next-event-banner" class="next-event-banner" href="./Our-Village/Events-Page/index.html">
+      <span id="next-event-text"></span>
+    </a>
+  </div>
+
   <!-- Navigation Cards -->
   <section class="nav-cards">
     <a href="./About-IN-NOLA/index.html" class="nav-card">
@@ -97,6 +105,52 @@
 </div>
 
 <script src="./js/main.js"></script>
+
+<script>
+(async function loadNextEvent() {
+  const wrapper = document.getElementById('next-event-wrapper');
+  const textEl = document.getElementById('next-event-text');
+
+  const isLocal = window.location.hostname === '127.0.0.1' ||
+                  window.location.hostname === 'localhost' ||
+                  window.location.port === '5500';
+
+  const fallback = {
+    upcoming: [
+      { title: 'Irish Network NOLA HAPPY HOUR!', date: '2026-02-26', time: '5:00 pm', location: 'Finn McCool\'s Irish Pub' }
+    ]
+  };
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function show(event) {
+    let dateStr = formatDate(event.date);
+    if (event.time) dateStr += ' at ' + event.time;
+    const parts = [event.title, dateStr];
+    if (event.location) parts.push(event.location);
+    textEl.textContent = parts.join('  ·  ');
+    wrapper.style.display = '';
+  }
+
+  try {
+    const response = await fetch('/api/events');
+    const contentType = response.headers.get('content-type');
+    if (!response.ok || !contentType || !contentType.includes('application/json')) {
+      if (isLocal) show(fallback.upcoming[0]);
+      return;
+    }
+    const data = await response.json();
+    if (data.upcoming && data.upcoming.length > 0) {
+      show(data.upcoming[0]);
+    }
+  } catch (e) {
+    if (isLocal) show(fallback.upcoming[0]);
+  }
+})();
+</script>
 
 </body>
 </html>

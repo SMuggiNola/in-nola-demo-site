@@ -96,7 +96,7 @@ Sent via IN-NOLA Contact Form
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'IN-NOLA Contact <onboarding@resend.dev>',
+        from: 'IN-NOLA Contact <contact@in-nola.org>',
         to: [TO_EMAIL],
         reply_to: email,
         subject: `[IN-NOLA Contact] Message from ${name}`,

@@ -615,8 +615,16 @@
                 </select>
               </div>
               <div class="form-group">
-                <label for="ticketSubmitter">Your Name</label>
-                <input type="text" id="ticketSubmitter" placeholder="Optional">
+                <label for="ticketSubmitter">Your Name *</label>
+                <select id="ticketSubmitter" required>
+                  <option value="" disabled selected>Select your name</option>
+                  <option value="Shannon">Shannon</option>
+                  <option value="Erin">Erin</option>
+                  <option value="Joni">Joni</option>
+                  <option value="Andrew">Andrew</option>
+                  <option value="Colm">Colm</option>
+                  <option value="Sean">Sean</option>
+                </select>
               </div>
             </div>
 
@@ -653,6 +661,23 @@
     </div>
   </div>
 
+  <!-- Close with Comment Modal -->
+  <div class="modal-overlay" id="closeModal">
+    <div class="modal">
+      <h2>Close Ticket</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">Closing "<span id="closeTicketTitle"></span>"</p>
+      <input type="hidden" id="closeTicketId">
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label for="closeComment">Closing comment *</label>
+        <textarea id="closeComment" required placeholder="What was done to resolve this?" style="width:100%; min-height:80px; padding:0.6rem 0.8rem; border:1px solid var(--glass-border); border-radius:6px; background:rgba(0,0,0,0.2); color:var(--text-primary); font-size:0.9rem; font-family:inherit; resize:vertical;"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" onclick="closeCloseModal()">Cancel</button>
+        <button type="button" class="submit-btn" style="width:auto; padding:0.6rem 1.2rem; font-size:0.9rem;" onclick="confirmClose()">Close Ticket</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/main.js"></script>
   <script src="/js/admin-auth.js"></script>
   <script>
@@ -663,6 +688,7 @@
 
     // Store tickets data
     let allTickets = [];
+    const isAdmin = getUserRole() === 'admin';
 
     // HTML escaping for safe output
     function escapeHtml(str) {
@@ -789,10 +815,10 @@
 
     // Create ticket card HTML
     function createTicketCard(ticket) {
-      const submitter = ticket.submittedBy ? ' by ' + escapeHtml(ticket.submittedBy) : '';
+      const submitter = (isAdmin && ticket.submittedBy) ? ' by ' + escapeHtml(ticket.submittedBy) : '';
       const dateStr = formatDate(ticket.createdAt);
 
-      // Comments HTML
+      // Comments HTML — visible to everyone
       let commentsHtml = '';
       if (ticket.comments && ticket.comments.length > 0) {
         commentsHtml = ticket.comments.map(c => `
@@ -804,16 +830,34 @@
         `).join('');
       }
 
-      // Status action buttons
-      let statusButtons = '';
-      if (ticket.status === 'open') {
-        statusButtons = `<button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'in-progress')">Mark In Progress</button>
-          <button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'completed')">Mark Completed</button>`;
-      } else if (ticket.status === 'in-progress') {
-        statusButtons = `<button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'open')">Reopen</button>
-          <button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'completed')">Mark Completed</button>`;
-      } else {
-        statusButtons = `<button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'open')">Reopen</button>`;
+      // Comment input — admin only
+      const commentFormHtml = isAdmin ? `
+        <div class="add-comment-form">
+          <input type="text" placeholder="Add a comment..." id="comment-${ticket.id}" onkeydown="if(event.key==='Enter'){event.preventDefault();addComment('${ticket.id}');}">
+          <button type="button" onclick="addComment('${ticket.id}')">Post</button>
+        </div>
+      ` : '';
+
+      // Status action buttons and delete — admin only
+      let actionsHtml = '';
+      if (isAdmin) {
+        let statusButtons = '';
+        if (ticket.status === 'open') {
+          statusButtons = `<button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'in-progress')">Mark In Progress</button>
+            <button type="button" class="status-btn" onclick="openCloseModal('${ticket.id}', '${escapeHtml(ticket.title).replace(/'/g, "\\'")}')">Close with Comment</button>`;
+        } else if (ticket.status === 'in-progress') {
+          statusButtons = `<button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'open')">Reopen</button>
+            <button type="button" class="status-btn" onclick="openCloseModal('${ticket.id}', '${escapeHtml(ticket.title).replace(/'/g, "\\'")}')">Close with Comment</button>`;
+        } else {
+          statusButtons = `<button type="button" class="status-btn" onclick="updateStatus('${ticket.id}', 'open')">Reopen</button>`;
+        }
+
+        actionsHtml = `
+          <div class="ticket-actions">
+            ${statusButtons}
+            <button type="button" class="delete-btn" onclick="openDeleteModal('${ticket.id}', '${escapeHtml(ticket.title).replace(/'/g, "\\'")}')">Delete</button>
+          </div>
+        `;
       }
 
       return `
@@ -834,16 +878,10 @@
             <div class="comments-section">
               <div class="comments-title">Comments (${(ticket.comments || []).length})</div>
               ${commentsHtml}
-              <div class="add-comment-form">
-                <input type="text" placeholder="Add a comment..." id="comment-${ticket.id}" onkeydown="if(event.key==='Enter'){event.preventDefault();addComment('${ticket.id}');}">
-                <button type="button" onclick="addComment('${ticket.id}')">Post</button>
-              </div>
+              ${commentFormHtml}
             </div>
 
-            <div class="ticket-actions">
-              ${statusButtons}
-              <button type="button" class="delete-btn" onclick="openDeleteModal('${ticket.id}', '${escapeHtml(ticket.title).replace(/'/g, "\\'")}')">Delete</button>
-            </div>
+            ${actionsHtml}
           </div>
         </div>
       `;
@@ -989,6 +1027,66 @@
         }
       } catch (error) {
         alert('Error deleting ticket: ' + error.message);
+      }
+    }
+
+    // Close-with-comment modal
+    function openCloseModal(ticketId, ticketTitle) {
+      document.getElementById('closeTicketId').value = ticketId;
+      document.getElementById('closeTicketTitle').textContent = ticketTitle;
+      document.getElementById('closeComment').value = '';
+      document.getElementById('closeModal').classList.add('active');
+      document.getElementById('closeComment').focus();
+    }
+
+    function closeCloseModal() {
+      document.getElementById('closeModal').classList.remove('active');
+    }
+
+    async function confirmClose() {
+      const ticketId = document.getElementById('closeTicketId').value;
+      const comment = document.getElementById('closeComment').value.trim();
+
+      if (!comment) {
+        document.getElementById('closeComment').focus();
+        return;
+      }
+
+      try {
+        // Add closing comment first
+        await fetch('/api/tickets', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminPassword: getAdminPassword(),
+            ticketId: ticketId,
+            addComment: {
+              text: comment,
+              author: sessionStorage.getItem('boardUser') || 'Admin'
+            }
+          })
+        });
+
+        // Then mark as completed
+        const response = await fetch('/api/tickets', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminPassword: getAdminPassword(),
+            ticketId: ticketId,
+            status: 'completed'
+          })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          closeCloseModal();
+          loadTickets();
+        } else {
+          alert(result.error || 'Failed to close ticket');
+        }
+      } catch (error) {
+        alert('Error closing ticket: ' + error.message);
       }
     }
 

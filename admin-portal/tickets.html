@@ -900,12 +900,12 @@
         `;
       }
 
-      // Quick-action button in header — admin only
+      // Quick-action / status badges in header
       let quickActionHtml = '';
       if (isAdmin && ticket.status === 'open') {
         quickActionHtml = `<button type="button" class="quick-action-btn" onclick="event.stopPropagation(); updateStatus('${ticket.id}', 'in-progress')">Working On It</button>`;
       } else if (ticket.status === 'in-progress') {
-        quickActionHtml = `<span class="status-badge in-progress">In Progress</span>`;
+        quickActionHtml = `<span class="status-badge in-progress">Working On It</span>`;
       } else if (ticket.status === 'completed') {
         quickActionHtml = `<span class="status-badge completed">Closed</span>`;
       }

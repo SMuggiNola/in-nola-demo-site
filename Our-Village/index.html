@@ -736,6 +736,48 @@
         display: flex;
       }
     }
+
+    /* Scroll wrapper — transparent by default */
+    .map-scroll-wrapper {
+      position: relative;
+    }
+
+    /* Portrait scroll mode: wide map with horizontal scrolling */
+    .map-scroll-wrapper.portrait-scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 6px;
+    }
+
+    .map-scroll-wrapper.portrait-scroll .village-map {
+      width: 900px;
+      min-width: 900px;
+      max-width: none;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    /* Right-edge gradient hint that content is scrollable */
+    .map-scroll-wrapper.portrait-scroll::after {
+      content: '';
+      position: sticky;
+      right: 0;
+      top: 0;
+      float: right;
+      width: 40px;
+      height: 100%;
+      margin-left: -40px;
+      pointer-events: none;
+      background: linear-gradient(to right, transparent, rgba(7, 26, 14, 0.6));
+      z-index: 5;
+      transition: opacity 0.3s;
+    }
+
+    /* Hide the scroll hint once the user has scrolled */
+    .map-scroll-wrapper.portrait-scroll.scrolled::after {
+      opacity: 0;
+    }
   </style>
 </head>
 
@@ -766,6 +808,7 @@
       <p>A living hub for community, culture, celebration, and connection</p>
 
       <!-- IRISH LANDSCAPE MAP -->
+      <div class="map-scroll-wrapper" id="mapScrollWrapper">
       <div class="village-map">
 
         <!-- Deep Green Landscape Background -->
@@ -1139,6 +1182,7 @@
         <div class="year-marker">Anno Domini MMXXV</div>
 
       </div>
+      </div><!-- .map-scroll-wrapper -->
 
       <!-- BACK TO HOME -->
       <div class="back-link">
@@ -1534,6 +1578,7 @@
     var overlay = document.getElementById('rotateOverlay');
     var landscapeBtn = document.getElementById('landscapeBtn');
     var dismissBtn = document.getElementById('dismissBtn');
+    var scrollWrapper = document.getElementById('mapScrollWrapper');
 
     // "View in Landscape" - try fullscreen + orientation lock
     landscapeBtn.addEventListener('click', function() {
@@ -1542,40 +1587,49 @@
 
       if (requestFS) {
         requestFS.call(el).then(function() {
-          // Try to lock orientation to landscape
           if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(function() {
-              // Orientation lock not supported - fullscreen still helps
-            });
+            screen.orientation.lock('landscape').catch(function() {});
           }
           overlay.classList.add('dismissed');
         }).catch(function() {
-          // Fullscreen denied - just dismiss the overlay
           overlay.classList.add('dismissed');
         });
       } else {
-        // No fullscreen API - just dismiss
         overlay.classList.add('dismissed');
       }
     });
 
-    // "Continue in Portrait" - dismiss the overlay for this visit
+    // "Continue in Portrait" - enable wide scrollable map
     dismissBtn.addEventListener('click', function() {
       overlay.classList.add('dismissed');
+      scrollWrapper.classList.add('portrait-scroll');
     });
 
-    // Re-show overlay if user rotates back to portrait (unless dismissed)
-    window.addEventListener('orientationchange', function() {
-      // When switching to landscape, auto-dismiss
-      if (window.innerWidth > window.innerHeight) {
-        overlay.classList.add('dismissed');
+    // Fade out the scroll hint once user scrolls a bit
+    scrollWrapper.addEventListener('scroll', function() {
+      if (scrollWrapper.scrollLeft > 30) {
+        scrollWrapper.classList.add('scrolled');
+      } else {
+        scrollWrapper.classList.remove('scrolled');
       }
     });
 
-    // Also hide on resize to landscape (covers orientation change on desktop)
-    window.addEventListener('resize', function() {
-      if (window.innerWidth > window.innerHeight && window.innerWidth <= 768) {
+    // When rotating to landscape, disable portrait-scroll (not needed)
+    function handleOrientationChange() {
+      if (window.innerWidth > window.innerHeight) {
         overlay.classList.add('dismissed');
+        scrollWrapper.classList.remove('portrait-scroll', 'scrolled');
+      }
+    }
+
+    window.addEventListener('orientationchange', function() {
+      // Slight delay so dimensions update
+      setTimeout(handleOrientationChange, 100);
+    });
+
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        scrollWrapper.classList.remove('portrait-scroll', 'scrolled');
       }
     });
   })();

@@ -69,6 +69,12 @@
       border: 3px solid #2a4a2a;
     }
 
+    .village-map-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
     /* Deep green Irish landscape background */
     .map-landscape {
       position: absolute;
@@ -599,58 +605,41 @@
       }
     }
 
-    /* Mobile Responsive */
+    /* Mobile Responsive — scrollable map */
     @media (max-width: 700px) {
       .village-map {
-        height: 75vh;
-        min-height: 500px;
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: 0;
+        height: 60vh;
+        min-height: 380px;
+        max-height: 550px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+
+      .village-map-inner {
+        min-width: 1000px;
+        height: 100%;
       }
 
       .cottage-icon {
-        width: 70px;
-        height: 60px;
+        width: 80px;
+        height: 68px;
       }
 
       .location-label {
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         padding: 5px 10px;
       }
 
-      .location-library {
-        top: 28%;
-        left: 3%;
-      }
-
-      .location-school {
-        top: 38%;
-        left: 25%;
-      }
-
-      .location-music {
-        top: 48%;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
-      .location-dancing {
-        top: 52%;
-        right: 5%;
-      }
-
-      .location-pub {
-        top: 14%;
-        left: 45%;
-      }
-
-      .location-village-hall {
-        top: 68%;
-        right: 10%;
-      }
-
       .announcement-board {
-        bottom: 8%;
-        right: 2%;
-        transform: scale(0.7);
+        transform: scale(0.75);
         transform-origin: bottom right;
       }
 
@@ -673,6 +662,7 @@
 
       <!-- IRISH LANDSCAPE MAP -->
       <div class="village-map">
+        <div class="village-map-inner">
 
         <!-- Deep Green Landscape Background -->
         <div class="map-landscape"></div>
@@ -1044,6 +1034,7 @@
         <!-- Year marker -->
         <div class="year-marker">Anno Domini MMXXV</div>
 
+        </div><!-- /.village-map-inner -->
       </div>
 
       <!-- BACK TO HOME -->
@@ -1126,6 +1117,7 @@
   <script>
   (function() {
     const map = document.querySelector('.village-map');
+    const innerMap = map.querySelector('.village-map-inner') || map;
     const cottages = document.querySelectorAll('.village-location[data-location]');
     let savedPositions = {};
     let editMode = false;
@@ -1164,7 +1156,7 @@
 
     function getCurrentPositions() {
       var positions = {};
-      var mapRect = map.getBoundingClientRect();
+      var mapRect = innerMap.getBoundingClientRect();
       cottages.forEach(function(el) {
         var key = el.dataset.location;
         var rect = el.getBoundingClientRect();
@@ -1348,7 +1340,7 @@
 
       function moveDrag(clientX, clientY) {
         if (!dragTarget) return;
-        var mapRect = map.getBoundingClientRect();
+        var mapRect = innerMap.getBoundingClientRect();
         var newLeft = clientX - mapRect.left - dragOffsetX;
         var newTop = clientY - mapRect.top - dragOffsetY;
 

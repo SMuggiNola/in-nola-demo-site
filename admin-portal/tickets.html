@@ -596,6 +596,42 @@
     .completed-section .ticket-card:hover {
       opacity: 1;
     }
+
+    @media (max-width: 600px) {
+      .tickets-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .progress-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .progress-card {
+        min-width: 0;
+        padding: 0.75rem 0.5rem;
+      }
+
+      .ticket-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .ticket-header-right {
+        align-self: flex-start;
+      }
+
+      .ticket-actions {
+        flex-direction: column;
+      }
+
+      .ticket-actions button {
+        width: 100%;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 

@@ -282,6 +282,26 @@
     .back-link a:hover {
       color: var(--gold);
     }
+
+    @media (max-width: 600px) {
+      .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .progress-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .progress-card {
+        min-width: 0;
+      }
+
+      .phase-title {
+        font-size: 0.95rem;
+      }
+    }
   </style>
 </head>
 

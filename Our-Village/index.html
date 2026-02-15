@@ -658,10 +658,104 @@
         font-size: 1.6rem;
       }
     }
+
+    /* Portrait mobile: rotate-your-phone overlay */
+    .rotate-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(7, 26, 14, 0.96);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      text-align: center;
+      padding: 2rem;
+      font-family: 'IM Fell English', serif;
+    }
+
+    .rotate-overlay .rotate-icon {
+      width: 80px;
+      height: 80px;
+      animation: rotateHint 2s ease-in-out infinite;
+    }
+
+    @keyframes rotateHint {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-30deg); }
+      75% { transform: rotate(-90deg); }
+    }
+
+    .rotate-overlay h2 {
+      color: #d4a84b;
+      font-family: 'Uncial Antiqua', serif;
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .rotate-overlay p {
+      color: rgba(255,255,255,0.75);
+      font-size: 1rem;
+      margin: 0;
+      max-width: 280px;
+    }
+
+    .rotate-overlay .landscape-btn {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #2a5a3a, #1a4a2a);
+      color: #ffd700;
+      border: 2px solid #d4a84b;
+      border-radius: 6px;
+      font-family: 'IM Fell English', serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .rotate-overlay .landscape-btn:active {
+      background: linear-gradient(135deg, #3a7048, #2a5a3a);
+    }
+
+    .rotate-overlay .dismiss-btn {
+      display: inline-block;
+      padding: 8px 20px;
+      background: transparent;
+      color: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      font-family: 'IM Fell English', serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) and (orientation: portrait) {
+      .rotate-overlay:not(.dismissed) {
+        display: flex;
+      }
+    }
   </style>
 </head>
 
 <body>
+
+  <!-- Rotate-to-landscape overlay for portrait mobile -->
+  <div class="rotate-overlay" id="rotateOverlay">
+    <svg class="rotate-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="4" width="36" height="56" rx="4" stroke="#d4a84b" stroke-width="2.5" fill="none"/>
+      <rect x="18" y="10" width="28" height="40" rx="1" stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none"/>
+      <circle cx="32" cy="55" r="2.5" stroke="#d4a84b" stroke-width="1.5" fill="none"/>
+      <!-- Rotation arrow -->
+      <path d="M52 28 C58 20, 58 44, 52 36" stroke="#ffd700" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M52 28 L56 30 L53 33" stroke="#ffd700" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>Rotate Your Device</h2>
+    <p>The Village map is best viewed in landscape mode</p>
+    <button class="landscape-btn" id="landscapeBtn">View in Landscape</button>
+    <button class="dismiss-btn" id="dismissBtn">Continue in Portrait</button>
+  </div>
 
   <div id="main-header-placeholder"></div>
 
@@ -1431,6 +1525,59 @@
     } else {
       loadPositions();
     }
+  })();
+  </script>
+
+  <!-- Landscape orientation helpers -->
+  <script>
+  (function() {
+    var overlay = document.getElementById('rotateOverlay');
+    var landscapeBtn = document.getElementById('landscapeBtn');
+    var dismissBtn = document.getElementById('dismissBtn');
+
+    // "View in Landscape" - try fullscreen + orientation lock
+    landscapeBtn.addEventListener('click', function() {
+      var el = document.documentElement;
+      var requestFS = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+
+      if (requestFS) {
+        requestFS.call(el).then(function() {
+          // Try to lock orientation to landscape
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(function() {
+              // Orientation lock not supported - fullscreen still helps
+            });
+          }
+          overlay.classList.add('dismissed');
+        }).catch(function() {
+          // Fullscreen denied - just dismiss the overlay
+          overlay.classList.add('dismissed');
+        });
+      } else {
+        // No fullscreen API - just dismiss
+        overlay.classList.add('dismissed');
+      }
+    });
+
+    // "Continue in Portrait" - dismiss the overlay for this visit
+    dismissBtn.addEventListener('click', function() {
+      overlay.classList.add('dismissed');
+    });
+
+    // Re-show overlay if user rotates back to portrait (unless dismissed)
+    window.addEventListener('orientationchange', function() {
+      // When switching to landscape, auto-dismiss
+      if (window.innerWidth > window.innerHeight) {
+        overlay.classList.add('dismissed');
+      }
+    });
+
+    // Also hide on resize to landscape (covers orientation change on desktop)
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > window.innerHeight && window.innerWidth <= 768) {
+        overlay.classList.add('dismissed');
+      }
+    });
   })();
   </script>
 

@@ -712,24 +712,77 @@ p {
   color: var(--text-muted);
 }
 
-.nav-card-image {
-  padding: 0;
-  overflow: visible;
-  background: none !important;
+/* Irish road sign style nav cards */
+.nav-card-sign {
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center;
+  background: #fff !important;
+  border: 3px solid #000 !important;
+  border-radius: 16px !important;
+  backdrop-filter: none;
+  padding: 1.1rem 1.5rem !important;
+  gap: 0.15rem !important;
+  min-height: 70px;
+}
+
+.nav-card-sign:hover {
+  background: #f0f0f0 !important;
+  border-color: #000 !important;
+  transform: translateY(-4px);
+}
+
+.sign-irish {
+  font-family: 'Arial Black', 'Helvetica Neue', sans-serif;
+  font-style: italic;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: 0.5px;
+}
+
+.sign-english {
+  font-family: 'Arial Black', 'Helvetica Neue', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.nav-card-contact {
+  background: #3a8a3a !important;
   border: none !important;
   backdrop-filter: none;
-  box-shadow: none;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
 }
 
-.nav-card-image img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.nav-card-image:hover {
-  background: none !important;
+.nav-card-contact:hover {
+  background: #44994a !important;
   border-color: transparent !important;
+}
+
+.contact-btn-waves {
+  flex-shrink: 0;
+  width: 45px;
+  height: 36px;
+}
+
+.contact-btn-waves svg {
+  width: 100%;
+  height: 100%;
+}
+
+.contact-btn-irish {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.contact-btn-english {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Next Event Banner */

@@ -1,7 +1,6 @@
 /* =========================================
    GLOBAL THEME — IN-NOLA Demo (Modern)
 ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;500;600&display=swap');
 :root {
   --gold: #d4a726;
   --gold-light: #f0d78a;
@@ -147,7 +146,6 @@ p {
   font-weight: 500;
 
   transition: var(--transition);
-  backdrop-filter: blur(12px);
 }
 
 .btn:hover {
@@ -444,7 +442,6 @@ p {
   border-radius: var(--radius-lg);
   padding: 1.5rem 1rem;
   text-align: center;
-  backdrop-filter: blur(12px);
   transition: var(--transition);
 }
 
@@ -517,7 +514,7 @@ p {
   z-index: 9999;
   font-family: 'Cinzel Decorative', serif;
   text-align: center;
-  animation: splashFade 1.8s ease forwards;
+  animation: splashFade 0.9s ease forwards;
   pointer-events: none;
 }
 
@@ -537,7 +534,7 @@ p {
 }
 
 @keyframes splashFade {
-  0%, 40% { opacity: 1; }
+  0%, 30% { opacity: 1; }
   100% { opacity: 0; visibility: hidden; }
 }
 
@@ -679,7 +676,6 @@ p {
   border-radius: var(--radius-lg);
   text-decoration: none;
   transition: var(--transition);
-  backdrop-filter: blur(12px);
   min-height: 70px;
 }
 
@@ -813,7 +809,6 @@ p {
   border-radius: var(--radius-full);
   text-decoration: none;
   text-align: center;
-  backdrop-filter: blur(12px);
   transition: var(--transition);
   margin-bottom: 0.5rem;
 }
@@ -966,7 +961,6 @@ p {
   font-size: 1rem;
   transition: var(--transition);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
 }
 
 .floating-btn-primary {

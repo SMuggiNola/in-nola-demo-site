@@ -14,34 +14,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const pathPrefix = getPathPrefix();
 
-  // 1. Fetch and inject the header
-  fetch(`${pathPrefix}header.html`)
-    .then(response => {
-      if (!response.ok) throw new Error(`Could not fetch header.html from ${pathPrefix}header.html`);
-      return response.text();
-    })
-    .then(data => {
-      const headerPlaceholder = document.getElementById('main-header-placeholder');
-      if (headerPlaceholder) {
+  // 1. Fetch and inject header/footer (skip if already inlined)
+  const headerPlaceholder = document.getElementById('main-header-placeholder');
+  if (headerPlaceholder) {
+    fetch(`${pathPrefix}header.html`)
+      .then(response => {
+        if (!response.ok) throw new Error(`Could not fetch header.html from ${pathPrefix}header.html`);
+        return response.text();
+      })
+      .then(data => {
         headerPlaceholder.innerHTML = data;
         setActiveNavLink();
-      }
-    })
-    .catch(error => console.error('Error injecting header:', error));
+      })
+      .catch(error => console.error('Error injecting header:', error));
+  } else {
+    setActiveNavLink();
+  }
 
-  // 2. Fetch and inject the footer
-  fetch(`${pathPrefix}footer.html`)
-    .then(response => {
-      if (!response.ok) throw new Error(`Could not fetch footer.html from ${pathPrefix}footer.html`);
-      return response.text();
-    })
-    .then(data => {
-      const footerPlaceholder = document.getElementById('main-footer-placeholder');
-      if (footerPlaceholder) {
+  const footerPlaceholder = document.getElementById('main-footer-placeholder');
+  if (footerPlaceholder) {
+    fetch(`${pathPrefix}footer.html`)
+      .then(response => {
+        if (!response.ok) throw new Error(`Could not fetch footer.html from ${pathPrefix}footer.html`);
+        return response.text();
+      })
+      .then(data => {
         footerPlaceholder.innerHTML = data;
-      }
-    })
-    .catch(error => console.error('Error injecting footer:', error));
+      })
+      .catch(error => console.error('Error injecting footer:', error));
+  }
 
   // 3. Set the active navigation link
   function setActiveNavLink() {
@@ -78,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainContent = document.getElementById('main-content');
   if (mainContent) {
     const isHomePage = document.body.id === 'landing';
-    const fadeInDelay = isHomePage ? 2000 : 100;
+    const fadeInDelay = isHomePage ? 900 : 100;
     setTimeout(() => mainContent.classList.add('fade-in'), fadeInDelay);
   }
 

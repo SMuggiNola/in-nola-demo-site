@@ -168,6 +168,40 @@ export async function onRequestPost(context) {
       users = await seedDefaultUsers(kv, env);
     } else {
       users = JSON.parse(raw);
+
+      // One-time migration: backfill membership fields on legacy users
+      const needsMigration = users.some(u =>
+        u.role !== 'scanner' && u.memberId === undefined
+      );
+      if (needsMigration) {
+        const memberSecret = env?.MEMBER_SECRET || 'default-dev-secret';
+        const existingIds = new Set(users.filter(u => u.memberId).map(u => u.memberId));
+        let idx = 0;
+        for (const u of users) {
+          if (u.memberId === undefined && u.role !== 'scanner') {
+            u.memberId = generateMemberId(existingIds, idx);
+            existingIds.add(u.memberId);
+            u.qrSignature = await generateSignature(u.memberId, memberSecret);
+            u.memberType = u.memberType || 'Board Member';
+            u.joinDate = u.joinDate || '2024-01-01';
+            u.expirationDate = u.expirationDate || '2026-12-31';
+          }
+          // Ensure scanner has null membership fields
+          if (u.role === 'scanner' && u.memberId === undefined) {
+            u.memberId = null;
+            u.memberType = null;
+            u.joinDate = null;
+            u.expirationDate = null;
+            u.qrSignature = null;
+          }
+          // Rename legacy 'admin' role to 'architect'
+          if (u.role === 'admin') {
+            u.role = 'architect';
+          }
+          idx++;
+        }
+        await kv.put('admin_users', JSON.stringify(users));
+      }
     }
 
     // Find user (case-insensitive)

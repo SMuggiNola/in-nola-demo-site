@@ -1,7 +1,7 @@
 name = "in-nola-demo-site"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "."
-account_id = "6b0ec0cc22b42c83a5860d586ca25330"
+# account_id lives in .env only — Pages rejects it in wrangler.toml
 
 # KV Namespace Bindings
 # Find IDs in Cloudflare dashboard → Workers & Pages → KV

@@ -77,7 +77,13 @@ export async function onRequestPost(context) {
 
     const users = JSON.parse(raw);
     const inputEmail = email.toLowerCase().trim();
-    const userIndex = users.findIndex(u => u.email && u.email.toLowerCase() === inputEmail);
+
+    // Support comma-separated emails per user
+    const userIndex = users.findIndex(u => {
+      if (!u.email) return false;
+      const emails = u.email.split(',').map(e => e.trim().toLowerCase());
+      return emails.includes(inputEmail);
+    });
 
     if (userIndex === -1) {
       return Response.json(successMsg, { headers: corsHeaders });
@@ -104,7 +110,7 @@ export async function onRequestPost(context) {
       },
       body: JSON.stringify({
         from: 'IN-NOLA Tech <contact@in-nola.org>',
-        to: [user.email],
+        to: [inputEmail],
         subject: 'Your IN-NOLA Admin PIN',
         html: `
           <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">

@@ -44,7 +44,7 @@ function randomPin() {
 
 async function seedDefaultUsers(kv) {
   const defaults = [
-    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'admin',   displayName: 'Seán Muggivan', boardId: 'sean',    email: 'sean.muggivan@gmail.com' },
+    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'admin',   displayName: 'Seán Muggivan', boardId: 'sean',    email: 'sean@muggivanlcsw.me' },
     { username: 'kel.sha', plaintext: randomPin(),    role: 'board',   displayName: 'Shannon Kelly',  boardId: 'shannon', email: '' },
     { username: 'mar.eri', plaintext: randomPin(),    role: 'board',   displayName: 'Erin Marjorie',  boardId: 'erin',    email: '' },
     { username: 'jon.and', plaintext: randomPin(),    role: 'board',   displayName: 'Andrew Jones',   boardId: 'andrew',  email: 'ajones27@tulane.edu' },

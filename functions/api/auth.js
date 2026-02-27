@@ -75,7 +75,7 @@ function generateMemberId(existingIds, index) {
 
 async function seedDefaultUsers(kv, env) {
   const defaults = [
-    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'architect', displayName: 'Seán Muggivan', boardId: 'sean',    email: 'sean@muggivanlcsw.me', memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'architect', displayName: 'Se\u00e1n Muggivan', boardId: 'sean',    email: 'sean@muggivanlcsw.me', memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
     { username: 'kel.sha', plaintext: randomPin(),    role: 'board',     displayName: 'Shannon Kelly',  boardId: 'shannon', email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
     { username: 'mar.eri', plaintext: randomPin(),    role: 'board',     displayName: 'Erin Marjorie',  boardId: 'erin',    email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
     { username: 'jon.and', plaintext: randomPin(),    role: 'board',     displayName: 'Andrew Jones',   boardId: 'andrew',  email: 'ajones27@tulane.edu',   memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },

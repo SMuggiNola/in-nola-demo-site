@@ -54,9 +54,15 @@ export async function onRequestPost(context) {
     const kv = env.BOARD_KV;
     const resendKey = env.RESEND_API_KEY;
 
-    if (!kv || !resendKey) {
+    if (!kv) {
       return Response.json(
-        { error: 'Server configuration error' },
+        { error: 'KV not configured' },
+        { status: 500, headers: corsHeaders }
+      );
+    }
+    if (!resendKey) {
+      return Response.json(
+        { error: 'Email service not configured' },
         { status: 500, headers: corsHeaders }
       );
     }

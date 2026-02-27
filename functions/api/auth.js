@@ -44,13 +44,13 @@ function randomPin() {
 
 async function seedDefaultUsers(kv) {
   const defaults = [
-    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'admin',   displayName: 'Seán Muggivan', boardId: 'sean'    },
-    { username: 'kel.sha', plaintext: randomPin(),    role: 'board',   displayName: 'Shannon Kelly',  boardId: 'shannon' },
-    { username: 'mar.eri', plaintext: randomPin(),    role: 'board',   displayName: 'Erin Marjorie',  boardId: 'erin'    },
-    { username: 'jon.and', plaintext: randomPin(),    role: 'board',   displayName: 'Andrew Jones',   boardId: 'andrew'  },
-    { username: 'mug.jon', plaintext: randomPin(),    role: 'board',   displayName: 'Joni Muggivan',  boardId: 'joni'    },
-    { username: 'ken.col', plaintext: randomPin(),    role: 'board',   displayName: 'Colm Kennedy',   boardId: 'colm'    },
-    { username: 'scanner', plaintext: randomPin(),    role: 'scanner', displayName: 'Scanner Kiosk',  boardId: null      },
+    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'admin',   displayName: 'Seán Muggivan', boardId: 'sean',    email: 'sean.muggivan@gmail.com' },
+    { username: 'kel.sha', plaintext: randomPin(),    role: 'board',   displayName: 'Shannon Kelly',  boardId: 'shannon', email: '' },
+    { username: 'mar.eri', plaintext: randomPin(),    role: 'board',   displayName: 'Erin Marjorie',  boardId: 'erin',    email: '' },
+    { username: 'jon.and', plaintext: randomPin(),    role: 'board',   displayName: 'Andrew Jones',   boardId: 'andrew',  email: 'ajones27@tulane.edu' },
+    { username: 'mug.jon', plaintext: randomPin(),    role: 'board',   displayName: 'Joni Muggivan',  boardId: 'joni',    email: '' },
+    { username: 'ken.col', plaintext: randomPin(),    role: 'board',   displayName: 'Colm Kennedy',   boardId: 'colm',    email: '' },
+    { username: 'scanner', plaintext: randomPin(),    role: 'scanner', displayName: 'Scanner Kiosk',  boardId: null,      email: '' },
   ];
 
   const users = [];
@@ -64,6 +64,7 @@ async function seedDefaultUsers(kv) {
       role: d.role,
       displayName: d.displayName,
       boardId: d.boardId,
+      email: d.email || '',
       createdAt: new Date().toISOString(),
     });
   }

@@ -1,9 +1,9 @@
 // Members API - Cloudflare Pages Function
-// Handles member import, login, verification, and QR generation
-// Requires KV binding: MEMBERS_KV
-// Requires secret: MEMBER_SECRET (32+ chars for HMAC signing)
+// Handles member import, verification, and QR generation
+// Uses BOARD_KV (admin_users) as the unified auth store
+// Login removed — all login goes through /api/auth
 
-const MEMBERS_KEY = 'all_members';
+const ADMIN_USERS_KEY = 'admin_users';
 
 // Shared admin password for all board member actions
 const ADMIN_PASSWORD = 'innola2026!';
@@ -15,6 +15,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
   'Content-Type': 'application/json'
 };
+
+// ── Password hashing (same as auth.js) ──────────────────────────────
+
+async function hashPassword(password, salt) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(salt + password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function generateSalt() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 // Generate HMAC-SHA256 signature using Web Crypto API
 async function generateSignature(memberId, secret) {
@@ -261,9 +280,7 @@ export async function onRequest(context) {
     return handleImport(request, env);
   }
 
-  if (path === '/api/members/login' && request.method === 'POST') {
-    return handleLogin(request, env);
-  }
+  // Login removed — all login goes through /api/auth
 
   if (path === '/api/members/verify' && request.method === 'GET') {
     return handleVerify(request, env);
@@ -283,11 +300,11 @@ export async function onRequest(context) {
   });
 }
 
-// POST /api/members/import - Import members from CSV
+// POST /api/members/import - Import members from CSV into BOARD_KV
 async function handleImport(request, env) {
   try {
-    if (!env.MEMBERS_KV) {
-      return new Response(JSON.stringify({ error: 'MEMBERS_KV not configured' }), {
+    if (!env.BOARD_KV) {
+      return new Response(JSON.stringify({ error: 'BOARD_KV not configured' }), {
         status: 500,
         headers: corsHeaders
       });
@@ -328,16 +345,14 @@ async function handleImport(request, env) {
       });
     }
 
-    // Get existing members
-    let membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
-    if (!membersData) {
-      membersData = { members: [] };
-    }
+    // Load existing users from BOARD_KV
+    let raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    let users = raw ? JSON.parse(raw) : [];
 
-    // Build sets of existing usernames and IDs
-    const existingUsernames = new Set(membersData.members.map(m => m.username));
-    const existingIds = new Set(membersData.members.map(m => m.id));
-    const existingEmails = new Set(membersData.members.map(m => m.email.toLowerCase()));
+    // Build sets of existing usernames, member IDs, and emails
+    const existingUsernames = new Set(users.map(u => u.username));
+    const existingMemberIds = new Set(users.filter(u => u.memberId).map(u => u.memberId));
+    const existingEmails = new Set(users.filter(u => u.email).map(u => u.email.toLowerCase()));
 
     const imported = [];
     const skipped = [];
@@ -352,46 +367,55 @@ async function handleImport(request, env) {
       }
 
       // Generate credentials
-      const id = generateMemberId(existingIds);
+      const memberId = generateMemberId(existingMemberIds);
       const username = generateUsername(row.name, existingUsernames);
       const pin = generatePin();
-      const qrSignature = await generateSignature(id, env.MEMBER_SECRET);
+      const qrSignature = await generateSignature(memberId, env.MEMBER_SECRET);
 
-      const member = {
-        id,
+      // Hash the PIN (not stored in plaintext)
+      const salt = generateSalt();
+      const passwordHash = await hashPassword(pin, salt);
+
+      const user = {
         username,
-        pin,
-        name: row.name.trim(),
+        passwordHash,
+        salt,
+        role: 'member',
+        displayName: row.name.trim(),
+        boardId: null,
         email,
+        memberId,
         memberType: row.membertype.trim(),
         joinDate: row.joindate.trim(),
         expirationDate: row.expirationdate.trim(),
         qrSignature,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
 
-      membersData.members.push(member);
+      users.push(user);
       existingUsernames.add(username);
-      existingIds.add(id);
+      existingMemberIds.add(memberId);
       existingEmails.add(email);
 
       imported.push({
-        name: member.name,
-        email: member.email,
-        username: member.username,
-        pin: member.pin,
-        id: member.id
+        name: user.displayName,
+        email: user.email,
+        username: user.username,
+        pin,  // Return plaintext PIN only in import response
+        id: user.memberId
       });
     }
 
-    // Save to KV
-    await env.MEMBERS_KV.put(MEMBERS_KEY, JSON.stringify(membersData));
+    // Save to BOARD_KV
+    await env.BOARD_KV.put(ADMIN_USERS_KEY, JSON.stringify(users));
+
+    const memberCount = users.filter(u => u.memberId).length;
 
     return new Response(JSON.stringify({
       success: true,
       imported,
       skipped,
-      totalMembers: membersData.members.length
+      totalMembers: memberCount
     }), {
       headers: corsHeaders
     });
@@ -407,78 +431,10 @@ async function handleImport(request, env) {
   }
 }
 
-// POST /api/members/login - Authenticate member
-async function handleLogin(request, env) {
-  try {
-    if (!env.MEMBERS_KV) {
-      return new Response(JSON.stringify({ error: 'MEMBERS_KV not configured' }), {
-        status: 500,
-        headers: corsHeaders
-      });
-    }
-
-    const body = await request.json();
-    const { username, pin } = body;
-
-    if (!username || !pin) {
-      return new Response(JSON.stringify({ error: 'Username and PIN required' }), {
-        status: 400,
-        headers: corsHeaders
-      });
-    }
-
-    // Get members
-    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
-    if (!membersData || !membersData.members) {
-      return new Response(JSON.stringify({ error: 'Invalid username or PIN' }), {
-        status: 401,
-        headers: corsHeaders
-      });
-    }
-
-    // Find member by username (case-insensitive)
-    const member = membersData.members.find(
-      m => m.username.toLowerCase() === username.toLowerCase()
-    );
-
-    if (!member || member.pin !== pin) {
-      return new Response(JSON.stringify({ error: 'Invalid username or PIN' }), {
-        status: 401,
-        headers: corsHeaders
-      });
-    }
-
-    // Return member data (excluding sensitive fields)
-    return new Response(JSON.stringify({
-      success: true,
-      member: {
-        id: member.id,
-        name: member.name,
-        email: member.email,
-        memberType: member.memberType,
-        joinDate: member.joinDate,
-        expirationDate: member.expirationDate,
-        qrSignature: member.qrSignature
-      }
-    }), {
-      headers: corsHeaders
-    });
-
-  } catch (error) {
-    return new Response(JSON.stringify({
-      error: 'Login failed',
-      details: error.message
-    }), {
-      status: 500,
-      headers: corsHeaders
-    });
-  }
-}
-
 // GET /api/members/verify?id=MEM-2025-001&sig=abc123 - Verify QR code
 async function handleVerify(request, env) {
   try {
-    if (!env.MEMBERS_KV || !env.MEMBER_SECRET) {
+    if (!env.BOARD_KV || !env.MEMBER_SECRET) {
       return new Response(JSON.stringify({
         valid: false,
         status: 'error',
@@ -515,9 +471,9 @@ async function handleVerify(request, env) {
       });
     }
 
-    // Get member from database
-    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
-    if (!membersData || !membersData.members) {
+    // Get user from BOARD_KV by memberId
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    if (!raw) {
       return new Response(JSON.stringify({
         valid: false,
         status: 'invalid',
@@ -527,8 +483,9 @@ async function handleVerify(request, env) {
       });
     }
 
-    const member = membersData.members.find(m => m.id === id);
-    if (!member) {
+    const users = JSON.parse(raw);
+    const user = users.find(u => u.memberId === id);
+    if (!user) {
       return new Response(JSON.stringify({
         valid: false,
         status: 'invalid',
@@ -539,7 +496,7 @@ async function handleVerify(request, env) {
     }
 
     // Check expiration
-    const expirationDate = new Date(member.expirationDate);
+    const expirationDate = new Date(user.expirationDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -549,10 +506,10 @@ async function handleVerify(request, env) {
         status: 'expired',
         message: 'Membership has expired',
         member: {
-          id: member.id,
-          name: member.name,
-          type: member.memberType,
-          expiredOn: member.expirationDate
+          id: user.memberId,
+          name: user.displayName,
+          type: user.memberType,
+          expiredOn: user.expirationDate
         }
       }), {
         headers: corsHeaders
@@ -565,10 +522,10 @@ async function handleVerify(request, env) {
       status: 'valid',
       message: 'Member in Good Standing',
       member: {
-        id: member.id,
-        name: member.name,
-        type: member.memberType,
-        validUntil: member.expirationDate
+        id: user.memberId,
+        name: user.displayName,
+        type: user.memberType,
+        validUntil: user.expirationDate
       }
     }), {
       headers: corsHeaders
@@ -589,8 +546,8 @@ async function handleVerify(request, env) {
 // GET /api/members?adminPassword=xxx - List all members (admin only)
 async function handleList(request, env) {
   try {
-    if (!env.MEMBERS_KV) {
-      return new Response(JSON.stringify({ error: 'MEMBERS_KV not configured' }), {
+    if (!env.BOARD_KV) {
+      return new Response(JSON.stringify({ error: 'BOARD_KV not configured' }), {
         status: 500,
         headers: corsHeaders
       });
@@ -606,24 +563,28 @@ async function handleList(request, env) {
       });
     }
 
-    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
-    if (!membersData || !membersData.members) {
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    if (!raw) {
       return new Response(JSON.stringify({ members: [] }), {
         headers: corsHeaders
       });
     }
 
-    // Return members without PINs
-    const members = membersData.members.map(m => ({
-      id: m.id,
-      username: m.username,
-      name: m.name,
-      email: m.email,
-      memberType: m.memberType,
-      joinDate: m.joinDate,
-      expirationDate: m.expirationDate,
-      qrSignature: m.qrSignature
-    }));
+    const users = JSON.parse(raw);
+
+    // Return only users with memberId (all roles that have membership)
+    const members = users
+      .filter(u => u.memberId)
+      .map(u => ({
+        id: u.memberId,
+        username: u.username,
+        name: u.displayName,
+        email: u.email,
+        memberType: u.memberType,
+        joinDate: u.joinDate,
+        expirationDate: u.expirationDate,
+        qrSignature: u.qrSignature
+      }));
 
     return new Response(JSON.stringify({ members }), {
       headers: corsHeaders
@@ -643,8 +604,8 @@ async function handleList(request, env) {
 // POST /api/members/qr/batch - Generate QR data for selected members
 async function handleBatchQR(request, env) {
   try {
-    if (!env.MEMBERS_KV) {
-      return new Response(JSON.stringify({ error: 'MEMBERS_KV not configured' }), {
+    if (!env.BOARD_KV) {
+      return new Response(JSON.stringify({ error: 'BOARD_KV not configured' }), {
         status: 500,
         headers: corsHeaders
       });
@@ -666,26 +627,28 @@ async function handleBatchQR(request, env) {
       });
     }
 
-    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
-    if (!membersData || !membersData.members) {
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    if (!raw) {
       return new Response(JSON.stringify({ error: 'No members found' }), {
         status: 404,
         headers: corsHeaders
       });
     }
 
+    const users = JSON.parse(raw);
+
     const qrData = [];
     for (const id of body.memberIds) {
-      const member = membersData.members.find(m => m.id === id);
-      if (member) {
+      const user = users.find(u => u.memberId === id);
+      if (user) {
         qrData.push({
-          id: member.id,
-          name: member.name,
-          memberType: member.memberType,
+          id: user.memberId,
+          name: user.displayName,
+          memberType: user.memberType,
           qrString: JSON.stringify({
             v: 1,
-            id: member.id,
-            sig: member.qrSignature
+            id: user.memberId,
+            sig: user.qrSignature
           })
         });
       }

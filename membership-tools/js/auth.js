@@ -1,23 +1,23 @@
 /**
  * IN-NOLA Membership Portal - Authentication Logic
- * Uses backend API for authentication
+ * Uses unified /api/auth endpoint for all logins
  */
 
 const AUTH_KEY = 'innola_member_session';
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 /**
- * Attempt to log in a member via API
+ * Attempt to log in via unified /api/auth
  * @param {string} username
- * @param {string} pin
- * @returns {Promise<Object>} Result with success status and member/error
+ * @param {string} password
+ * @returns {Promise<Object>} Result with success status and user/error
  */
-async function login(username, pin) {
+async function login(username, password) {
     try {
-        const response = await fetch('/api/members/login', {
+        const response = await fetch('/api/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, pin })
+            body: JSON.stringify({ username, password })
         });
 
         const data = await response.json();
@@ -26,25 +26,31 @@ async function login(username, pin) {
             return { success: false, error: data.error || 'Invalid username or PIN' };
         }
 
-        // Create session with member data from API
+        const user = data.user;
+
+        // Create session with membership + role data from API
         const session = {
-            memberId: data.member.id,
-            name: data.member.name,
-            email: data.member.email,
-            memberType: data.member.memberType,
-            joinDate: data.member.joinDate,
-            expirationDate: data.member.expirationDate,
-            qrSignature: data.member.qrSignature,
+            username: user.username,
+            role: user.role,
+            displayName: user.displayName,
+            boardId: user.boardId,
+            memberId: user.memberId,
+            name: user.displayName,
+            email: user.email || '',
+            memberType: user.memberType,
+            joinDate: user.joinDate,
+            expirationDate: user.expirationDate,
+            qrSignature: user.qrSignature,
+            apiToken: data.apiToken,
             loginTime: Date.now(),
             expiresAt: Date.now() + SESSION_DURATION
         };
 
         localStorage.setItem(AUTH_KEY, JSON.stringify(session));
 
-        return { success: true, member: data.member };
+        return { success: true, user: user };
 
     } catch (error) {
-        // For local development fallback
         console.warn('API login failed, running locally?', error);
         return { success: false, error: 'Cannot connect to server. Please use the deployed site.' };
     }
@@ -80,18 +86,26 @@ function getSession() {
  */
 function getCurrentMember() {
     const session = getSession();
-    if (!session) return null;
+    if (!session || !session.memberId) return null;
 
-    // Return member data from session (populated by API at login)
     return {
         id: session.memberId,
-        name: session.name,
+        name: session.displayName || session.name,
         email: session.email,
         memberType: session.memberType,
         joinDate: session.joinDate,
         expirationDate: session.expirationDate,
         qrSignature: session.qrSignature
     };
+}
+
+/**
+ * Get the current user's role
+ * @returns {string|null} Role string or null
+ */
+function getUserRole() {
+    const session = getSession();
+    return session ? session.role : null;
 }
 
 /**
@@ -145,6 +159,7 @@ window.Auth = {
     logout,
     getSession,
     getCurrentMember,
+    getUserRole,
     isMembershipValid,
     requireAuth,
     redirectIfAuthenticated

@@ -181,13 +181,20 @@
           sessionStorage.setItem('displayName', data.user.displayName || '');
           sessionStorage.setItem('boardId', data.user.boardId || '');
 
-          // Scanner role goes straight to scanner page
-          if (data.user.role === 'scanner') {
+          // Role-based redirect
+          const role = data.user.role;
+
+          if (role === 'member') {
+            window.location.href = '/membership-tools/certificate.html';
+            return;
+          }
+
+          if (role === 'scanner') {
             window.location.href = '/membership-tools/scanner.html';
             return;
           }
 
-          // Redirect to return URL if present, otherwise dashboard
+          // board / architect → return URL or dashboard
           const params = new URLSearchParams(window.location.search);
           const returnUrl = params.get('return');
           window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'home.html';

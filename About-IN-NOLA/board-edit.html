@@ -594,7 +594,7 @@
       const role = getUserRole();
       const boardId = getBoardId();
 
-      if (role === 'admin') {
+      if (role === 'architect') {
         // Admin sees the member picker dropdown
         document.getElementById('admin-picker').classList.remove('hidden');
       } else if (boardId) {

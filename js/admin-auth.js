@@ -5,7 +5,9 @@
  * It checks sessionStorage for a valid session and redirects to the
  * login page at /admin-portal/ if the user is not authenticated.
  *
- * Scanner role is restricted to scanner.html only.
+ * Role gates:
+ *   - scanner → scanner.html only
+ *   - member  → /membership-tools/ pages only
  *
  * After login, the user is sent back to the page they originally tried to visit.
  */
@@ -16,11 +18,21 @@
     return;
   }
 
+  var role = sessionStorage.getItem('userRole');
+
   // Scanner role gate: can only access scanner.html
-  if (sessionStorage.getItem('userRole') === 'scanner') {
+  if (role === 'scanner') {
     var onScannerPage = window.location.pathname.indexOf('scanner.html') !== -1;
     if (!onScannerPage) {
       window.location.href = '/membership-tools/scanner.html';
+    }
+  }
+
+  // Member role gate: can only access /membership-tools/ pages
+  if (role === 'member') {
+    var onMemberPage = window.location.pathname.indexOf('/membership-tools/') !== -1;
+    if (!onMemberPage) {
+      window.location.href = '/membership-tools/certificate.html';
     }
   }
 })();
@@ -30,7 +42,7 @@ function getAdminPassword() {
   return sessionStorage.getItem('adminPassword') || '';
 }
 
-/** Return the logged-in user's role ('admin', 'board', or 'scanner'). */
+/** Return the logged-in user's role ('architect', 'board', 'scanner', or 'member'). */
 function getUserRole() {
   return sessionStorage.getItem('userRole');
 }

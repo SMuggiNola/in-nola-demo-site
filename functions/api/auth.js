@@ -40,23 +40,67 @@ function randomPin() {
   return String(100000 + (arr[0] % 900000));
 }
 
+// ── helpers ── HMAC signature for QR codes ──────────────────────────
+
+async function generateSignature(memberId, secret) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(memberId));
+  const hashHex = Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+  return hashHex.substring(0, 12);
+}
+
+// ── helpers ── generate member ID ───────────────────────────────────
+
+function generateMemberId(existingIds, index) {
+  const year = new Date().getFullYear();
+  let num = index + 1;
+  let id;
+  do {
+    id = `MEM-${year}-${String(num).padStart(3, '0')}`;
+    num++;
+  } while (existingIds.has(id));
+  return id;
+}
+
 // ── seed default users ────────────────────────────────────────────────
 
-async function seedDefaultUsers(kv) {
+async function seedDefaultUsers(kv, env) {
   const defaults = [
-    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'admin',   displayName: 'Seán Muggivan', boardId: 'sean',    email: 'sean@muggivanlcsw.me' },
-    { username: 'kel.sha', plaintext: randomPin(),    role: 'board',   displayName: 'Shannon Kelly',  boardId: 'shannon', email: '' },
-    { username: 'mar.eri', plaintext: randomPin(),    role: 'board',   displayName: 'Erin Marjorie',  boardId: 'erin',    email: '' },
-    { username: 'jon.and', plaintext: randomPin(),    role: 'board',   displayName: 'Andrew Jones',   boardId: 'andrew',  email: 'ajones27@tulane.edu' },
-    { username: 'mug.jon', plaintext: randomPin(),    role: 'board',   displayName: 'Joni Muggivan',  boardId: 'joni',    email: '' },
-    { username: 'ken.col', plaintext: randomPin(),    role: 'board',   displayName: 'Colm Kennedy',   boardId: 'colm',    email: '' },
-    { username: 'scanner', plaintext: randomPin(),    role: 'scanner', displayName: 'Scanner Kiosk',  boardId: null,      email: '' },
+    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'architect', displayName: 'Seán Muggivan', boardId: 'sean',    email: 'sean@muggivanlcsw.me', memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'kel.sha', plaintext: randomPin(),    role: 'board',     displayName: 'Shannon Kelly',  boardId: 'shannon', email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'mar.eri', plaintext: randomPin(),    role: 'board',     displayName: 'Erin Marjorie',  boardId: 'erin',    email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'jon.and', plaintext: randomPin(),    role: 'board',     displayName: 'Andrew Jones',   boardId: 'andrew',  email: 'ajones27@tulane.edu',   memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'mug.jon', plaintext: randomPin(),    role: 'board',     displayName: 'Joni Muggivan',  boardId: 'joni',    email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'ken.col', plaintext: randomPin(),    role: 'board',     displayName: 'Colm Kennedy',   boardId: 'colm',    email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'scanner', plaintext: randomPin(),    role: 'scanner',   displayName: 'Scanner Kiosk',  boardId: null,      email: '',                      memberType: null,           joinDate: null,         expirationDate: null },
   ];
 
+  const memberSecret = env?.MEMBER_SECRET || 'default-dev-secret';
+  const existingIds = new Set();
   const users = [];
-  for (const d of defaults) {
+  for (let i = 0; i < defaults.length; i++) {
+    const d = defaults[i];
     const salt = generateSalt();
     const passwordHash = await hashPassword(d.plaintext, salt);
+
+    // Generate membership fields for non-scanner roles
+    let memberId = null;
+    let qrSignature = null;
+    if (d.memberType) {
+      memberId = generateMemberId(existingIds, i);
+      existingIds.add(memberId);
+      qrSignature = await generateSignature(memberId, memberSecret);
+    }
+
     users.push({
       username: d.username,
       passwordHash,
@@ -65,6 +109,11 @@ async function seedDefaultUsers(kv) {
       displayName: d.displayName,
       boardId: d.boardId,
       email: d.email || '',
+      memberId,
+      memberType: d.memberType || null,
+      joinDate: d.joinDate || null,
+      expirationDate: d.expirationDate || null,
+      qrSignature,
       createdAt: new Date().toISOString(),
     });
   }
@@ -116,7 +165,7 @@ export async function onRequestPost(context) {
     let raw = await kv.get('admin_users');
     let users;
     if (!raw) {
-      users = await seedDefaultUsers(kv);
+      users = await seedDefaultUsers(kv, env);
     } else {
       users = JSON.parse(raw);
     }
@@ -150,6 +199,11 @@ export async function onRequestPost(context) {
           role: user.role,
           displayName: user.displayName,
           boardId: user.boardId ?? null,
+          memberId: user.memberId ?? null,
+          memberType: user.memberType ?? null,
+          joinDate: user.joinDate ?? null,
+          expirationDate: user.expirationDate ?? null,
+          qrSignature: user.qrSignature ?? null,
         },
         apiToken: API_PASSWORD,
       },

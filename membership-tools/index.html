@@ -20,19 +20,23 @@
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" required
-                           placeholder="e.g. jmurphy" autocomplete="username"
+                           placeholder="e.g. mac.sha" autocomplete="username"
                            autocapitalize="none">
                 </div>
 
                 <div class="form-group">
-                    <label for="pin">PIN</label>
-                    <input type="password" id="pin" name="pin" required
+                    <label for="password">PIN</label>
+                    <input type="password" id="password" name="password" required
                            placeholder="6-digit PIN" autocomplete="current-password"
-                           pattern="[0-9]*" inputmode="numeric" maxlength="6">
+                           pattern="[0-9]*" inputmode="numeric" maxlength="20">
                 </div>
 
                 <button type="submit" class="btn btn-primary">Sign In</button>
             </form>
+
+            <div style="text-align: center; margin-top: 0.75rem;">
+                <a href="/admin-portal/index.html" id="forgotLink" style="color: var(--celtic-gold); font-size: 0.85rem; text-decoration: none; opacity: 0.7;">Forgot your PIN?</a>
+            </div>
 
             <div class="loading" id="loading">
                 <div class="spinner"></div>
@@ -41,7 +45,7 @@
         </div>
 
         <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; opacity: 0.7;">
-            <a href="scanner.html" style="color: var(--celtic-gold);">Admin Scanner</a>
+            <a href="/index.html" style="color: var(--celtic-gold);">Return to Home</a>
         </p>
     </div>
 
@@ -78,21 +82,32 @@
             hideMessage();
 
             const username = document.getElementById('username').value.trim();
-            const pin = document.getElementById('pin').value;
+            const password = document.getElementById('password').value;
 
-            if (!username || !pin) {
+            if (!username || !password) {
                 showMessage('Please enter both username and PIN', 'error');
                 return;
             }
 
             setLoading(true);
 
-            const result = await window.Auth.login(username, pin);
+            const result = await window.Auth.login(username, password);
 
             if (result.success) {
                 showMessage('Login successful! Redirecting...', 'success');
+
+                // Role-based redirect
+                const role = result.user.role;
+                let redirect = 'certificate.html';
+                if (role === 'scanner') {
+                    redirect = 'scanner.html';
+                } else if (role === 'board' || role === 'architect') {
+                    // Board/architect can access member cert but also admin portal
+                    redirect = 'certificate.html';
+                }
+
                 setTimeout(function() {
-                    window.location.href = 'certificate.html';
+                    window.location.href = redirect;
                 }, 500);
             } else {
                 setLoading(false);

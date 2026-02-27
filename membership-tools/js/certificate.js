@@ -70,7 +70,7 @@ function renderCertificate(member) {
 
     // Set member type with appropriate class
     const typeEl = document.getElementById('memberType');
-    typeEl.textContent = member.memberType + ' Member';
+    typeEl.textContent = member.memberType.toLowerCase().includes('member') ? member.memberType : member.memberType + ' Member';
     if (member.memberType === 'Lifetime') {
         typeEl.classList.add('lifetime');
     }

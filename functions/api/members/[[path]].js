@@ -45,16 +45,17 @@ async function verifySignature(memberId, sig, secret) {
   return sig === expectedSig;
 }
 
-// Generate username from name (e.g., "John Murphy" -> "jmurphy")
+// Generate username from name (e.g., "John Murphy" -> "mur.joh")
 function generateUsername(name, existingUsernames) {
   // Clean and split name
   const parts = name.trim().toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/);
   if (parts.length === 0) return 'member' + Date.now();
 
-  // First initial + last name
   const firstName = parts[0];
   const lastName = parts[parts.length - 1];
-  let baseUsername = firstName.charAt(0) + lastName;
+  const last3 = lastName.slice(0, 3);
+  const first3 = firstName.slice(0, 3);
+  let baseUsername = last3 + '.' + first3;
 
   // Ensure uniqueness
   let username = baseUsername;

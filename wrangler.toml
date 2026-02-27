@@ -1,0 +1,23 @@
+name = "in-nola-demo-site"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "."
+account_id = "6b0ec0cc22b42c83a5860d586ca25330"
+
+# KV Namespace Bindings
+# Find IDs in Cloudflare dashboard → Workers & Pages → KV
+
+[[kv_namespaces]]
+binding = "EVENTS_KV"
+id = "925270a52e634821b5ca2dce22c66e9e"
+
+[[kv_namespaces]]
+binding = "BOARD_KV"
+id = "f9354f81dc34463ea33694b282b61721"
+
+[[kv_namespaces]]
+binding = "TICKETS_KV"
+id = "dc52dbe3b66e4b47b58f9da4fd0a1888"
+
+[[kv_namespaces]]
+binding = "MEMBERS_KV"
+id = "936fda0c56ad41359ad331c365c276c4"

@@ -32,12 +32,25 @@ function generateSalt() {
     .join('');
 }
 
+// ── helpers ── random 6-digit PIN ─────────────────────────────────────
+
+function randomPin() {
+  const arr = new Uint32Array(1);
+  crypto.getRandomValues(arr);
+  return String(100000 + (arr[0] % 900000));
+}
+
 // ── seed default users ────────────────────────────────────────────────
 
 async function seedDefaultUsers(kv) {
   const defaults = [
-    { username: 'mug.sea',      plaintext: 'TADGHlina22', role: 'admin' },
-    { username: 'boardmember',  plaintext: 'innola2026!', role: 'board' },
+    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'admin',   displayName: 'Seán Muggivan', boardId: 'sean'    },
+    { username: 'kel.sha', plaintext: randomPin(),    role: 'board',   displayName: 'Shannon Kelly',  boardId: 'shannon' },
+    { username: 'mar.eri', plaintext: randomPin(),    role: 'board',   displayName: 'Erin Marjorie',  boardId: 'erin'    },
+    { username: 'jon.and', plaintext: randomPin(),    role: 'board',   displayName: 'Andrew Jones',   boardId: 'andrew'  },
+    { username: 'mug.jon', plaintext: randomPin(),    role: 'board',   displayName: 'Joni Muggivan',  boardId: 'joni'    },
+    { username: 'ken.col', plaintext: randomPin(),    role: 'board',   displayName: 'Colm Kennedy',   boardId: 'colm'    },
+    { username: 'scanner', plaintext: randomPin(),    role: 'scanner', displayName: 'Scanner Kiosk',  boardId: null      },
   ];
 
   const users = [];
@@ -49,11 +62,23 @@ async function seedDefaultUsers(kv) {
       passwordHash,
       salt,
       role: d.role,
+      displayName: d.displayName,
+      boardId: d.boardId,
       createdAt: new Date().toISOString(),
     });
   }
 
   await kv.put('admin_users', JSON.stringify(users));
+
+  // Save plaintext credentials so admin can retrieve them once
+  const credentials = defaults.map(d => ({
+    username: d.username,
+    displayName: d.displayName,
+    password: d.plaintext,
+    role: d.role,
+  }));
+  await kv.put('admin_credentials', JSON.stringify(credentials));
+
   return users;
 }
 
@@ -119,7 +144,12 @@ export async function onRequestPost(context) {
     return Response.json(
       {
         success: true,
-        user: { username: user.username, role: user.role },
+        user: {
+          username: user.username,
+          role: user.role,
+          displayName: user.displayName,
+          boardId: user.boardId ?? null,
+        },
         apiToken: API_PASSWORD,
       },
       { headers: corsHeaders }
@@ -133,12 +163,44 @@ export async function onRequestPost(context) {
   }
 }
 
+// GET /api/auth?adminPassword=X — retrieve generated credentials (one-time, admin only)
+export async function onRequestGet(context) {
+  const { request, env } = context;
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  const url = new URL(request.url);
+  const password = url.searchParams.get('adminPassword');
+
+  if (password !== API_PASSWORD) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
+  }
+
+  const kv = env.BOARD_KV;
+  if (!kv) {
+    return Response.json({ error: 'Server configuration error' }, { status: 500, headers: corsHeaders });
+  }
+
+  const raw = await kv.get('admin_credentials');
+  if (!raw) {
+    return Response.json({ error: 'No credentials found. They may have already been retrieved and deleted.' }, { status: 404, headers: corsHeaders });
+  }
+
+  // Delete after reading so PINs aren't stored in plaintext forever
+  await kv.delete('admin_credentials');
+
+  return Response.json({ credentials: JSON.parse(raw) }, { headers: corsHeaders });
+}
+
 // Handle CORS preflight
 export async function onRequestOptions() {
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   });

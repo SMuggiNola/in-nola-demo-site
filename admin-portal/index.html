@@ -160,6 +160,14 @@
           sessionStorage.setItem('boardUser', data.user.username);
           sessionStorage.setItem('userRole', data.user.role);
           sessionStorage.setItem('adminPassword', data.apiToken);
+          sessionStorage.setItem('displayName', data.user.displayName || '');
+          sessionStorage.setItem('boardId', data.user.boardId || '');
+
+          // Scanner role goes straight to scanner page
+          if (data.user.role === 'scanner') {
+            window.location.href = '/membership-tools/scanner.html';
+            return;
+          }
 
           // Redirect to return URL if present, otherwise dashboard
           const params = new URLSearchParams(window.location.search);

@@ -378,23 +378,11 @@
         <!-- Message area -->
         <div id="message" class="message hidden"></div>
 
-        <!-- Login Form -->
-        <div id="login-section" class="login-form">
-          <h2>Sign In</h2>
-          <p>Enter admin credentials to edit a board profile.</p>
-
+        <!-- Admin member picker (only shown for admin role) -->
+        <div id="admin-picker" class="login-form hidden">
+          <h2>Select Board Member to Edit</h2>
           <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" placeholder="Enter username" autocomplete="username">
-          </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
-          </div>
-
-          <div class="form-group">
-            <label for="member-select">Board Member to Edit</label>
+            <label for="member-select">Board Member</label>
             <select id="member-select" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gold-muted); border-radius: 4px; background: rgba(255,255,255,0.95); color: #1a1a1a; font-size: 1rem;">
               <option value="">-- Select member --</option>
               <option value="shannon">Shannon Kelly - President</option>
@@ -405,8 +393,7 @@
               <option value="sean">Seán Muggivan - Data Manager</option>
             </select>
           </div>
-
-          <button type="button" class="btn-primary btn-sign-in" onclick="login()">Sign In</button>
+          <button type="button" class="btn-primary btn-sign-in" onclick="loadMemberProfile()">Edit Profile</button>
         </div>
 
         <!-- Edit Form (hidden until logged in) -->
@@ -499,7 +486,7 @@
 
           <div style="margin-top: 2rem;">
             <button type="button" class="btn-primary" onclick="saveProfile()">Save Changes</button>
-            <button type="button" class="btn-secondary" onclick="logout()">Sign Out</button>
+            <button type="button" class="btn-secondary" onclick="adminLogout()">Sign Out</button>
           </div>
 
         </div>
@@ -517,6 +504,7 @@
   </div>
 
   <script src="../js/main.js"></script>
+  <script src="/js/admin-auth.js"></script>
 
   <script>
     let currentUser = null;
@@ -543,49 +531,19 @@
       setTimeout(() => msg.classList.add('hidden'), 5000);
     }
 
-    async function login() {
-      const username = document.getElementById('username').value.toLowerCase().trim();
-      const password = document.getElementById('password').value.trim();
-      const memberId = document.getElementById('member-select').value;
-
-      if (!username || !password) {
-        showMessage('Please enter both username and password', 'error');
-        return;
-      }
-
-      if (!memberId) {
-        showMessage('Please select a board member to edit', 'error');
-        return;
-      }
-
+    // Load a member's profile into the edit form
+    async function loadMemberForEdit(memberId) {
       try {
-        // Authenticate via backend
-        const authResponse = await fetch('/api/auth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-
-        const authData = await authResponse.json();
-
-        if (!authResponse.ok || !authData.success) {
-          showMessage(authData.error || 'Invalid username or password', 'error');
-          return;
-        }
-
-        // Fetch board data to get member data
         const response = await fetch('/api/board');
         const data = await response.json();
 
-        // Find the member
         const member = data.members?.find(m => m.id === memberId);
         if (!member) {
           showMessage('Member not found', 'error');
           return;
         }
 
-        // Store credentials — use apiToken from backend for API calls
-        currentUser = { memberId, password: authData.apiToken };
+        currentUser = { memberId, password: getAdminPassword() };
         currentMemberData = member;
 
         // Populate form
@@ -596,10 +554,8 @@
         document.getElementById('edit-bio').value = member.bio || '';
         document.getElementById('edit-photo-url').value = member.photo || '';
 
-        // Show photo preview if exists
         updatePhotoPreview(member.photo);
 
-        // Load saved crop data
         if (member.photoCrop) {
           cropState = {
             zoom: member.photoCrop.zoom || 100,
@@ -610,34 +566,44 @@
           cropState = { zoom: 100, offsetX: 0, offsetY: 0 };
         }
 
-        // Show crop tool if photo exists
         if (member.photo) {
           showCropTool(member.photo);
         }
 
-        // Switch views
-        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('admin-picker').classList.add('hidden');
         document.getElementById('edit-section').classList.remove('hidden');
 
-        showMessage('Signed in successfully!', 'success');
-
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('Load error:', error);
         showMessage('Failed to connect to server', 'error');
       }
     }
 
-    function logout() {
-      currentUser = null;
-      currentMemberData = null;
-      uploadedPhotoBase64 = null;
-
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
-      document.getElementById('member-select').value = '';
-      document.getElementById('login-section').classList.remove('hidden');
-      document.getElementById('edit-section').classList.add('hidden');
+    // Admin picks a member from dropdown
+    function loadMemberProfile() {
+      const memberId = document.getElementById('member-select').value;
+      if (!memberId) {
+        showMessage('Please select a board member to edit', 'error');
+        return;
+      }
+      loadMemberForEdit(memberId);
     }
+
+    // On page load: auto-select member based on session or show admin picker
+    (function initBoardEdit() {
+      const role = getUserRole();
+      const boardId = getBoardId();
+
+      if (role === 'admin') {
+        // Admin sees the member picker dropdown
+        document.getElementById('admin-picker').classList.remove('hidden');
+      } else if (boardId) {
+        // Board member — go straight to editing their own profile
+        loadMemberForEdit(boardId);
+      } else {
+        showMessage('Your account is not linked to a board member profile.', 'error');
+      }
+    })();
 
     function updatePhotoPreview(photoUrl) {
       const container = document.getElementById('photo-preview-container');

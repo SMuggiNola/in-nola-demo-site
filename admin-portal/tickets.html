@@ -655,16 +655,8 @@
                 </select>
               </div>
               <div class="form-group">
-                <label for="ticketSubmitter">Your Name *</label>
-                <select id="ticketSubmitter" required>
-                  <option value="" disabled selected>Select your name</option>
-                  <option value="Shannon">Shannon</option>
-                  <option value="Erin">Erin</option>
-                  <option value="Joni">Joni</option>
-                  <option value="Andrew">Andrew</option>
-                  <option value="Colm">Colm</option>
-                  <option value="Sean">Sean</option>
-                </select>
+                <label for="ticketSubmitter">Your Name</label>
+                <input type="text" id="ticketSubmitter" readonly>
               </div>
             </div>
 
@@ -733,6 +725,9 @@
     // Store tickets data
     let allTickets = [];
     const isAdmin = getUserRole() === 'admin';
+
+    // Auto-populate submitter name from session
+    document.getElementById('ticketSubmitter').value = getDisplayName();
 
     // HTML escaping for safe output
     function escapeHtml(str) {
@@ -1032,7 +1027,7 @@
             ticketId: ticketId,
             addComment: {
               text: text,
-              author: sessionStorage.getItem('boardUser') || 'Board Member'
+              author: getDisplayName() || sessionStorage.getItem('boardUser') || 'Board Member'
             }
           })
         });
@@ -1117,7 +1112,7 @@
             ticketId: ticketId,
             addComment: {
               text: comment,
-              author: sessionStorage.getItem('boardUser') || 'Admin'
+              author: getDisplayName() || sessionStorage.getItem('boardUser') || 'Admin'
             }
           })
         });

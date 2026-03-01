@@ -59,7 +59,7 @@ export async function onRequestPost(context) {
 
     // Send email via Resend
     const RESEND_API_KEY = env.RESEND_API_KEY;
-    const FROM_EMAIL = env.RESEND_FROM_EMAIL || 'IN-NOLA <contact@in-nola.org>';
+    const FROM_EMAIL = 'IN-NOLA Tech <tech@in-nola.org>';
 
     if (RESEND_API_KEY) {
       const loginUrl = 'https://in-nola-demo-site.pages.dev/admin-portal/';

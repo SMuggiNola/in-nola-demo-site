@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="/global.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcode-svg@1.0.0/dist/qrcode.min.js"></script>
   <script>var QRCodeSVG = QRCode;</script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <style>
     .roster-header {
@@ -400,16 +399,6 @@
       margin-top: 0.75rem;
     }
 
-    #qrPreview {
-      margin-top: 1.5rem;
-      text-align: center;
-    }
-
-    #qrPreview canvas {
-      max-width: 100%;
-      border-radius: var(--radius);
-    }
-
     .qr-buttons {
       display: flex;
       justify-content: center;
@@ -417,11 +406,47 @@
       flex-wrap: wrap;
     }
 
-    .qr-actions {
-      display: flex;
-      justify-content: center;
+    /* Selection mode for individual QR download */
+    .select-col {
+      display: none;
+    }
+
+    .select-mode .select-col {
+      display: table-cell;
+    }
+
+    .select-col input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .select-controls {
+      display: none;
+      align-items: center;
       gap: 0.75rem;
-      margin-top: 1rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .select-mode .select-controls {
+      display: flex;
+    }
+
+    .select-controls button {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .select-count {
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .select-mode .qr-buttons .hide-in-select {
+      display: none;
     }
 
     @media (max-width: 600px) {
@@ -493,6 +518,7 @@
           <table class="roster-table">
             <thead>
               <tr>
+                <th class="select-col"><input type="checkbox" id="selectAllCb" title="Select all"></th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Member ID</th>
@@ -504,7 +530,7 @@
               </tr>
             </thead>
             <tbody id="rosterBody">
-              <tr><td colspan="8" class="empty-state">Loading...</td></tr>
+              <tr><td colspan="9" class="empty-state">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -512,17 +538,19 @@
 
       <!-- QR Code Download -->
       <div class="qr-section">
-        <h2>QR Codes</h2>
+        <h2>QR Codes for Engraver</h2>
         <div class="qr-buttons">
-          <button id="downloadQrBtn" class="btn btn-gold download-qr-btn" disabled>Download All QR Codes</button>
-          <button id="downloadEngraverBtn" class="btn btn-gold download-qr-btn" disabled>Download for Engraver (SVG)</button>
+          <button id="downloadEngraverBtn" class="btn btn-gold download-qr-btn hide-in-select" disabled>Download All (SVG + PNG)</button>
+          <button id="selectEngraverBtn" class="btn btn-gold download-qr-btn hide-in-select" disabled>Select Members to Download</button>
+          <button id="downloadSelectedBtn" class="btn btn-gold download-qr-btn" style="display:none;" disabled>Download 0 Selected</button>
+          <button id="cancelSelectBtn" class="btn btn-gold download-qr-btn" style="display:none;" onclick="exitSelectMode()">Cancel</button>
+        </div>
+        <div class="select-controls">
+          <button class="btn btn-gold" onclick="selectAllMembers()">Select All</button>
+          <button class="btn btn-gold" onclick="selectNoneMembers()">Select None</button>
+          <span class="select-count" id="selectCount">0 selected</span>
         </div>
         <div id="qrStatus" class="qr-status"></div>
-        <div id="qrPreview"></div>
-        <div id="qrActions" class="qr-actions" style="display:none;">
-          <button class="btn btn-gold" onclick="downloadQrImage()">Save Image</button>
-          <button class="btn btn-gold" onclick="printQrImage()">Print</button>
-        </div>
       </div>
 
       <div class="portal-footer">
@@ -622,7 +650,7 @@
         var data = await res.json();
 
         if (!res.ok || !data.members) {
-          tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Failed to load roster</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Failed to load roster</td></tr>';
           return;
         }
 
@@ -630,7 +658,7 @@
         countEl.textContent = '(' + members.length + ')';
 
         if (members.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No members yet. Add one above.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No members yet. Add one above.</td></tr>';
           return;
         }
 
@@ -660,6 +688,7 @@
             actionBtns = '<span class="remove-msg">Email <a href="mailto:tech@in-nola.org">tech@in-nola.org</a></span>';
           }
           return '<tr data-member-id="' + escapeHtml(m.id) + '">' +
+            '<td class="select-col"><input type="checkbox" class="member-select-cb" data-id="' + escapeHtml(m.id) + '"></td>' +
             '<td data-field="name">' + escapeHtml(m.name) + '</td>' +
             '<td data-field="email">' + escapeHtml(m.email) + '</td>' +
             '<td>' + escapeHtml(m.id) + '</td>' +
@@ -674,7 +703,7 @@
         }).join('');
 
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Error loading roster</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Error loading roster</td></tr>';
       }
     }
 
@@ -959,8 +988,10 @@
     // ── QR Code Download ────────────────────────────────────────────────
 
     var cachedMembers = [];
+    var selectedMemberIds = new Set();
+    var inSelectMode = false;
 
-    // Enable QR button once roster loads (patched into loadRoster)
+    // Enable QR buttons once roster loads (patched into loadRoster)
     var _origLoadRoster = loadRoster;
     loadRoster = async function () {
       await _origLoadRoster();
@@ -970,184 +1001,120 @@
         var data = await res.json();
         if (data.members && data.members.length > 0) {
           cachedMembers = data.members;
-          document.getElementById('downloadQrBtn').disabled = false;
           document.getElementById('downloadEngraverBtn').disabled = false;
+          document.getElementById('selectEngraverBtn').disabled = false;
         }
       } catch (e) {}
+      // Restore checkbox state if in select mode
+      if (inSelectMode) {
+        document.querySelectorAll('.member-select-cb').forEach(function (cb) {
+          cb.checked = selectedMemberIds.has(cb.getAttribute('data-id'));
+        });
+      }
     };
     // Re-run to apply the patch
     loadRoster();
 
-    document.getElementById('downloadQrBtn').addEventListener('click', generateAllQR);
+    // ── Selection mode ──────────────────────────────────────────────────
 
-    async function generateAllQR() {
-      var btn = document.getElementById('downloadQrBtn');
-      var statusEl = document.getElementById('qrStatus');
-      var previewEl = document.getElementById('qrPreview');
-      var actionsEl = document.getElementById('qrActions');
+    document.getElementById('selectEngraverBtn').addEventListener('click', enterSelectMode);
+    document.getElementById('downloadSelectedBtn').addEventListener('click', downloadSelectedEngraver);
 
-      btn.disabled = true;
-      btn.textContent = 'Generating...';
-      statusEl.textContent = 'Fetching QR data for ' + cachedMembers.length + ' members...';
-      previewEl.innerHTML = '';
-      actionsEl.style.display = 'none';
+    function enterSelectMode() {
+      inSelectMode = true;
+      selectedMemberIds.clear();
+      document.querySelector('.roster-section').classList.add('select-mode');
+      document.querySelector('.qr-section').classList.add('select-mode');
+      document.getElementById('downloadSelectedBtn').style.display = 'inline-block';
+      document.getElementById('cancelSelectBtn').style.display = 'inline-block';
+      document.getElementById('selectAllCb').checked = false;
+      updateSelectCount();
+    }
 
-      try {
-        var memberIds = cachedMembers.map(function (m) { return m.id; });
+    function exitSelectMode() {
+      inSelectMode = false;
+      selectedMemberIds.clear();
+      document.querySelector('.roster-section').classList.remove('select-mode');
+      document.querySelector('.qr-section').classList.remove('select-mode');
+      document.getElementById('downloadSelectedBtn').style.display = 'none';
+      document.getElementById('cancelSelectBtn').style.display = 'none';
+      document.querySelectorAll('.member-select-cb').forEach(function (cb) { cb.checked = false; });
+      document.getElementById('selectAllCb').checked = false;
+      document.getElementById('qrStatus').textContent = '';
+    }
 
-        var res = await fetch('/api/members/qr/batch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adminPassword: adminPassword, memberIds: memberIds })
-        });
+    function updateSelectCount() {
+      var count = selectedMemberIds.size;
+      document.getElementById('selectCount').textContent = count + ' selected';
+      var dlBtn = document.getElementById('downloadSelectedBtn');
+      dlBtn.disabled = count === 0;
+      dlBtn.textContent = 'Download ' + count + ' Selected';
+    }
 
-        var data = await res.json();
-        if (!res.ok || !data.qrData) {
-          statusEl.textContent = 'Failed to fetch QR data.';
-          btn.disabled = false;
-          btn.textContent = 'Download All QR Codes';
-          return;
-        }
-
-        statusEl.textContent = 'Rendering ' + data.qrData.length + ' QR codes...';
-
-        // Generate individual QR codes off-screen
-        var tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.left = '-9999px';
-        document.body.appendChild(tempContainer);
-
-        var qrCanvases = [];
-
-        for (var i = 0; i < data.qrData.length; i++) {
-          var item = data.qrData[i];
-          var div = document.createElement('div');
-          tempContainer.appendChild(div);
-          new QRCode(div, {
-            text: item.qrString,
-            width: 200,
-            height: 200,
-            colorDark: '#0d2818',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.M
-          });
-          qrCanvases.push({ div: div, name: item.name, id: item.id, type: item.memberType });
-        }
-
-        // Wait for QR codes to render
-        await new Promise(function (resolve) { setTimeout(resolve, 500); });
-
-        // Composite onto one canvas
-        var cols = 3;
-        var cardW = 240;
-        var cardH = 290;
-        var pad = 20;
-        var rows = Math.ceil(qrCanvases.length / cols);
-        var canvasW = cols * cardW + (cols + 1) * pad;
-        var canvasH = rows * cardH + (rows + 1) * pad + 50; // 50 for header
-
-        var canvas = document.createElement('canvas');
-        canvas.width = canvasW;
-        canvas.height = canvasH;
-        var ctx = canvas.getContext('2d');
-
-        // White background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvasW, canvasH);
-
-        // Header
-        ctx.fillStyle = '#0d2818';
-        ctx.font = 'bold 22px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('IN-NOLA Member QR Codes', canvasW / 2, 35);
-
-        for (var i = 0; i < qrCanvases.length; i++) {
-          var col = i % cols;
-          var row = Math.floor(i / cols);
-          var x = pad + col * (cardW + pad);
-          var y = 50 + pad + row * (cardH + pad);
-
-          // Card background
-          ctx.fillStyle = '#f8f8f8';
-          ctx.strokeStyle = '#ddd';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.roundRect(x, y, cardW, cardH, 8);
-          ctx.fill();
-          ctx.stroke();
-
-          // Get QR image
-          var qrImg = qrCanvases[i].div.querySelector('canvas') || qrCanvases[i].div.querySelector('img');
-          if (qrImg) {
-            ctx.drawImage(qrImg, x + 20, y + 15, 200, 200);
-          }
-
-          // Name
-          ctx.fillStyle = '#0d2818';
-          ctx.font = 'bold 14px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(qrCanvases[i].name, x + cardW / 2, y + 232);
-
-          // Member type
-          ctx.fillStyle = '#666';
-          ctx.font = '12px sans-serif';
-          ctx.fillText(qrCanvases[i].type || 'Member', x + cardW / 2, y + 250);
-
-          // Member ID
-          ctx.fillStyle = '#999';
-          ctx.font = '10px sans-serif';
-          ctx.fillText(qrCanvases[i].id, x + cardW / 2, y + 268);
-        }
-
-        // Clean up temp container
-        document.body.removeChild(tempContainer);
-
-        // Show preview
-        previewEl.appendChild(canvas);
-        actionsEl.style.display = 'flex';
-        statusEl.textContent = data.qrData.length + ' QR codes ready.';
-
-      } catch (err) {
-        statusEl.textContent = 'Error: ' + err.message;
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Download All QR Codes';
+    // Delegated click handler for member checkboxes
+    document.getElementById('rosterBody').addEventListener('change', function (e) {
+      var cb = e.target.closest('.member-select-cb');
+      if (!cb) return;
+      var id = cb.getAttribute('data-id');
+      if (cb.checked) {
+        selectedMemberIds.add(id);
+      } else {
+        selectedMemberIds.delete(id);
       }
+      updateSelectCount();
+      // Update select-all checkbox
+      var allCbs = document.querySelectorAll('.member-select-cb');
+      document.getElementById('selectAllCb').checked = selectedMemberIds.size === allCbs.length && allCbs.length > 0;
+    });
+
+    // Select-all header checkbox
+    document.getElementById('selectAllCb').addEventListener('change', function () {
+      if (this.checked) {
+        selectAllMembers();
+      } else {
+        selectNoneMembers();
+      }
+    });
+
+    function selectAllMembers() {
+      document.querySelectorAll('.member-select-cb').forEach(function (cb) {
+        cb.checked = true;
+        selectedMemberIds.add(cb.getAttribute('data-id'));
+      });
+      document.getElementById('selectAllCb').checked = true;
+      updateSelectCount();
     }
 
-    function downloadQrImage() {
-      var canvas = document.querySelector('#qrPreview canvas');
-      if (!canvas) return;
-      var link = document.createElement('a');
-      link.download = 'IN-NOLA-QR-Codes.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
-
-    function printQrImage() {
-      var canvas = document.querySelector('#qrPreview canvas');
-      if (!canvas) return;
-      var win = window.open('', '_blank');
-      win.document.write('<html><head><title>IN-NOLA QR Codes</title></head><body style="margin:0;text-align:center;"><img src="' + canvas.toDataURL('image/png') + '" style="max-width:100%;"></body></html>');
-      win.document.close();
-      win.onload = function () { win.print(); };
+    function selectNoneMembers() {
+      document.querySelectorAll('.member-select-cb').forEach(function (cb) {
+        cb.checked = false;
+      });
+      selectedMemberIds.clear();
+      document.getElementById('selectAllCb').checked = false;
+      updateSelectCount();
     }
 
     // ── Engraver QR Download (individual SVG + PNG in ZIP) ──────────────
 
-    document.getElementById('downloadEngraverBtn').addEventListener('click', generateEngraverQR);
+    document.getElementById('downloadEngraverBtn').addEventListener('click', function () {
+      generateEngraverQR(cachedMembers.map(function (m) { return m.id; }), 'all');
+    });
 
-    async function generateEngraverQR() {
-      var btn = document.getElementById('downloadEngraverBtn');
+    function downloadSelectedEngraver() {
+      if (selectedMemberIds.size === 0) return;
+      generateEngraverQR(Array.from(selectedMemberIds), 'selected');
+    }
+
+    async function generateEngraverQR(memberIds, mode) {
+      var btn = mode === 'selected' ? document.getElementById('downloadSelectedBtn') : document.getElementById('downloadEngraverBtn');
       var statusEl = document.getElementById('qrStatus');
+      var origText = btn.textContent;
 
       btn.disabled = true;
       btn.textContent = 'Generating...';
-      statusEl.textContent = 'Fetching QR data for ' + cachedMembers.length + ' members...';
+      statusEl.textContent = 'Fetching QR data for ' + memberIds.length + ' member(s)...';
 
       try {
-        var memberIds = cachedMembers.map(function (m) { return m.id; });
-
         var res = await fetch('/api/members/qr/batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1158,7 +1125,7 @@
         if (!res.ok || !data.qrData) {
           statusEl.textContent = 'Failed to fetch QR data.';
           btn.disabled = false;
-          btn.textContent = 'Download for Engraver (SVG)';
+          btn.textContent = origText;
           return;
         }
 
@@ -1215,20 +1182,25 @@
         readmeLines.push('Irish Network New Orleans — in-nola.org');
         zip.file('README.txt', readmeLines.join('\n'));
 
+        var zipName = mode === 'selected' ? 'IN-NOLA-QR-Engraver-Selected.zip' : 'IN-NOLA-QR-Engraver.zip';
         var blob = await zip.generateAsync({ type: 'blob' });
         var link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'IN-NOLA-QR-Engraver.zip';
+        link.download = zipName;
         link.click();
         URL.revokeObjectURL(link.href);
 
         statusEl.textContent = data.qrData.length + ' engraver-ready QR codes downloaded.';
 
+        if (mode === 'selected') {
+          exitSelectMode();
+        }
+
       } catch (err) {
         statusEl.textContent = 'Error: ' + err.message;
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Download for Engraver (SVG)';
+        btn.textContent = origText;
       }
     }
 

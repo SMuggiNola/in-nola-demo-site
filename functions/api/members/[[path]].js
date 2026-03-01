@@ -1100,29 +1100,68 @@ async function handleSendSetup(request, env) {
         body: JSON.stringify({
           from: FROM_EMAIL,
           to: [member.email],
-          subject: 'Welcome to IN-NOLA — Your Member Portal is Ready',
+          subject: '\u2618\uFE0F Welcome to IN-NOLA \u2014 You\u2019re In!',
           html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #0d2818;">Welcome to IN-NOLA, ${member.displayName}!</h2>
-              <p>Your Irish Network New Orleans member portal is set up and ready to go. Here are your login credentials:</p>
-              <table style="margin: 20px 0; border-collapse: collapse; background: #f8f8f8; border-radius: 8px; overflow: hidden;">
-                <tr><td style="padding: 10px 20px; font-weight: bold; color: #0d2818;">Username:</td><td style="padding: 10px 20px; font-family: monospace; font-size: 1.1em;">${member.username}</td></tr>
-                <tr><td style="padding: 10px 20px; font-weight: bold; color: #0d2818;">PIN:</td><td style="padding: 10px 20px; font-family: monospace; font-size: 1.2em; letter-spacing: 2px;">${newPin}</td></tr>
-              </table>
-              <h3 style="color: #0d2818;">How to Log In</h3>
-              <p>Visit <a href="${siteUrl}" style="color: #d4a726;">${siteUrl}</a> and look for the <strong>shamrock (&shamrock;) "Member Login" button</strong> in the bottom-right corner of the page. You can also go directly to:</p>
-              <p><a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background: #d4a726; color: #071a0e; text-decoration: none; border-radius: 8px; font-weight: bold;">Member Login</a></p>
-              <h3 style="color: #0d2818;">What You'll Find</h3>
-              <ul style="color: #333;">
-                <li>Your <strong>digital membership card</strong></li>
-                <li>Your <strong>personal QR code</strong> for event check-ins</li>
-              </ul>
-              <h3 style="color: #0d2818;">Need a New PIN?</h3>
-              <p>If you ever forget your PIN, just visit the login page and click <strong>"Replace My PIN"</strong>. A new PIN will be emailed to you right away — no need to contact anyone.</p>
-              <p style="margin-top: 30px; color: #666; font-size: 13px;">This is your first-time setup email from Irish Network New Orleans. If you have questions, reply to this email or contact <a href="mailto:tech@in-nola.org" style="color: #d4a726;">tech@in-nola.org</a>.</p>
+            <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: 0 auto; background: #0d2818; border-radius: 16px; overflow: hidden;">
+              <!-- Header banner -->
+              <div style="background: linear-gradient(135deg, #0d2818 0%, #1a4d2e 50%, #0d2818 100%); padding: 35px 30px; text-align: center; border-bottom: 3px solid #d4a726;">
+                <div style="font-size: 42px; line-height: 1;">&#9752;&#65039;</div>
+                <h1 style="color: #d4a726; font-size: 28px; margin: 12px 0 4px; font-family: Georgia, serif; letter-spacing: 1px;">C\u00e9ad M\u00edle F\u00e1ilte!</h1>
+                <p style="color: #8fbc8f; font-size: 14px; margin: 0; font-style: italic;">A Hundred Thousand Welcomes</p>
+              </div>
+
+              <!-- Body -->
+              <div style="padding: 30px; color: #e8e8e8; line-height: 1.6;">
+                <p style="font-size: 18px; margin-top: 0;">Hi <strong style="color: #d4a726;">${member.displayName}</strong>,</p>
+                <p>Welcome to the <strong>Irish Network New Orleans</strong> family! Your member portal is set up and ready to go.</p>
+
+                <!-- Credentials card -->
+                <div style="background: linear-gradient(135deg, #1a4d2e, #2d6b45); border: 2px solid #d4a726; border-radius: 12px; padding: 20px 25px; margin: 25px 0; text-align: center;">
+                  <div style="font-size: 20px; margin-bottom: 8px;">&#9752;&#65039; Your Login Credentials &#9752;&#65039;</div>
+                  <table style="margin: 15px auto; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 15px; text-align: right; color: #8fbc8f; font-size: 14px;">Username</td>
+                      <td style="padding: 8px 15px; text-align: left; font-family: 'Courier New', monospace; font-size: 20px; color: #fff; letter-spacing: 1px; font-weight: bold;">${member.username}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 15px; text-align: right; color: #8fbc8f; font-size: 14px;">PIN</td>
+                      <td style="padding: 8px 15px; text-align: left; font-family: 'Courier New', monospace; font-size: 24px; color: #d4a726; letter-spacing: 4px; font-weight: bold;">${newPin}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- How to log in -->
+                <h3 style="color: #d4a726; font-family: Georgia, serif; font-size: 18px; margin-bottom: 8px;">&#9752;&#65039; How to Log In</h3>
+                <p>Visit <a href="${siteUrl}" style="color: #d4a726; text-decoration: underline;">in-nola.org</a> and look for the <strong style="color: #4ade80;">shamrock &#9752;&#65039; &ldquo;Member Login&rdquo; button</strong> in the bottom-right corner. Or go straight there:</p>
+                <p style="text-align: center; margin: 20px 0;">
+                  <a href="${loginUrl}" style="display: inline-block; padding: 14px 32px; background: #d4a726; color: #0d2818; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; font-family: Georgia, serif; letter-spacing: 0.5px;">&#9752;&#65039; Open Member Portal</a>
+                </p>
+
+                <!-- What you'll find -->
+                <h3 style="color: #d4a726; font-family: Georgia, serif; font-size: 18px; margin-bottom: 8px;">&#9752;&#65039; What You&rsquo;ll Find</h3>
+                <table style="margin: 10px 0 20px; border-collapse: collapse;">
+                  <tr><td style="padding: 6px 10px; font-size: 20px; vertical-align: middle;">&#127891;</td><td style="padding: 6px 10px; color: #e8e8e8;">Your <strong>digital membership card</strong></td></tr>
+                  <tr><td style="padding: 6px 10px; font-size: 20px; vertical-align: middle;">&#128242;</td><td style="padding: 6px 10px; color: #e8e8e8;">Your <strong>personal QR code</strong> for event check-ins</td></tr>
+                </table>
+
+                <!-- PIN replacement -->
+                <h3 style="color: #d4a726; font-family: Georgia, serif; font-size: 18px; margin-bottom: 8px;">&#9752;&#65039; Need a New PIN?</h3>
+                <p>No worries! Visit the login page and tap <strong style="color: #4ade80;">&ldquo;Replace My PIN&rdquo;</strong>. A fresh one will be emailed to you instantly &mdash; no need to contact anyone.</p>
+
+                <!-- Divider -->
+                <div style="border-top: 1px solid #2d6b45; margin: 30px 0 20px;"></div>
+
+                <!-- Shamrock row -->
+                <p style="text-align: center; font-size: 24px; margin: 0 0 15px; letter-spacing: 12px;">&#9752;&#65039;&#9752;&#65039;&#9752;&#65039;</p>
+
+                <p style="text-align: center; color: #8fbc8f; font-size: 13px; font-style: italic; margin: 0;">&ldquo;There are no strangers here, only friends you haven&rsquo;t yet met.&rdquo;</p>
+                <p style="text-align: center; color: #6b8f6b; font-size: 12px; margin: 4px 0 20px;">&mdash; W.B. Yeats</p>
+
+                <p style="text-align: center; color: #6b8f6b; font-size: 12px; margin: 0;">Questions? Email <a href="mailto:tech@in-nola.org" style="color: #d4a726;">tech@in-nola.org</a></p>
+              </div>
             </div>
           `,
-          text: `Welcome to IN-NOLA, ${member.displayName}!\n\nYour member portal is ready. Here are your login credentials:\n\nUsername: ${member.username}\nPIN: ${newPin}\n\nHow to Log In:\nVisit ${siteUrl} and look for the shamrock "Member Login" button in the bottom-right corner, or go directly to ${loginUrl}\n\nWhat You'll Find:\n- Your digital membership card\n- Your personal QR code for event check-ins\n\nNeed a New PIN?\nVisit the login page and click "Replace My PIN". A new PIN will be emailed to you right away.\n\nQuestions? Email tech@in-nola.org`,
+          text: `Cead Mile Failte! (A Hundred Thousand Welcomes)\n\nHi ${member.displayName},\n\nWelcome to the Irish Network New Orleans family! Your member portal is set up and ready.\n\nYour Login Credentials:\n  Username: ${member.username}\n  PIN: ${newPin}\n\nHow to Log In:\nVisit ${siteUrl} and look for the shamrock "Member Login" button in the bottom-right corner, or go directly to ${loginUrl}\n\nWhat You'll Find:\n- Your digital membership card\n- Your personal QR code for event check-ins\n\nNeed a New PIN?\nVisit the login page and click "Replace My PIN". A new PIN will be emailed to you right away.\n\n"There are no strangers here, only friends you haven't yet met." - W.B. Yeats\n\nQuestions? Email tech@in-nola.org`,
         }),
       });
     }

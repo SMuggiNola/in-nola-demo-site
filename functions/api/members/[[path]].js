@@ -224,7 +224,7 @@ function parseCSV(csvText) {
       if (memberType.toLowerCase().includes('student')) {
         memberType = 'Student';
       } else if (memberType.toLowerCase().includes('adult')) {
-        memberType = 'Adult';
+        memberType = 'Member';
       } else if (memberType.toLowerCase().includes('family')) {
         memberType = 'Family';
       } else if (memberType.toLowerCase().includes('lifetime')) {
@@ -932,7 +932,7 @@ async function handleRosterAdd(request, env) {
       boardId: null,
       email,
       memberId,
-      memberType: body.memberType || 'Individual',
+      memberType: body.memberType || 'Member',
       joinDate: today,
       expirationDate: '2026-12-31',
       qrSignature,

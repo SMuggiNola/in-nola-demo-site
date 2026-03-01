@@ -821,6 +821,35 @@ async function handleAdminUpdate(request, env) {
       }
     }
 
+    // Add new users
+    if (body.addUsers && Array.isArray(body.addUsers)) {
+      for (const newUser of body.addUsers) {
+        if (!newUser.username) continue;
+        // Skip if username already exists
+        if (users.some(u => u.username === newUser.username)) continue;
+        const pin = newUser.pin || generatePin();
+        const salt = generateSalt();
+        const passwordHash = await hashPassword(pin, salt);
+        users.push({
+          username: newUser.username,
+          passwordHash,
+          salt,
+          pin,
+          authMethod: newUser.authMethod || 'pin',
+          role: newUser.role || 'member',
+          displayName: newUser.displayName || newUser.username,
+          boardId: newUser.boardId || null,
+          email: newUser.email || '',
+          memberId: newUser.memberId || null,
+          memberType: newUser.memberType || null,
+          joinDate: newUser.joinDate || null,
+          expirationDate: newUser.expirationDate || null,
+          qrSignature: null,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+
     await env.BOARD_KV.put(ADMIN_USERS_KEY, JSON.stringify(users));
 
     const memberCount = users.filter(u => u.memberId).length;

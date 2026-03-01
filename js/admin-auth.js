@@ -20,9 +20,9 @@
 
   var role = sessionStorage.getItem('userRole');
 
-  // Scanner role gate: can only access scanner.html
+  // Scanner role gate: can only access scanner page
   if (role === 'scanner') {
-    var onScannerPage = window.location.pathname.indexOf('scanner.html') !== -1;
+    var onScannerPage = /\/scanner(\.html)?$/.test(window.location.pathname);
     if (!onScannerPage) {
       window.location.href = '/membership-tools/scanner.html';
     }

@@ -137,6 +137,7 @@ export async function onRequestPost(context) {
       priority: priority,
       status: 'open',
       submittedBy: body.submittedBy?.trim() || '',
+      submitterEmail: body.submitterEmail?.trim() || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       comments: []
@@ -288,6 +289,7 @@ export async function onRequestPut(context) {
       priority: validPriorities.includes(body.priority) ? body.priority : existing.priority,
       status: validStatuses.includes(body.status) ? body.status : existing.status,
       submittedBy: body.submittedBy?.trim() ?? existing.submittedBy,
+      submitterEmail: existing.submitterEmail || '',
       createdAt: existing.createdAt,
       updatedAt: new Date().toISOString(),
       comments: existing.comments || []
@@ -296,10 +298,63 @@ export async function onRequestPut(context) {
     // Save back to KV
     await env.TICKETS_KV.put(TICKETS_KEY, JSON.stringify(ticketsData));
 
+    // Send email notification when a comment is added
+    const updatedTicket = ticketsData.tickets[ticketIndex];
+    if (body.addComment && env.RESEND_API_KEY) {
+      try {
+        const commenterName = body.commenterName || body.addComment.author || 'Someone';
+        const isSubmitterCommenting = commenterName === updatedTicket.submittedBy;
+
+        let notifyEmail = null;
+        let notifySubject = '';
+        let notifyLabel = '';
+
+        if (isSubmitterCommenting) {
+          // Submitter replied → notify tech admin
+          notifyEmail = 'tech@in-nola.org';
+          notifySubject = `[Tech Request Reply] ${updatedTicket.title}`;
+          notifyLabel = `${escapeHtml(commenterName)} replied on their ticket`;
+        } else if (updatedTicket.submitterEmail) {
+          // Admin replied → notify submitter
+          notifyEmail = updatedTicket.submitterEmail;
+          notifySubject = `[Tech Request Update] ${updatedTicket.title}`;
+          notifyLabel = `${escapeHtml(commenterName)} commented on your ticket`;
+        }
+
+        if (notifyEmail) {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: 'IN-NOLA Tech Requests <contact@in-nola.org>',
+              to: [notifyEmail],
+              subject: notifySubject,
+              html: `
+                <h2>${notifyLabel}</h2>
+                <p><strong>Ticket:</strong> ${escapeHtml(updatedTicket.title)}</p>
+                <p><strong>Comment:</strong></p>
+                <blockquote style="border-left: 3px solid #d4a726; padding-left: 12px; color: #333;">
+                  ${escapeHtml(body.addComment.text)}
+                </blockquote>
+                <hr>
+                <p style="color: #666; font-size: 12px;">View and reply at <a href="https://in-nola.org/admin-portal/tickets.html">Tech Requests</a></p>
+              `,
+              text: `${notifyLabel}\n\nTicket: ${updatedTicket.title}\n\nComment:\n${body.addComment.text}\n\n---\nView at https://in-nola.org/admin-portal/tickets.html`,
+            }),
+          });
+        }
+      } catch (emailErr) {
+        console.error('Failed to send comment notification:', emailErr);
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
       message: body.addComment ? 'Comment added successfully' : 'Ticket updated successfully',
-      ticket: sanitizeTicket(ticketsData.tickets[ticketIndex])
+      ticket: sanitizeTicket(updatedTicket)
     }), {
       headers: { 'Content-Type': 'application/json' }
     });

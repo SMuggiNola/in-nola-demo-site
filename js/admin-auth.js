@@ -57,6 +57,11 @@ function getBoardId() {
   return sessionStorage.getItem('boardId') || null;
 }
 
+/** Return the logged-in user's email address. */
+function getUserEmail() {
+  return sessionStorage.getItem('userEmail') || '';
+}
+
 /** Clear all admin session data and redirect to login. */
 function adminLogout() {
   sessionStorage.removeItem('boardAuth');
@@ -65,5 +70,6 @@ function adminLogout() {
   sessionStorage.removeItem('adminPassword');
   sessionStorage.removeItem('displayName');
   sessionStorage.removeItem('boardId');
+  sessionStorage.removeItem('userEmail');
   window.location.href = '/admin-portal/index.html';
 }

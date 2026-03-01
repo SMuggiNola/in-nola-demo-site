@@ -636,8 +636,23 @@
         <div class="phase-content" id="submitForm">
           <form id="ticketForm">
             <div class="form-group">
-              <label for="ticketTitle">Title *</label>
-              <input type="text" id="ticketTitle" required placeholder="Brief summary of the request">
+              <label for="ticketTitle">Site Section *</label>
+              <select id="ticketTitle" required>
+                <option value="">— Select a section —</option>
+                <option value="Homepage">Homepage</option>
+                <option value="About IN-NOLA">About IN-NOLA</option>
+                <option value="Events Page">Events Page</option>
+                <option value="Our Village">Our Village</option>
+                <option value="Library">Library</option>
+                <option value="Join / Membership">Join / Membership</option>
+                <option value="Donate">Donate</option>
+                <option value="Contact Form">Contact Form</option>
+                <option value="Admin Portal">Admin Portal</option>
+                <option value="Board Dashboard">Board Dashboard</option>
+                <option value="Member Roster">Member Roster</option>
+                <option value="Tech Requests">Tech Requests</option>
+                <option value="NOLA-Gra.org">NOLA-Gra.org</option>
+              </select>
             </div>
 
             <div class="form-group">
@@ -672,7 +687,7 @@
       </div>
 
       <p style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-top: 2rem;">
-        Need to follow up on a submitted ticket or have other questions? Email <a href="mailto:tech@in-nola.org" style="color: var(--gold); text-decoration: none;">tech@in-nola.org</a>
+        Use the comment thread on your ticket to follow up. Notifications are sent by email.
       </p>
 
       <div class="back-link">
@@ -725,6 +740,7 @@
     // Store tickets data
     let allTickets = [];
     const isAdmin = getUserRole() === 'architect';
+    const currentDisplayName = getDisplayName();
 
     // Auto-populate submitter name from session
     document.getElementById('ticketSubmitter').value = getDisplayName();
@@ -854,7 +870,7 @@
 
     // Create ticket card HTML
     function createTicketCard(ticket) {
-      const submitter = (isAdmin && ticket.submittedBy) ? ' by ' + escapeHtml(ticket.submittedBy) : '';
+      const submitter = ticket.submittedBy ? ' by ' + escapeHtml(ticket.submittedBy) : '';
       const dateStr = formatDate(ticket.createdAt);
 
       // Comments HTML — visible to everyone
@@ -869,8 +885,10 @@
         `).join('');
       }
 
-      // Comment input — admin only
-      const commentFormHtml = isAdmin ? `
+      // Comment input — admin or ticket submitter
+      const isSubmitter = currentDisplayName && ticket.submittedBy && currentDisplayName === ticket.submittedBy;
+      const canComment = isAdmin || isSubmitter;
+      const commentFormHtml = canComment ? `
         <div class="add-comment-form">
           <input type="text" placeholder="Add a comment..." id="comment-${ticket.id}" onkeydown="if(event.key==='Enter'){event.preventDefault();addComment('${ticket.id}');}">
           <button type="button" onclick="addComment('${ticket.id}')">Post</button>
@@ -951,10 +969,11 @@
 
       const ticketData = {
         adminPassword: getAdminPassword(),
-        title: document.getElementById('ticketTitle').value.trim(),
+        title: document.getElementById('ticketTitle').value,
         description: document.getElementById('ticketDescription').value.trim(),
         priority: document.getElementById('ticketPriority').value,
-        submittedBy: document.getElementById('ticketSubmitter').value.trim()
+        submittedBy: document.getElementById('ticketSubmitter').value.trim(),
+        submitterEmail: getUserEmail()
       };
 
       try {
@@ -970,6 +989,7 @@
           formStatus.textContent = 'Request submitted successfully!';
           formStatus.className = 'status-message success';
           this.reset();
+          document.getElementById('ticketSubmitter').value = getDisplayName();
 
           // Collapse form and reload tickets
           document.getElementById('submitToggle').classList.remove('active');
@@ -1019,15 +1039,17 @@
       if (!text) return;
 
       try {
+        const commenterName = getDisplayName() || sessionStorage.getItem('boardUser') || 'Board Member';
         const response = await fetch('/api/tickets', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             adminPassword: getAdminPassword(),
             ticketId: ticketId,
+            commenterName: commenterName,
             addComment: {
               text: text,
-              author: getDisplayName() || sessionStorage.getItem('boardUser') || 'Board Member'
+              author: commenterName
             }
           })
         });
@@ -1104,15 +1126,17 @@
 
       try {
         // Add closing comment first
+        const closerName = getDisplayName() || sessionStorage.getItem('boardUser') || 'Admin';
         await fetch('/api/tickets', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             adminPassword: getAdminPassword(),
             ticketId: ticketId,
+            commenterName: closerName,
             addComment: {
               text: comment,
-              author: getDisplayName() || sessionStorage.getItem('boardUser') || 'Admin'
+              author: closerName
             }
           })
         });

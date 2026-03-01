@@ -188,6 +188,7 @@
           sessionStorage.setItem('adminPassword', data.apiToken);
           sessionStorage.setItem('displayName', data.user.displayName || '');
           sessionStorage.setItem('boardId', data.user.boardId || '');
+          sessionStorage.setItem('userEmail', data.user.email || '');
 
           // Role-based redirect
           const role = data.user.role;

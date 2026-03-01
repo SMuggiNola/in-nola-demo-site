@@ -292,6 +292,7 @@ export async function onRequestPost(context) {
           role: user.role,
           displayName: user.displayName,
           boardId: user.boardId ?? null,
+          email: user.email || '',
           memberId: user.memberId ?? null,
           memberType: user.memberType ?? null,
           joinDate: user.joinDate ?? null,

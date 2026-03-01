@@ -599,7 +599,8 @@ async function handleList(request, env) {
         memberType: u.memberType,
         joinDate: u.joinDate,
         expirationDate: u.expirationDate,
-        qrSignature: u.qrSignature
+        qrSignature: u.qrSignature,
+        paid: u.paid || false
       }));
 
     return new Response(JSON.stringify({ members }), {
@@ -935,6 +936,7 @@ async function handleRosterAdd(request, env) {
       joinDate: today,
       expirationDate: '2026-12-31',
       qrSignature,
+      paid: body.paid || false,
       createdAt: new Date().toISOString(),
     };
 

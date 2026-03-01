@@ -680,7 +680,7 @@ async function handleBatchQR(request, env) {
 // POST /api/members/send-credentials - Email credentials to member
 async function handleSendCredentials(request, env) {
   try {
-    if (!env.MEMBERS_KV) {
+    if (!env.BOARD_KV) {
       return new Response(JSON.stringify({ error: 'Server configuration error' }), {
         status: 500,
         headers: corsHeaders
@@ -703,26 +703,30 @@ async function handleSendCredentials(request, env) {
       message: 'If this email is registered, your credentials have been sent.'
     }), { headers: corsHeaders });
 
-    // Look up member by email
-    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
-    if (!membersData || !membersData.members) {
+    // Look up member by email in BOARD_KV (flat array of users)
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    if (!raw) {
       return genericResponse;
     }
 
-    const member = membersData.members.find(
-      m => m.email.toLowerCase() === email
+    const users = JSON.parse(raw);
+    const member = users.find(
+      u => u.email && u.email.toLowerCase() === email && u.memberId
     );
 
     if (!member) {
       return genericResponse;
     }
 
-    // Generate a fresh PIN
+    // Generate a fresh PIN and hash it
     const newPin = generatePin();
+    const salt = generateSalt();
+    member.passwordHash = await hashPassword(newPin, salt);
+    member.salt = salt;
     member.pin = newPin;
 
-    // Save updated members data
-    await env.MEMBERS_KV.put(MEMBERS_KEY, JSON.stringify(membersData));
+    // Save updated users
+    await env.BOARD_KV.put(ADMIN_USERS_KEY, JSON.stringify(users));
 
     // Send email via Resend
     const RESEND_API_KEY = env.RESEND_API_KEY;
@@ -743,7 +747,7 @@ async function handleSendCredentials(request, env) {
           subject: 'Your IN-NOLA Login Credentials',
           html: `
             <h2>Your IN-NOLA Member Login</h2>
-            <p>Hi ${member.name},</p>
+            <p>Hi ${member.displayName},</p>
             <p>Here are your login credentials for the IN-NOLA Member Portal:</p>
             <table style="margin: 20px 0; border-collapse: collapse;">
               <tr><td style="padding: 8px 16px; font-weight: bold;">Username:</td><td style="padding: 8px 16px;">${member.username}</td></tr>
@@ -752,7 +756,7 @@ async function handleSendCredentials(request, env) {
             <p><a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background: #d4a726; color: #071a0e; text-decoration: none; border-radius: 8px; font-weight: bold;">Log In Now</a></p>
             <p style="color: #666; font-size: 12px; margin-top: 20px;">This PIN replaces any previous PIN. If you did not request this, you can ignore this email.</p>
           `,
-          text: `Your IN-NOLA Member Login\n\nHi ${member.name},\n\nUsername: ${member.username}\nPIN: ${newPin}\n\nLog in at: ${loginUrl}\n\nThis PIN replaces any previous PIN. If you did not request this, you can ignore this email.`,
+          text: `Your IN-NOLA Member Login\n\nHi ${member.displayName},\n\nUsername: ${member.username}\nPIN: ${newPin}\n\nLog in at: ${loginUrl}\n\nThis PIN replaces any previous PIN. If you did not request this, you can ignore this email.`,
         }),
       });
     }
@@ -770,8 +774,8 @@ async function handleSendCredentials(request, env) {
 // POST /api/members/admin-update - Update or delete members (admin only)
 async function handleAdminUpdate(request, env) {
   try {
-    if (!env.MEMBERS_KV) {
-      return new Response(JSON.stringify({ error: 'MEMBERS_KV not configured' }), {
+    if (!env.BOARD_KV) {
+      return new Response(JSON.stringify({ error: 'BOARD_KV not configured' }), {
         status: 500, headers: corsHeaders
       });
     }
@@ -784,36 +788,46 @@ async function handleAdminUpdate(request, env) {
       });
     }
 
-    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
-    if (!membersData || !membersData.members) {
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    if (!raw) {
       return new Response(JSON.stringify({ error: 'No members found' }), {
         status: 404, headers: corsHeaders
       });
     }
 
-    // Delete members by ID
+    let users = JSON.parse(raw);
+
+    // Delete members by memberId
     if (body.deleteIds && Array.isArray(body.deleteIds)) {
       const deleteSet = new Set(body.deleteIds);
-      membersData.members = membersData.members.filter(m => !deleteSet.has(m.id));
+      users = users.filter(u => !deleteSet.has(u.memberId));
     }
 
-    // Update member fields by ID
+    // Delete members by username
+    if (body.deleteUsernames && Array.isArray(body.deleteUsernames)) {
+      const deleteSet = new Set(body.deleteUsernames);
+      users = users.filter(u => !deleteSet.has(u.username));
+    }
+
+    // Update member fields by memberId
     if (body.updates && Array.isArray(body.updates)) {
       for (const update of body.updates) {
-        const member = membersData.members.find(m => m.id === update.id);
-        if (member) {
+        const user = users.find(u => u.memberId === update.id);
+        if (user) {
           for (const [key, value] of Object.entries(update)) {
-            if (key !== 'id') member[key] = value;
+            if (key !== 'id') user[key] = value;
           }
         }
       }
     }
 
-    await env.MEMBERS_KV.put(MEMBERS_KEY, JSON.stringify(membersData));
+    await env.BOARD_KV.put(ADMIN_USERS_KEY, JSON.stringify(users));
+
+    const memberCount = users.filter(u => u.memberId).length;
 
     return new Response(JSON.stringify({
       success: true,
-      totalMembers: membersData.members.length
+      totalMembers: memberCount
     }), { headers: corsHeaders });
 
   } catch (error) {

@@ -19,6 +19,61 @@
 
 <body id="landing">
 
+  <!-- New Member Welcome Banner -->
+  <div class="welcome-ticker">
+    <div class="welcome-ticker-track">
+      <span class="welcome-ticker-content">
+        ☘ New members — watch for your welcome email with login info! Didn't receive one? Check your spam folder for an email from <strong>tech@in-nola.org</strong>, or reach out to us at <a href="mailto:tech@in-nola.org">tech@in-nola.org</a> ☘
+      </span>
+      <span class="welcome-ticker-content" aria-hidden="true">
+        ☘ New members — watch for your welcome email with login info! Didn't receive one? Check your spam folder for an email from <strong>tech@in-nola.org</strong>, or reach out to us at <a href="mailto:tech@in-nola.org">tech@in-nola.org</a> ☘
+      </span>
+    </div>
+  </div>
+
+  <style>
+    .welcome-ticker {
+      background: linear-gradient(90deg, #b8860b, #d4a726, #f5c842, #d4a726, #b8860b);
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .welcome-ticker-track {
+      display: inline-flex;
+      animation: ticker-scroll 28s linear infinite;
+    }
+
+    .welcome-ticker-content {
+      display: inline-block;
+      padding: 0 3rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      letter-spacing: 0.01em;
+    }
+
+    .welcome-ticker-content a {
+      color: #1a1a1a;
+      text-decoration: underline;
+    }
+
+    .welcome-ticker-content strong {
+      font-weight: 800;
+    }
+
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .welcome-ticker:hover .welcome-ticker-track {
+      animation-play-state: paused;
+    }
+  </style>
+
   <header class="site-header-main">
     <nav class="main-nav">
       <a href="/index.html" class="nav-link active">Home</a>

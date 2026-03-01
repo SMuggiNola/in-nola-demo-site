@@ -2,8 +2,7 @@
  * POST /api/auth/send-credentials
  *
  * Looks up an admin user by email, generates a fresh PIN, saves it,
- * and emails the credentials via Resend. Always returns a generic
- * success message to avoid revealing whether the email exists.
+ * and emails the credentials via Resend.
  */
 
 function generatePin() {
@@ -19,11 +18,6 @@ export async function onRequestPost(context) {
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 
-  const genericResponse = Response.json(
-    { success: true, message: 'If this email is registered, your credentials have been sent.' },
-    { headers: corsHeaders }
-  );
-
   try {
     const body = await request.json();
     const email = (body.email || '').toLowerCase().trim();
@@ -37,13 +31,19 @@ export async function onRequestPost(context) {
 
     const kv = env.BOARD_KV;
     if (!kv) {
-      return genericResponse;
+      return Response.json(
+        { success: false, debug: 'no_kv' },
+        { headers: corsHeaders }
+      );
     }
 
     // Load admin users
     const raw = await kv.get('admin_users');
     if (!raw) {
-      return genericResponse;
+      return Response.json(
+        { success: false, debug: 'no_admin_users_key' },
+        { headers: corsHeaders }
+      );
     }
 
     const users = JSON.parse(raw);
@@ -52,12 +52,20 @@ export async function onRequestPost(context) {
     const user = users.find(u => u.email && u.email.toLowerCase() === email);
 
     if (!user) {
-      return genericResponse;
+      // Show what emails exist for debugging
+      const emails = users.map(u => u.email || '(none)');
+      return Response.json(
+        { success: false, debug: 'user_not_found', searched: email, available: emails },
+        { headers: corsHeaders }
+      );
     }
 
     // Only generate PINs for PIN-auth users
     if (user.authMethod !== 'pin') {
-      return genericResponse;
+      return Response.json(
+        { success: false, debug: 'not_pin_auth', authMethod: user.authMethod, username: user.username },
+        { headers: corsHeaders }
+      );
     }
 
     // Generate a fresh PIN and save
@@ -71,7 +79,7 @@ export async function onRequestPost(context) {
 
     if (!RESEND_API_KEY) {
       return Response.json(
-        { success: false, debug: 'RESEND_API_KEY not configured' },
+        { success: false, debug: 'no_resend_key' },
         { headers: corsHeaders }
       );
     }
@@ -105,14 +113,10 @@ export async function onRequestPost(context) {
 
     const emailResult = await emailRes.json();
 
-    if (!emailRes.ok) {
-      return Response.json(
-        { success: false, debug: { resendStatus: emailRes.status, resendError: emailResult, from: FROM_EMAIL, to: user.email } },
-        { headers: corsHeaders }
-      );
-    }
-
-    return genericResponse;
+    return Response.json(
+      { success: emailRes.ok, debug: { resendStatus: emailRes.status, resendResult: emailResult, from: FROM_EMAIL, to: user.email, username: user.username } },
+      { headers: corsHeaders }
+    );
 
   } catch (err) {
     return Response.json(

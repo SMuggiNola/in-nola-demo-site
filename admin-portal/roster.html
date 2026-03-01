@@ -263,6 +263,64 @@
       color: var(--gold);
     }
 
+    .edit-btn {
+      background: transparent;
+      border: 1px solid rgba(212, 167, 38, 0.3);
+      color: var(--gold);
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .edit-btn:hover {
+      background: rgba(212, 167, 38, 0.15);
+      border-color: var(--gold);
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .save-btn {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .cancel-btn {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .roster-table td input.inline-edit {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--gold);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      padding: 0.3rem 0.5rem;
+      font-size: 0.85rem;
+      width: 100%;
+      min-width: 80px;
+    }
+
+    .roster-table td input.inline-edit:focus {
+      outline: none;
+      border-color: #d4a726;
+      box-shadow: 0 0 0 2px rgba(212, 167, 38, 0.2);
+    }
+
     .empty-state {
       text-align: center;
       padding: 2rem;
@@ -563,20 +621,24 @@
           var paidClass = m.paid ? 'paid' : 'unpaid';
           var setupClass = m.setupEmailSent ? 'sent' : 'unsent';
           var setupLabel = m.setupEmailSent ? 'Sent' : (isTechAdmin ? 'Send' : '—');
-          var removeCell = isTechAdmin
-            ? '<button class="remove-btn" data-id="' + escapeHtml(m.id) + '" data-name="' + escapeHtml(m.name) + '">Remove</button>'
-            : '<span class="remove-msg">Email <a href="mailto:tech@in-nola.org">tech@in-nola.org</a></span>';
-          return '<tr>' +
-            '<td>' + escapeHtml(m.name) + '</td>' +
-            '<td>' + escapeHtml(m.email) + '</td>' +
+          var actionBtns = '';
+          if (isTechAdmin) {
+            actionBtns = '<button class="edit-btn" data-id="' + escapeHtml(m.id) + '">Edit</button> ' +
+              '<button class="remove-btn" data-id="' + escapeHtml(m.id) + '" data-name="' + escapeHtml(m.name) + '">Remove</button>';
+          } else {
+            actionBtns = '<span class="remove-msg">Email <a href="mailto:tech@in-nola.org">tech@in-nola.org</a></span>';
+          }
+          return '<tr data-member-id="' + escapeHtml(m.id) + '">' +
+            '<td data-field="name">' + escapeHtml(m.name) + '</td>' +
+            '<td data-field="email">' + escapeHtml(m.email) + '</td>' +
             '<td>' + escapeHtml(m.id) + '</td>' +
             '<td>' + escapeHtml(m.username) + '</td>' +
             '<td><span class="paid-toggle ' + paidClass + '" data-id="' + escapeHtml(m.id) + '" data-paid="' + (m.paid ? '1' : '0') + '"><span class="toggle-track"></span><span class="toggle-thumb"></span></span></td>' +
             '<td>' + (isTechAdmin
               ? '<span class="setup-badge ' + setupClass + '" data-id="' + escapeHtml(m.id) + '" data-name="' + escapeHtml(m.name) + '">' + setupLabel + '</span>'
               : (m.setupEmailSent ? '<span class="setup-badge sent" style="cursor:default;">Sent</span>' : '<span style="color:var(--text-secondary);font-size:0.8rem;">—</span>')) + '</td>' +
-            '<td>' + escapeHtml(m.expirationDate) + '</td>' +
-            '<td>' + removeCell + '</td>' +
+            '<td data-field="expirationDate">' + escapeHtml(m.expirationDate) + '</td>' +
+            '<td>' + actionBtns + '</td>' +
             '</tr>';
         }).join('');
 
@@ -666,6 +728,100 @@
         toggle.setAttribute('data-paid', currentlyPaid ? '1' : '0');
         toggle.className = 'paid-toggle ' + (currentlyPaid ? 'paid' : 'unpaid');
       }
+    });
+
+    // Handle edit button clicks (delegated) — mug.sea only
+    document.getElementById('rosterBody').addEventListener('click', function (e) {
+      var btn = e.target.closest('.edit-btn');
+      if (!btn) return;
+
+      var row = btn.closest('tr');
+      var memberId = row.getAttribute('data-member-id');
+
+      // Get editable cells
+      var nameCell = row.querySelector('[data-field="name"]');
+      var emailCell = row.querySelector('[data-field="email"]');
+      var expiresCell = row.querySelector('[data-field="expirationDate"]');
+
+      // Store original values
+      var origName = nameCell.textContent;
+      var origEmail = emailCell.textContent;
+      var origExpires = expiresCell.textContent;
+
+      // Replace cell contents with inputs
+      nameCell.innerHTML = '<input class="inline-edit" type="text" value="' + escapeHtml(origName) + '">';
+      emailCell.innerHTML = '<input class="inline-edit" type="email" value="' + escapeHtml(origEmail) + '">';
+      expiresCell.innerHTML = '<input class="inline-edit" type="date" value="' + escapeHtml(origExpires) + '">';
+
+      // Replace action buttons with Save/Cancel
+      var actionsCell = btn.closest('td');
+      actionsCell.innerHTML = '<span class="edit-actions">' +
+        '<button class="save-btn" data-id="' + escapeHtml(memberId) + '">Save</button>' +
+        '<button class="cancel-btn">Cancel</button>' +
+        '</span>';
+
+      // Focus the name input
+      nameCell.querySelector('input').focus();
+    });
+
+    // Handle save button clicks (delegated)
+    document.getElementById('rosterBody').addEventListener('click', async function (e) {
+      var btn = e.target.closest('.save-btn');
+      if (!btn) return;
+
+      var row = btn.closest('tr');
+      var memberId = btn.getAttribute('data-id');
+
+      var newName = row.querySelector('[data-field="name"] input').value.trim();
+      var newEmail = row.querySelector('[data-field="email"] input').value.trim();
+      var newExpires = row.querySelector('[data-field="expirationDate"] input').value;
+
+      if (!newName || !newEmail) {
+        alert('Name and email are required.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        var res = await fetch('/api/members/admin-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminPassword: adminPassword,
+            updates: [{
+              id: memberId,
+              displayName: newName,
+              email: newEmail,
+              expirationDate: newExpires
+            }]
+          })
+        });
+
+        if (!res.ok) {
+          var data = await res.json();
+          alert(data.error || 'Failed to save changes');
+          btn.disabled = false;
+          btn.textContent = 'Save';
+          return;
+        }
+
+        loadRoster();
+
+      } catch (err) {
+        alert('Network error. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Save';
+      }
+    });
+
+    // Handle cancel button clicks (delegated)
+    document.getElementById('rosterBody').addEventListener('click', function (e) {
+      var btn = e.target.closest('.cancel-btn');
+      if (!btn) return;
+
+      loadRoster();
     });
 
     // Handle setup email badge clicks (delegated)

@@ -42,18 +42,24 @@ export async function onRequestPost(context) {
     if (!raw) return genericResponse;
 
     const users = JSON.parse(raw);
-    const user = users.find(u => u.email && u.email.toLowerCase() === email);
-    if (!user) return genericResponse;
 
-    // Only generate PINs for PIN-auth users
-    if (user.authMethod !== 'pin') return genericResponse;
+    // Find ALL users matching this email (supports shared emails for family members)
+    const matchingUsers = users.filter(u => u.email && u.email.toLowerCase() === email);
+    if (matchingUsers.length === 0) return genericResponse;
 
-    // Generate a fresh PIN and save
-    const newPin = generatePin();
-    user.pin = newPin;
-    // Scanner PINs expire after 24 hours; other PINs don't expire
-    if (user.role === 'scanner') {
-      user.pinExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    // Only process PIN-auth users
+    const pinUsers = matchingUsers.filter(u => u.authMethod !== 'password');
+    if (pinUsers.length === 0) return genericResponse;
+
+    // Generate a fresh PIN for each matching user
+    const credentials = [];
+    for (const user of pinUsers) {
+      const newPin = generatePin();
+      user.pin = newPin;
+      if (user.role === 'scanner') {
+        user.pinExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      }
+      credentials.push({ user, pin: newPin });
     }
     await kv.put('admin_users', JSON.stringify(users));
 
@@ -64,14 +70,16 @@ export async function onRequestPost(context) {
     if (RESEND_API_KEY) {
       const loginUrl = 'https://in-nola-demo-site.pages.dev/admin-portal/';
 
-      // Scanner role: send PIN to ALL board members so anyone at an event can scan
-      if (user.role === 'scanner') {
+      // Check if any matched user is a scanner
+      const scannerCred = credentials.find(c => c.user.role === 'scanner');
+
+      if (scannerCred) {
+        // Scanner role: send PIN to ALL board members
         const boardEmails = users
           .filter(u => u.email && (u.role === 'board' || u.role === 'architect'))
           .map(u => u.email);
-        // Include the scanner user's own email too
-        if (user.email && !boardEmails.includes(user.email)) {
-          boardEmails.push(user.email);
+        if (scannerCred.user.email && !boardEmails.includes(scannerCred.user.email)) {
+          boardEmails.push(scannerCred.user.email);
         }
 
         if (boardEmails.length > 0) {
@@ -92,8 +100,8 @@ export async function onRequestPost(context) {
                   <strong>This PIN is safe to share.</strong> It only provides access to the membership scanner — nothing else. Feel free to share it with any volunteer helping check memberships at the door.
                 </p>
                 <table style="margin: 20px 0; border-collapse: collapse;">
-                  <tr><td style="padding: 8px 16px; font-weight: bold;">Username:</td><td style="padding: 8px 16px;">${user.username}</td></tr>
-                  <tr><td style="padding: 8px 16px; font-weight: bold;">PIN:</td><td style="padding: 8px 16px; font-size: 1.2em; letter-spacing: 2px;">${newPin}</td></tr>
+                  <tr><td style="padding: 8px 16px; font-weight: bold;">Username:</td><td style="padding: 8px 16px;">${scannerCred.user.username}</td></tr>
+                  <tr><td style="padding: 8px 16px; font-weight: bold;">PIN:</td><td style="padding: 8px 16px; font-size: 1.2em; letter-spacing: 2px;">${scannerCred.pin}</td></tr>
                   <tr><td style="padding: 8px 16px; font-weight: bold;">Expires:</td><td style="padding: 8px 16px;">24 hours from now</td></tr>
                 </table>
                 <h3 style="margin-top: 24px;">How to use the scanner:</h3>
@@ -106,12 +114,35 @@ export async function onRequestPost(context) {
                 <p><a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background: #d4a726; color: #071a0e; text-decoration: none; border-radius: 8px; font-weight: bold;">Open Scanner Login</a></p>
                 <p style="color: #666; font-size: 12px; margin-top: 20px;">This PIN expires in 24 hours and replaces any previous scanner PIN. Request a new one for the next event.</p>
               `,
-              text: `IN-NOLA Membership Scanner\n\nA fresh PIN has been generated for scanning memberships at tonight's IN-NOLA event.\n\nThis PIN is safe to share. It only provides access to the membership scanner — nothing else. Feel free to share it with any volunteer helping check memberships at the door.\n\nUsername: ${user.username}\nPIN: ${newPin}\nExpires: 24 hours from now\n\nHow to use:\n1. Open the login page: ${loginUrl}\n2. Enter the username and PIN above\n3. Allow camera access when prompted\n4. Point your camera at a member's QR code to verify their membership\n\nThis PIN expires in 24 hours and replaces any previous scanner PIN. Request a new one for the next event.`,
+              text: `IN-NOLA Membership Scanner\n\nA fresh PIN has been generated for scanning memberships at tonight's IN-NOLA event.\n\nThis PIN is safe to share. It only provides access to the membership scanner — nothing else. Feel free to share it with any volunteer helping check memberships at the door.\n\nUsername: ${scannerCred.user.username}\nPIN: ${scannerCred.pin}\nExpires: 24 hours from now\n\nHow to use:\n1. Open the login page: ${loginUrl}\n2. Enter the username and PIN above\n3. Allow camera access when prompted\n4. Point your camera at a member's QR code to verify their membership\n\nThis PIN expires in 24 hours and replaces any previous scanner PIN. Request a new one for the next event.`,
             }),
           });
         }
-      } else {
-        // Regular user: send PIN only to that user
+      }
+
+      // Send credentials for regular (non-scanner) users
+      const regularCreds = credentials.filter(c => c.user.role !== 'scanner');
+      if (regularCreds.length > 0) {
+        // Build a table row for each account sharing this email
+        const credRows = regularCreds.map(c => `
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 8px 16px; font-weight: bold;">${c.user.displayName || c.user.username}</td>
+            <td style="padding: 8px 16px;">${c.user.username}</td>
+            <td style="padding: 8px 16px; font-size: 1.2em; letter-spacing: 2px;">${c.pin}</td>
+          </tr>
+        `).join('');
+
+        const credText = regularCreds.map(c =>
+          `  ${c.user.displayName || c.user.username} — Username: ${c.user.username}, PIN: ${c.pin}`
+        ).join('\n');
+
+        const greeting = regularCreds.length === 1
+          ? `Hi ${regularCreds[0].user.displayName || regularCreds[0].user.username},`
+          : `Hi,`;
+        const intro = regularCreds.length === 1
+          ? 'Here are your login credentials for IN-NOLA:'
+          : `Here are the login credentials for the ${regularCreds.length} accounts linked to this email:`;
+
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -120,20 +151,24 @@ export async function onRequestPost(context) {
           },
           body: JSON.stringify({
             from: FROM_EMAIL,
-            to: [user.email],
+            to: [email],
             subject: 'Your IN-NOLA Login Credentials',
             html: `
               <h2>Your IN-NOLA Login</h2>
-              <p>Hi ${user.displayName || user.username},</p>
-              <p>Here are your login credentials for IN-NOLA:</p>
-              <table style="margin: 20px 0; border-collapse: collapse;">
-                <tr><td style="padding: 8px 16px; font-weight: bold;">Username:</td><td style="padding: 8px 16px;">${user.username}</td></tr>
-                <tr><td style="padding: 8px 16px; font-weight: bold;">PIN:</td><td style="padding: 8px 16px; font-size: 1.2em; letter-spacing: 2px;">${newPin}</td></tr>
+              <p>${greeting}</p>
+              <p>${intro}</p>
+              <table style="margin: 20px 0; border-collapse: collapse; width: 100%;">
+                <tr style="background: #f5f5f5;">
+                  <th style="padding: 8px 16px; text-align: left;">Name</th>
+                  <th style="padding: 8px 16px; text-align: left;">Username</th>
+                  <th style="padding: 8px 16px; text-align: left;">PIN</th>
+                </tr>
+                ${credRows}
               </table>
               <p><a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background: #d4a726; color: #071a0e; text-decoration: none; border-radius: 8px; font-weight: bold;">Log In Now</a></p>
-              <p style="color: #666; font-size: 12px; margin-top: 20px;">This PIN replaces any previous PIN. If you did not request this, you can ignore this email.</p>
+              <p style="color: #666; font-size: 12px; margin-top: 20px;">These PINs replace any previous PINs. If you did not request this, you can ignore this email.</p>
             `,
-            text: `Your IN-NOLA Login\n\nHi ${user.displayName || user.username},\n\nUsername: ${user.username}\nPIN: ${newPin}\n\nLog in at: ${loginUrl}\n\nThis PIN replaces any previous PIN. If you did not request this, you can ignore this email.`,
+            text: `Your IN-NOLA Login\n\n${greeting}\n\n${intro}\n\n${credText}\n\nLog in at: ${loginUrl}\n\nThese PINs replace any previous PINs. If you did not request this, you can ignore this email.`,
           }),
         });
       }

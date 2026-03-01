@@ -380,9 +380,9 @@ async function handleImport(request, env) {
     for (const row of rows) {
       const email = row.email.toLowerCase().trim();
 
-      // Skip if email already exists
-      if (existingEmails.has(email)) {
-        skipped.push({ name: row.name, email, reason: 'Email already exists' });
+      // Skip if this exact name + email combo already exists (allow shared emails)
+      if (users.some(u => u.email && u.email.toLowerCase() === email && u.displayName === row.name.trim())) {
+        skipped.push({ name: row.name, email, reason: 'Member already exists' });
         continue;
       }
 
@@ -915,9 +915,9 @@ async function handleRosterAdd(request, env) {
     const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
     let users = raw ? JSON.parse(raw) : [];
 
-    // Check for duplicate email
-    if (users.some(u => u.email && u.email.toLowerCase() === email)) {
-      return new Response(JSON.stringify({ error: 'A member with this email already exists' }), {
+    // Check for duplicate name + email combo (allow shared emails for family members)
+    if (users.some(u => u.email && u.email.toLowerCase() === email && u.displayName === name)) {
+      return new Response(JSON.stringify({ error: 'A member with this name and email already exists' }), {
         status: 409, headers: corsHeaders
       });
     }

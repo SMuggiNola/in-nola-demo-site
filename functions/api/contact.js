@@ -54,6 +54,7 @@ export async function onRequestPost(context) {
   // Configuration (set in Cloudflare Pages Environment Variables)
   const RESEND_API_KEY = env.RESEND_API_KEY;
   const TO_EMAIL = env.CONTACT_TO_EMAIL || 'irishnetworknola@gmail.com';
+  const FROM_EMAIL = env.RESEND_FROM_EMAIL || 'IN-NOLA Contact <contact@in-nola.org>';
 
   if (!RESEND_API_KEY) {
     console.error('RESEND_API_KEY environment variable not set');
@@ -96,7 +97,7 @@ Sent via IN-NOLA Contact Form
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'IN-NOLA Contact <contact@in-nola.org>',
+        from: FROM_EMAIL,
         to: [TO_EMAIL],
         reply_to: email,
         subject: `[IN-NOLA Contact] Message from ${name}`,
@@ -116,10 +117,16 @@ Sent via IN-NOLA Contact Form
         headers: { 'Content-Type': 'application/json' }
       });
     } else {
-      console.error('Resend error:', response.status, result);
+      console.error('Resend error:', response.status, JSON.stringify(result));
 
       return new Response(JSON.stringify({
-        error: 'Failed to send message. Please try again later.'
+        error: 'Failed to send message. Please try again later.',
+        debug: {
+          resendStatus: response.status,
+          resendError: result.message || result.error || result,
+          from: FROM_EMAIL,
+          to: TO_EMAIL
+        }
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }

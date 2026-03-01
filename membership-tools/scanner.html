@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Scanner - IN-NOLA</title>
     <link rel="stylesheet" href="css/membership.css">
-    <!-- html5-qrcode library -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -25,10 +23,10 @@
                 <div id="reader" style="display: none;"></div>
 
                 <div style="text-align: center; margin: 20px 0;">
-                    <button id="startScanBtn" class="btn btn-primary" onclick="window.Scanner.startScanner()">
+                    <button id="startScanBtn" class="btn btn-primary">
                         Start Camera
                     </button>
-                    <button id="stopScanBtn" class="btn btn-secondary" onclick="window.Scanner.stopScanner()" style="display: none;">
+                    <button id="stopScanBtn" class="btn btn-secondary" style="display: none;">
                         Stop Camera
                     </button>
                 </div>
@@ -38,25 +36,37 @@
                     <div id="statusIcon" class="status-icon"></div>
                     <div id="statusText" class="status-text"></div>
                     <div id="memberInfo" class="member-info"></div>
-                    <button class="btn btn-primary scan-again-btn" onclick="window.Scanner.scanAgain()">
+                    <button id="scanAgainBtn" class="btn btn-primary scan-again-btn">
                         Scan Another
                     </button>
                 </div>
 
                 <div style="text-align: center; margin-top: 20px;">
-                    <span class="sign-out-link" onclick="exitScanner()">Exit Scanner</span>
+                    <span id="exitBtn" class="sign-out-link">Exit Scanner</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="/js/admin-auth.js"></script>
+    <!-- Load QR library with defer so it doesn't block page render -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="js/scanner.js"></script>
     <script>
-        function exitScanner() {
-            window.Scanner.stopScanner();
+        // Wire up buttons after all scripts are loaded
+        document.getElementById('startScanBtn').addEventListener('click', function() {
+            if (window.Scanner) window.Scanner.startScanner();
+        });
+        document.getElementById('stopScanBtn').addEventListener('click', function() {
+            if (window.Scanner) window.Scanner.stopScanner();
+        });
+        document.getElementById('scanAgainBtn').addEventListener('click', function() {
+            if (window.Scanner) window.Scanner.scanAgain();
+        });
+        document.getElementById('exitBtn').addEventListener('click', function() {
+            if (window.Scanner) window.Scanner.stopScanner();
             adminLogout();
-        }
+        });
     </script>
 </body>
 </html>

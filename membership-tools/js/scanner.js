@@ -6,6 +6,19 @@
 let html5QrCode = null;
 let isScanning = false;
 
+// ── Cookie helpers ──────────────────────────────────────────────────────
+
+function setCameraCookie() {
+    var expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = 'scanner_camera_ok=1; expires=' + expires + '; path=/membership-tools';
+}
+
+function hasCameraCookie() {
+    return document.cookie.split(';').some(function (c) {
+        return c.trim().startsWith('scanner_camera_ok=');
+    });
+}
+
 /**
  * Verify QR code data via API
  * @param {string} qrString - Raw QR code string
@@ -187,11 +200,18 @@ function startScanner() {
         }
     ).then(() => {
         isScanning = true;
+        setCameraCookie();
         document.getElementById('startScanBtn').style.display = 'none';
         document.getElementById('stopScanBtn').style.display = 'inline-block';
     }).catch((err) => {
         console.error('Error starting scanner:', err);
-        alert('Could not start camera. Please ensure camera permissions are granted.');
+        var msg = 'Could not start camera.';
+        if (String(err).indexOf('NotFound') !== -1) {
+            msg = 'No camera found on this device.';
+        } else {
+            msg = 'Camera permission denied. Please allow camera access and try again.';
+        }
+        showResult({ status: 'error', message: msg });
     });
 }
 
@@ -226,5 +246,6 @@ window.Scanner = {
     hideResult,
     startScanner,
     stopScanner,
-    scanAgain
+    scanAgain,
+    hasCameraCookie
 };

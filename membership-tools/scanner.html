@@ -67,6 +67,11 @@
             if (window.Scanner) window.Scanner.stopScanner();
             adminLogout();
         });
+
+        // Auto-start camera if permission was previously granted (24h cookie)
+        if (window.Scanner && window.Scanner.hasCameraCookie()) {
+            window.Scanner.startScanner();
+        }
     </script>
 </body>
 </html>

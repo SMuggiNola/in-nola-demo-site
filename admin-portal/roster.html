@@ -6,7 +6,10 @@
   <title>Member Roster | Irish Network NOLA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/global.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-svg@1.0.0/dist/qrcode.min.js"></script>
+  <script>var QRCodeSVG = QRCode;</script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <style>
     .roster-header {
       display: flex;
@@ -407,6 +410,13 @@
       border-radius: var(--radius);
     }
 
+    .qr-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
     .qr-actions {
       display: flex;
       justify-content: center;
@@ -503,7 +513,10 @@
       <!-- QR Code Download -->
       <div class="qr-section">
         <h2>QR Codes</h2>
-        <button id="downloadQrBtn" class="btn btn-gold download-qr-btn" disabled>Download All QR Codes</button>
+        <div class="qr-buttons">
+          <button id="downloadQrBtn" class="btn btn-gold download-qr-btn" disabled>Download All QR Codes</button>
+          <button id="downloadEngraverBtn" class="btn btn-gold download-qr-btn" disabled>Download for Engraver (SVG)</button>
+        </div>
         <div id="qrStatus" class="qr-status"></div>
         <div id="qrPreview"></div>
         <div id="qrActions" class="qr-actions" style="display:none;">
@@ -958,6 +971,7 @@
         if (data.members && data.members.length > 0) {
           cachedMembers = data.members;
           document.getElementById('downloadQrBtn').disabled = false;
+          document.getElementById('downloadEngraverBtn').disabled = false;
         }
       } catch (e) {}
     };
@@ -1117,6 +1131,129 @@
       win.document.write('<html><head><title>IN-NOLA QR Codes</title></head><body style="margin:0;text-align:center;"><img src="' + canvas.toDataURL('image/png') + '" style="max-width:100%;"></body></html>');
       win.document.close();
       win.onload = function () { win.print(); };
+    }
+
+    // ── Engraver QR Download (individual SVG + PNG in ZIP) ──────────────
+
+    document.getElementById('downloadEngraverBtn').addEventListener('click', generateEngraverQR);
+
+    async function generateEngraverQR() {
+      var btn = document.getElementById('downloadEngraverBtn');
+      var statusEl = document.getElementById('qrStatus');
+
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+      statusEl.textContent = 'Fetching QR data for ' + cachedMembers.length + ' members...';
+
+      try {
+        var memberIds = cachedMembers.map(function (m) { return m.id; });
+
+        var res = await fetch('/api/members/qr/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: adminPassword, memberIds: memberIds })
+        });
+
+        var data = await res.json();
+        if (!res.ok || !data.qrData) {
+          statusEl.textContent = 'Failed to fetch QR data.';
+          btn.disabled = false;
+          btn.textContent = 'Download for Engraver (SVG)';
+          return;
+        }
+
+        statusEl.textContent = 'Generating ' + data.qrData.length + ' SVG + PNG files...';
+
+        var zip = new JSZip();
+        var svgFolder = zip.folder('svg');
+        var pngFolder = zip.folder('png');
+        var readmeLines = ['IN-NOLA Member QR Codes — Engraver Package', '==========================================', ''];
+        readmeLines.push('Generated: ' + new Date().toLocaleDateString());
+        readmeLines.push('Total members: ' + data.qrData.length);
+        readmeLines.push('');
+        readmeLines.push('Files:');
+        readmeLines.push('  svg/  — Vector SVG files (scalable, best for laser engraving)');
+        readmeLines.push('  png/  — High-res 1000x1000 PNG files (fallback)');
+        readmeLines.push('');
+        readmeLines.push('Settings: Error correction H (highest), 1000x1000px, 4-module padding');
+        readmeLines.push('');
+        readmeLines.push('Member List:');
+        readmeLines.push('─────────────────────────────────────');
+
+        for (var i = 0; i < data.qrData.length; i++) {
+          var item = data.qrData[i];
+          var safeName = item.name.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '-');
+          var fileName = 'IN-NOLA-QR-' + item.id + '-' + safeName;
+
+          statusEl.textContent = 'Processing ' + (i + 1) + ' of ' + data.qrData.length + ': ' + item.name;
+
+          // Generate SVG using qrcode-svg (exposed as global QRCodeSVG)
+          var qr = new QRCodeSVG({
+            content: item.qrString,
+            width: 1000,
+            height: 1000,
+            padding: 4,
+            color: '#000000',
+            background: '#ffffff',
+            ecl: 'H'
+          });
+          var svgString = qr.svg();
+          svgFolder.file(fileName + '.svg', svgString);
+
+          // Render SVG to canvas for PNG
+          var pngDataUrl = await svgToPng(svgString, 1000, 1000);
+          var pngBase64 = pngDataUrl.split(',')[1];
+          pngFolder.file(fileName + '.png', pngBase64, { base64: true });
+
+          readmeLines.push('  ' + item.id + '  ' + item.name + '  (' + (item.memberType || 'Member') + ')');
+        }
+
+        statusEl.textContent = 'Creating ZIP file...';
+
+        readmeLines.push('');
+        readmeLines.push('─────────────────────────────────────');
+        readmeLines.push('Irish Network New Orleans — in-nola.org');
+        zip.file('README.txt', readmeLines.join('\n'));
+
+        var blob = await zip.generateAsync({ type: 'blob' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'IN-NOLA-QR-Engraver.zip';
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        statusEl.textContent = data.qrData.length + ' engraver-ready QR codes downloaded.';
+
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Download for Engraver (SVG)';
+      }
+    }
+
+    function svgToPng(svgString, width, height) {
+      return new Promise(function (resolve, reject) {
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext('2d');
+        var img = new Image();
+        var blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        img.onload = function () {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          URL.revokeObjectURL(url);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(url);
+          reject(new Error('Failed to render SVG to PNG'));
+        };
+        img.src = url;
+      });
     }
   </script>
 

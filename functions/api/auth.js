@@ -1,14 +1,16 @@
 /**
  * Backend admin authentication endpoint.
  *
- * POST /api/auth — validate username + password against BOARD_KV.
+ * POST /api/auth — validate username + password/pin against BOARD_KV.
  *
  * Credentials are stored in BOARD_KV under key "admin_users" as an array of
- * { username, passwordHash, salt, role, createdAt } objects.  On first call
- * the default users are auto-seeded.
+ * user objects. On first call the default users are auto-seeded.
  *
- * Returns { success, user: { username, role }, apiToken } on success.
- * The apiToken is the shared API password so existing endpoints keep working.
+ * Supports two auth methods:
+ *   - Password: { username, password } — for mug.sea (permanent password)
+ *   - PIN: { username, pin } — for board members (PIN delivered via email)
+ *
+ * Returns { success, user: { username, role, ... }, apiToken } on success.
  */
 
 const API_PASSWORD = 'innola2026!';
@@ -75,13 +77,11 @@ function generateMemberId(existingIds, index) {
 
 async function seedDefaultUsers(kv, env) {
   const defaults = [
-    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'architect', displayName: 'Se\u00e1n Muggivan', boardId: 'sean',    email: 'sean@muggivanlcsw.me', memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
-    { username: 'kel.sha', plaintext: randomPin(),    role: 'board',     displayName: 'Shannon Kelly',  boardId: 'shannon', email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
-    { username: 'mar.eri', plaintext: randomPin(),    role: 'board',     displayName: 'Erin Marjorie',  boardId: 'erin',    email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
-    { username: 'jon.and', plaintext: randomPin(),    role: 'board',     displayName: 'Andrew Jones',   boardId: 'andrew',  email: 'ajones27@tulane.edu',   memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
-    { username: 'mug.jon', plaintext: randomPin(),    role: 'board',     displayName: 'Joni Muggivan',  boardId: 'joni',    email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
-    { username: 'ken.col', plaintext: randomPin(),    role: 'board',     displayName: 'Colm Kennedy',   boardId: 'colm',    email: '',                      memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
-    { username: 'scanner', plaintext: randomPin(),    role: 'scanner',   displayName: 'Scanner Kiosk',  boardId: null,      email: '',                      memberType: null,           joinDate: null,         expirationDate: null },
+    { username: 'mug.sea', plaintext: 'TADGHlina22', role: 'architect', authMethod: 'password', displayName: 'Se\u00e1n Muggivan', boardId: 'sean',    email: 'sean@muggivanlcsw.me',        memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'skelly',  plaintext: randomPin(),    role: 'board',     authMethod: 'pin',      displayName: 'Shannon Kelly',     boardId: 'shannon', email: 'shannonkelly.harp@gmail.com', memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'ckennedy',plaintext: randomPin(),    role: 'board',     authMethod: 'pin',      displayName: 'Colm Kennedy',      boardId: 'colm',    email: 'colm.m.kennedy@gmail.com',    memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'ajones',  plaintext: randomPin(),    role: 'board',     authMethod: 'pin',      displayName: 'Andrew Jones',      boardId: 'andrew',  email: 'ajones27@tulane.edu',         memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
+    { username: 'smuggivan', plaintext: randomPin(),  role: 'scanner',   authMethod: 'pin',      displayName: 'Sean Muggivan',     boardId: null,      email: 'sean.muggivan@gmail.com',     memberType: null,           joinDate: null,         expirationDate: null },
   ];
 
   const memberSecret = env?.MEMBER_SECRET || 'default-dev-secret';
@@ -105,6 +105,8 @@ async function seedDefaultUsers(kv, env) {
       username: d.username,
       passwordHash,
       salt,
+      pin: d.authMethod === 'pin' ? d.plaintext : null,
+      authMethod: d.authMethod,
       role: d.role,
       displayName: d.displayName,
       boardId: d.boardId,
@@ -144,11 +146,12 @@ export async function onRequestPost(context) {
   };
 
   try {
-    const { username, password } = await request.json();
+    const body = await request.json();
+    const { username, password, pin } = body;
 
-    if (!username || !password) {
+    if (!username || (!password && !pin)) {
       return Response.json(
-        { error: 'Username and password are required' },
+        { error: 'Username and password or PIN are required' },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -215,9 +218,25 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Verify password
-    const submittedHash = await hashPassword(password.trim(), user.salt);
-    if (submittedHash !== user.passwordHash) {
+    // Authenticate based on what was provided
+    let authenticated = false;
+
+    if (password) {
+      // Password auth — verify against hash
+      if (user.passwordHash) {
+        const submittedHash = await hashPassword(password.trim(), user.salt);
+        authenticated = (submittedHash === user.passwordHash);
+      }
+    }
+
+    if (pin) {
+      // PIN auth — verify against stored PIN
+      if (user.pin && user.pin === pin.trim()) {
+        authenticated = true;
+      }
+    }
+
+    if (!authenticated) {
       return Response.json(
         { error: 'Invalid credentials' },
         { status: 401, headers: corsHeaders }

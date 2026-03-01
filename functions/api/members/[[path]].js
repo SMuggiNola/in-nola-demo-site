@@ -294,6 +294,10 @@ export async function onRequest(context) {
     return handleBatchQR(request, env);
   }
 
+  if (path === '/api/members/send-credentials' && request.method === 'POST') {
+    return handleSendCredentials(request, env);
+  }
+
   return new Response(JSON.stringify({ error: 'Not found' }), {
     status: 404,
     headers: corsHeaders
@@ -666,5 +670,95 @@ async function handleBatchQR(request, env) {
       status: 500,
       headers: corsHeaders
     });
+  }
+}
+
+// POST /api/members/send-credentials - Email credentials to member
+async function handleSendCredentials(request, env) {
+  try {
+    if (!env.MEMBERS_KV) {
+      return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+        status: 500,
+        headers: corsHeaders
+      });
+    }
+
+    const body = await request.json();
+    const email = (body.email || '').toLowerCase().trim();
+
+    if (!email) {
+      return new Response(JSON.stringify({ error: 'Email is required' }), {
+        status: 400,
+        headers: corsHeaders
+      });
+    }
+
+    // Always return same message regardless of whether email exists
+    const genericResponse = new Response(JSON.stringify({
+      success: true,
+      message: 'If this email is registered, your credentials have been sent.'
+    }), { headers: corsHeaders });
+
+    // Look up member by email
+    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
+    if (!membersData || !membersData.members) {
+      return genericResponse;
+    }
+
+    const member = membersData.members.find(
+      m => m.email.toLowerCase() === email
+    );
+
+    if (!member) {
+      return genericResponse;
+    }
+
+    // Generate a fresh PIN
+    const newPin = generatePin();
+    member.pin = newPin;
+
+    // Save updated members data
+    await env.MEMBERS_KV.put(MEMBERS_KEY, JSON.stringify(membersData));
+
+    // Send email via Resend
+    const RESEND_API_KEY = env.RESEND_API_KEY;
+    const FROM_EMAIL = env.RESEND_FROM_EMAIL || 'IN-NOLA <contact@in-nola.org>';
+
+    if (RESEND_API_KEY) {
+      const loginUrl = 'https://in-nola.org/membership-tools/';
+
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: FROM_EMAIL,
+          to: [member.email],
+          subject: 'Your IN-NOLA Login Credentials',
+          html: `
+            <h2>Your IN-NOLA Member Login</h2>
+            <p>Hi ${member.name},</p>
+            <p>Here are your login credentials for the IN-NOLA Member Portal:</p>
+            <table style="margin: 20px 0; border-collapse: collapse;">
+              <tr><td style="padding: 8px 16px; font-weight: bold;">Username:</td><td style="padding: 8px 16px;">${member.username}</td></tr>
+              <tr><td style="padding: 8px 16px; font-weight: bold;">PIN:</td><td style="padding: 8px 16px; font-size: 1.2em; letter-spacing: 2px;">${newPin}</td></tr>
+            </table>
+            <p><a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background: #d4a726; color: #071a0e; text-decoration: none; border-radius: 8px; font-weight: bold;">Log In Now</a></p>
+            <p style="color: #666; font-size: 12px; margin-top: 20px;">This PIN replaces any previous PIN. If you did not request this, you can ignore this email.</p>
+          `,
+          text: `Your IN-NOLA Member Login\n\nHi ${member.name},\n\nUsername: ${member.username}\nPIN: ${newPin}\n\nLog in at: ${loginUrl}\n\nThis PIN replaces any previous PIN. If you did not request this, you can ignore this email.`,
+        }),
+      });
+    }
+
+    return genericResponse;
+
+  } catch (error) {
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'If this email is registered, your credentials have been sent.'
+    }), { headers: corsHeaders });
   }
 }

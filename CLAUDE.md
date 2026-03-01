@@ -9,6 +9,7 @@ Irish Network New Orleans (IN-NOLA) community website with membership management
 
 **Live Site:** https://in-nola-demo-site.pages.dev (currently on Sean's Cloudflare)
 **Repo:** https://github.com/SMuggiNola/in-nola-demo-site
+**Cloudflare Account:** `6b0ec0cc22b42c83a5860d586ca25330` (sean.muggivan@gmail.com) — **THIS IS THE ONLY CORRECT ACCOUNT. Never use any other CF account ID. Auth via OAuth.**
 
 **Status:** Pre-production POC - Events and Membership systems are dynamic with Cloudflare KV backend.
 

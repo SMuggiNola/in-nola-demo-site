@@ -242,7 +242,6 @@
       flex: 0 0 auto;
     }
 
-    /* The cropping viewport - fixed circle with image underneath */
     .crop-viewport {
       position: relative;
       width: 200px;
@@ -266,7 +265,6 @@
       -webkit-user-drag: none;
     }
 
-    /* Overlay to show crop area on full image */
     .crop-overlay-container {
       position: relative;
       display: inline-block;
@@ -378,7 +376,7 @@
         <!-- Message area -->
         <div id="message" class="message hidden"></div>
 
-        <!-- Admin member picker (only shown for admin role) -->
+        <!-- Admin member picker (only shown for admin/architect role) -->
         <div id="admin-picker" class="login-form hidden">
           <h2>Select Board Member to Edit</h2>
           <div class="form-group">
@@ -394,6 +392,21 @@
             </select>
           </div>
           <button type="button" class="btn-primary btn-sign-in" onclick="loadMemberProfile()">Edit Profile</button>
+        </div>
+
+        <!-- Credential request section (shown when not logged in) -->
+        <div id="cred-section" class="login-form hidden" style="margin-top: 1rem;">
+          <h3 style="margin-bottom: 0.5rem; color: var(--gold-light);">First Time Access / Replace My PIN</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Enter your email to receive your username and a fresh PIN.</p>
+
+          <div id="credMessage" class="message hidden"></div>
+
+          <div class="form-group">
+            <label for="credEmail">Email Address</label>
+            <input type="email" id="credEmail" placeholder="you@example.com">
+          </div>
+
+          <button type="button" class="btn-primary" style="width: 100%;" onclick="sendCredentials()">Send My Credentials</button>
         </div>
 
         <!-- Edit Form (hidden until logged in) -->
@@ -571,6 +584,7 @@
         }
 
         document.getElementById('admin-picker').classList.add('hidden');
+        document.getElementById('cred-section').classList.add('hidden');
         document.getElementById('edit-section').classList.remove('hidden');
 
       } catch (error) {
@@ -589,6 +603,35 @@
       loadMemberForEdit(memberId);
     }
 
+    // Send credentials via email
+    async function sendCredentials() {
+      const email = document.getElementById('credEmail').value.trim();
+      const credMsg = document.getElementById('credMessage');
+
+      if (!email) {
+        credMsg.textContent = 'Please enter your email address.';
+        credMsg.className = 'message error';
+        credMsg.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const resp = await fetch('/api/auth/send-credentials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await resp.json();
+        credMsg.textContent = data.message || 'If this email is registered, your credentials have been sent.';
+        credMsg.className = 'message success';
+        credMsg.classList.remove('hidden');
+      } catch (err) {
+        credMsg.textContent = 'Service unavailable. Please try again later.';
+        credMsg.className = 'message error';
+        credMsg.classList.remove('hidden');
+      }
+    }
+
     // On page load: auto-select member based on session or show admin picker
     (function initBoardEdit() {
       const role = getUserRole();
@@ -601,7 +644,9 @@
         // Board member — go straight to editing their own profile
         loadMemberForEdit(boardId);
       } else {
-        showMessage('Your account is not linked to a board member profile.', 'error');
+        // Not logged in — show credential request section
+        document.getElementById('cred-section').classList.remove('hidden');
+        showMessage('Please log in via the Admin Portal first, then return here to edit your profile.', 'error');
       }
     })();
 
@@ -635,31 +680,23 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      // Check file size (500KB max)
       if (file.size > 500 * 1024) {
         showMessage('Image too large. Please use an image under 500KB.', 'error');
         return;
       }
 
-      // Check file type
       if (!file.type.startsWith('image/')) {
         showMessage('Please select an image file.', 'error');
         return;
       }
 
-      // Read and convert to base64
       const reader = new FileReader();
       reader.onload = function(e) {
         uploadedPhotoBase64 = e.target.result;
-
-        // Show preview
         document.getElementById('upload-preview-img').src = uploadedPhotoBase64;
         document.getElementById('upload-preview').classList.remove('hidden');
         document.getElementById('file-upload-area').innerHTML = '<p>Image selected</p>';
-
         updatePhotoPreview(uploadedPhotoBase64);
-
-        // Show crop tool for uploaded image
         cropState = { zoom: 100, offsetX: 0, offsetY: 0 };
         showCropTool(uploadedPhotoBase64);
       };
@@ -675,17 +712,12 @@
         return;
       }
 
-      // Load image to get natural dimensions
       const tempImg = new Image();
       tempImg.onload = function() {
         imageNaturalSize = { width: this.width, height: this.height };
         cropImage.src = photoSrc;
         tool.classList.remove('hidden');
-
-        // Apply current crop state
         updateCropDisplay();
-
-        // Set up zoom slider
         document.getElementById('zoom-slider').value = cropState.zoom;
         document.getElementById('zoom-value').textContent = cropState.zoom + '%';
       };
@@ -698,29 +730,23 @@
 
       if (!imageNaturalSize.width) return;
 
-      const viewportSize = 200; // Fixed viewport size
+      const viewportSize = 200;
       const zoom = cropState.zoom / 100;
 
-      // Calculate scaled image size to fill viewport at current zoom
-      // Image should be scaled so its smallest dimension fills the viewport, then zoomed
       const aspectRatio = imageNaturalSize.width / imageNaturalSize.height;
       let imgWidth, imgHeight;
 
       if (aspectRatio > 1) {
-        // Landscape - height fits viewport
         imgHeight = viewportSize * zoom;
         imgWidth = imgHeight * aspectRatio;
       } else {
-        // Portrait or square - width fits viewport
         imgWidth = viewportSize * zoom;
         imgHeight = imgWidth / aspectRatio;
       }
 
-      // Calculate position with offset
       const centerX = (viewportSize - imgWidth) / 2;
       const centerY = (viewportSize - imgHeight) / 2;
 
-      // Apply offset as percentage of the excess space
       const maxOffsetX = (imgWidth - viewportSize) / 2;
       const maxOffsetY = (imgHeight - viewportSize) / 2;
 
@@ -732,7 +758,6 @@
       cropImage.style.left = offsetX + 'px';
       cropImage.style.top = offsetY + 'px';
 
-      // Update header preview
       const headerPreview = document.querySelector('#photo-preview-container .photo-preview');
       if (headerPreview) {
         const pos = getCropPosition();
@@ -753,16 +778,12 @@
       updateCropDisplay();
     }
 
-    // Set up drag functionality
     function initCropDrag() {
       const viewport = document.getElementById('crop-viewport');
-
       viewport.addEventListener('mousedown', startDrag);
       viewport.addEventListener('touchstart', startDrag, { passive: false });
-
       document.addEventListener('mousemove', doDrag);
       document.addEventListener('touchmove', doDrag, { passive: false });
-
       document.addEventListener('mouseup', endDrag);
       document.addEventListener('touchend', endDrag);
     }
@@ -777,16 +798,12 @@
     function doDrag(e) {
       if (!isDragging) return;
       e.preventDefault();
-
       const pos = e.touches ? e.touches[0] : e;
       const deltaX = pos.clientX - dragStart.x;
       const deltaY = pos.clientY - dragStart.y;
-
-      // Convert pixel movement to offset percentage
-      const sensitivity = 0.5; // Adjust for feel
+      const sensitivity = 0.5;
       cropState.offsetX = Math.max(-100, Math.min(100, cropState.offsetX + deltaX * sensitivity));
       cropState.offsetY = Math.max(-100, Math.min(100, cropState.offsetY + deltaY * sensitivity));
-
       dragStart = { x: pos.clientX, y: pos.clientY };
       updateCropDisplay();
     }
@@ -795,7 +812,6 @@
       isDragging = false;
     }
 
-    // Set up zoom slider
     function initZoomSlider() {
       const slider = document.getElementById('zoom-slider');
       slider.addEventListener('input', function() {
@@ -805,13 +821,11 @@
       });
     }
 
-    // Initialize crop controls when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
       initCropDrag();
       initZoomSlider();
     });
 
-    // Handle photo URL changes
     function handlePhotoUrlChange() {
       const url = document.getElementById('edit-photo-url').value.trim();
       if (url) {
@@ -823,18 +837,15 @@
       }
     }
 
-    // Drag and drop support
     const uploadArea = document.getElementById('file-upload-area');
     if (uploadArea) {
       uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadArea.classList.add('dragover');
       });
-
       uploadArea.addEventListener('dragleave', () => {
         uploadArea.classList.remove('dragover');
       });
-
       uploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadArea.classList.remove('dragover');
@@ -852,7 +863,6 @@
         return;
       }
 
-      // Determine which photo to use
       const photoMethod = document.querySelector('input[name="photo-method"]:checked').value;
       let photoValue = '';
 

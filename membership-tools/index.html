@@ -44,6 +44,27 @@
             </div>
         </div>
 
+        <div class="celtic-border card" style="margin-top: 24px;">
+            <h3 style="text-align: center; color: var(--gold); margin-bottom: 8px; font-size: 1.1rem;">First Time Access / Replace My PIN</h3>
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Enter your email to receive your username and a fresh PIN.</p>
+
+            <div id="credMessage" class="message"></div>
+
+            <form id="credForm">
+                <div class="form-group">
+                    <label for="credEmail">Email Address</label>
+                    <input type="email" id="credEmail" name="email" required
+                           placeholder="you@example.com" autocomplete="email">
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">Send My Credentials</button>
+            </form>
+
+            <div class="loading" id="credLoading">
+                <div class="spinner"></div>
+                <p>Sending...</p>
+            </div>
+        </div>
+
         <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; opacity: 0.7;">
             <a href="/index.html" style="color: var(--celtic-gold);">Return to Home</a>
         </p>
@@ -77,6 +98,40 @@
             }
         }
 
+        // ── Credential request form ──
+        const credForm = document.getElementById('credForm');
+        const credMessageEl = document.getElementById('credMessage');
+        const credLoadingEl = document.getElementById('credLoading');
+
+        credForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            credMessageEl.className = 'message';
+
+            const email = document.getElementById('credEmail').value.trim();
+            if (!email) return;
+
+            credForm.style.display = 'none';
+            credLoadingEl.classList.add('show');
+
+            try {
+                const resp = await fetch('/api/members/send-credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await resp.json();
+                credMessageEl.textContent = data.message || 'If this email is registered, your credentials have been sent.';
+                credMessageEl.className = 'message success show';
+            } catch (err) {
+                credMessageEl.textContent = 'Service unavailable. Please try again later.';
+                credMessageEl.className = 'message error show';
+            }
+
+            credLoadingEl.classList.remove('show');
+            credForm.style.display = 'block';
+        });
+
+        // ── Login form ──
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             hideMessage();

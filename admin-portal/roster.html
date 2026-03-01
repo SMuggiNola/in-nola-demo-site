@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>Member Roster | Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/global.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    .roster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .roster-header h1 {
+      margin: 0;
+    }
+
+    .logout-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    /* Add member form */
+    .add-form {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .add-form h2 {
+      margin: 0 0 1rem;
+      font-size: 1.1rem;
+      color: var(--gold);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .form-field {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .form-field input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .form-field input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .add-btn {
+      padding: 0.6rem 1.5rem;
+      white-space: nowrap;
+    }
+
+    /* Credential card shown after adding */
+    .credential-card {
+      background: rgba(212, 167, 38, 0.1);
+      border: 1px solid rgba(212, 167, 38, 0.3);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .credential-card.visible {
+      display: block;
+    }
+
+    .credential-card h3 {
+      margin: 0 0 0.75rem;
+      color: var(--gold);
+      font-size: 1rem;
+    }
+
+    .credential-card .cred-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.95rem;
+    }
+
+    .credential-card .cred-label {
+      color: var(--text-secondary);
+      min-width: 90px;
+    }
+
+    .credential-card .cred-value {
+      font-family: monospace;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
+
+    /* Roster table */
+    .roster-section h2 {
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .roster-count {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: normal;
+    }
+
+    .roster-table-wrap {
+      overflow-x: auto;
+    }
+
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .roster-table th {
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .roster-table td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+    }
+
+    .roster-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .remove-btn {
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .remove-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #ef4444;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .form-error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .form-error.visible {
+      display: block;
+    }
+
+    .portal-footer {
+      text-align: center;
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .portal-footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .portal-footer a:hover {
+      color: var(--gold);
+    }
+
+    /* QR download section */
+    .qr-section {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .qr-section h2 {
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .download-qr-btn {
+      padding: 0.6rem 1.5rem;
+    }
+
+    .qr-status {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+    }
+
+    #qrPreview {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    #qrPreview canvas {
+      max-width: 100%;
+      border-radius: var(--radius);
+    }
+
+    .qr-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column;
+      }
+
+      .form-field {
+        min-width: unset;
+      }
+
+      .roster-table {
+        font-size: 0.8rem;
+      }
+
+      .roster-table th,
+      .roster-table td {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <main class="page-content" style="max-width: 900px;">
+
+      <div class="roster-header">
+        <h1>Member Roster</h1>
+        <button id="logoutBtn" class="btn btn-gold logout-btn">Sign Out</button>
+      </div>
+
+      <!-- Add member form -->
+      <div class="add-form">
+        <h2>Add Member</h2>
+        <form id="addMemberForm">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="memberName">Full Name</label>
+              <input type="text" id="memberName" placeholder="Jane Murphy" required>
+            </div>
+            <div class="form-field">
+              <label for="memberEmail">Email</label>
+              <input type="email" id="memberEmail" placeholder="jane@example.com" required>
+            </div>
+            <button type="submit" id="addBtn" class="btn btn-gold add-btn">Add Member</button>
+          </div>
+        </form>
+        <div id="formError" class="form-error"></div>
+        <div id="credentialCard" class="credential-card">
+          <h3>Member Added</h3>
+          <div class="cred-row"><span class="cred-label">Name:</span><span id="credName" class="cred-value"></span></div>
+          <div class="cred-row"><span class="cred-label">Email:</span><span id="credEmail" class="cred-value"></span></div>
+          <div class="cred-row"><span class="cred-label">Username:</span><span id="credUsername" class="cred-value"></span></div>
+          <div class="cred-row"><span class="cred-label">PIN:</span><span id="credPin" class="cred-value"></span></div>
+          <div class="cred-row"><span class="cred-label">Member ID:</span><span id="credId" class="cred-value"></span></div>
+        </div>
+      </div>
+
+      <!-- Roster table -->
+      <div class="roster-section">
+        <h2>Current Members <span id="memberCount" class="roster-count"></span></h2>
+        <div class="roster-table-wrap">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Member ID</th>
+                <th>Username</th>
+                <th>Expires</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="rosterBody">
+              <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- QR Code Download -->
+      <div class="qr-section">
+        <h2>QR Codes</h2>
+        <button id="downloadQrBtn" class="btn btn-gold download-qr-btn" disabled>Download All QR Codes</button>
+        <div id="qrStatus" class="qr-status"></div>
+        <div id="qrPreview"></div>
+        <div id="qrActions" class="qr-actions" style="display:none;">
+          <button class="btn btn-gold" onclick="downloadQrImage()">Save Image</button>
+          <button class="btn btn-gold" onclick="printQrImage()">Print</button>
+        </div>
+      </div>
+
+      <div class="portal-footer">
+        <a href="home.html">Admin Portal</a>
+        <a href="/membership-tools/admin-import.html">Import Members</a>
+        <a href="/membership-tools/admin-qr.html">Generate QR Codes</a>
+      </div>
+
+    </main>
+
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/admin-auth.js"></script>
+  <script>
+    var adminPassword = getAdminPassword();
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      adminLogout();
+    });
+
+    // Load roster on page load
+    loadRoster();
+
+    // Add member form submission
+    document.getElementById('addMemberForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      var nameInput = document.getElementById('memberName');
+      var emailInput = document.getElementById('memberEmail');
+      var addBtn = document.getElementById('addBtn');
+      var errorEl = document.getElementById('formError');
+      var credCard = document.getElementById('credentialCard');
+
+      var name = nameInput.value.trim();
+      var email = emailInput.value.trim();
+
+      if (!name || !email) return;
+
+      addBtn.disabled = true;
+      addBtn.textContent = 'Adding...';
+      errorEl.classList.remove('visible');
+      credCard.classList.remove('visible');
+
+      try {
+        var res = await fetch('/api/members/roster', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: adminPassword, name: name, email: email })
+        });
+
+        var data = await res.json();
+
+        if (!res.ok) {
+          errorEl.textContent = data.error || 'Failed to add member';
+          errorEl.classList.add('visible');
+          return;
+        }
+
+        // Show credentials
+        document.getElementById('credName').textContent = data.member.name;
+        document.getElementById('credEmail').textContent = data.member.email;
+        document.getElementById('credUsername').textContent = data.member.username;
+        document.getElementById('credPin').textContent = data.member.pin;
+        document.getElementById('credId').textContent = data.member.memberId;
+        credCard.classList.add('visible');
+
+        // Clear form
+        nameInput.value = '';
+        emailInput.value = '';
+        nameInput.focus();
+
+        // Refresh roster
+        loadRoster();
+
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.classList.add('visible');
+      } finally {
+        addBtn.disabled = false;
+        addBtn.textContent = 'Add Member';
+      }
+    });
+
+    // Load and render roster table
+    async function loadRoster() {
+      var tbody = document.getElementById('rosterBody');
+      var countEl = document.getElementById('memberCount');
+
+      try {
+        var res = await fetch('/api/members?adminPassword=' + encodeURIComponent(adminPassword));
+        var data = await res.json();
+
+        if (!res.ok || !data.members) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Failed to load roster</td></tr>';
+          return;
+        }
+
+        var members = data.members;
+        countEl.textContent = '(' + members.length + ')';
+
+        if (members.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No members yet. Add one above.</td></tr>';
+          return;
+        }
+
+        // Sort by name
+        members.sort(function (a, b) {
+          return (a.name || '').localeCompare(b.name || '');
+        });
+
+        tbody.innerHTML = members.map(function (m) {
+          return '<tr>' +
+            '<td>' + escapeHtml(m.name) + '</td>' +
+            '<td>' + escapeHtml(m.email) + '</td>' +
+            '<td>' + escapeHtml(m.id) + '</td>' +
+            '<td>' + escapeHtml(m.username) + '</td>' +
+            '<td>' + escapeHtml(m.expirationDate) + '</td>' +
+            '<td><button class="remove-btn" data-id="' + escapeHtml(m.id) + '" data-name="' + escapeHtml(m.name) + '">Remove</button></td>' +
+            '</tr>';
+        }).join('');
+
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Error loading roster</td></tr>';
+      }
+    }
+
+    // Handle remove button clicks (delegated)
+    document.getElementById('rosterBody').addEventListener('click', async function (e) {
+      var btn = e.target.closest('.remove-btn');
+      if (!btn) return;
+
+      var memberId = btn.getAttribute('data-id');
+      var memberName = btn.getAttribute('data-name');
+
+      if (!confirm('Remove ' + memberName + ' from the roster? This cannot be undone.')) return;
+
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        var res = await fetch('/api/members/roster', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: adminPassword, memberId: memberId })
+        });
+
+        var data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Failed to remove member');
+          btn.disabled = false;
+          btn.textContent = 'Remove';
+          return;
+        }
+
+        loadRoster();
+
+      } catch (err) {
+        alert('Network error. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Remove';
+      }
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── QR Code Download ────────────────────────────────────────────────
+
+    var cachedMembers = [];
+
+    // Enable QR button once roster loads (patched into loadRoster)
+    var _origLoadRoster = loadRoster;
+    loadRoster = async function () {
+      await _origLoadRoster();
+      // Cache members for QR generation
+      try {
+        var res = await fetch('/api/members?adminPassword=' + encodeURIComponent(adminPassword));
+        var data = await res.json();
+        if (data.members && data.members.length > 0) {
+          cachedMembers = data.members;
+          document.getElementById('downloadQrBtn').disabled = false;
+        }
+      } catch (e) {}
+    };
+    // Re-run to apply the patch
+    loadRoster();
+
+    document.getElementById('downloadQrBtn').addEventListener('click', generateAllQR);
+
+    async function generateAllQR() {
+      var btn = document.getElementById('downloadQrBtn');
+      var statusEl = document.getElementById('qrStatus');
+      var previewEl = document.getElementById('qrPreview');
+      var actionsEl = document.getElementById('qrActions');
+
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+      statusEl.textContent = 'Fetching QR data for ' + cachedMembers.length + ' members...';
+      previewEl.innerHTML = '';
+      actionsEl.style.display = 'none';
+
+      try {
+        var memberIds = cachedMembers.map(function (m) { return m.id; });
+
+        var res = await fetch('/api/members/qr/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: adminPassword, memberIds: memberIds })
+        });
+
+        var data = await res.json();
+        if (!res.ok || !data.qrData) {
+          statusEl.textContent = 'Failed to fetch QR data.';
+          btn.disabled = false;
+          btn.textContent = 'Download All QR Codes';
+          return;
+        }
+
+        statusEl.textContent = 'Rendering ' + data.qrData.length + ' QR codes...';
+
+        // Generate individual QR codes off-screen
+        var tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        document.body.appendChild(tempContainer);
+
+        var qrCanvases = [];
+
+        for (var i = 0; i < data.qrData.length; i++) {
+          var item = data.qrData[i];
+          var div = document.createElement('div');
+          tempContainer.appendChild(div);
+          new QRCode(div, {
+            text: item.qrString,
+            width: 200,
+            height: 200,
+            colorDark: '#0d2818',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          qrCanvases.push({ div: div, name: item.name, id: item.id, type: item.memberType });
+        }
+
+        // Wait for QR codes to render
+        await new Promise(function (resolve) { setTimeout(resolve, 500); });
+
+        // Composite onto one canvas
+        var cols = 3;
+        var cardW = 240;
+        var cardH = 290;
+        var pad = 20;
+        var rows = Math.ceil(qrCanvases.length / cols);
+        var canvasW = cols * cardW + (cols + 1) * pad;
+        var canvasH = rows * cardH + (rows + 1) * pad + 50; // 50 for header
+
+        var canvas = document.createElement('canvas');
+        canvas.width = canvasW;
+        canvas.height = canvasH;
+        var ctx = canvas.getContext('2d');
+
+        // White background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvasW, canvasH);
+
+        // Header
+        ctx.fillStyle = '#0d2818';
+        ctx.font = 'bold 22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('IN-NOLA Member QR Codes', canvasW / 2, 35);
+
+        for (var i = 0; i < qrCanvases.length; i++) {
+          var col = i % cols;
+          var row = Math.floor(i / cols);
+          var x = pad + col * (cardW + pad);
+          var y = 50 + pad + row * (cardH + pad);
+
+          // Card background
+          ctx.fillStyle = '#f8f8f8';
+          ctx.strokeStyle = '#ddd';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(x, y, cardW, cardH, 8);
+          ctx.fill();
+          ctx.stroke();
+
+          // Get QR image
+          var qrImg = qrCanvases[i].div.querySelector('canvas') || qrCanvases[i].div.querySelector('img');
+          if (qrImg) {
+            ctx.drawImage(qrImg, x + 20, y + 15, 200, 200);
+          }
+
+          // Name
+          ctx.fillStyle = '#0d2818';
+          ctx.font = 'bold 14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(qrCanvases[i].name, x + cardW / 2, y + 232);
+
+          // Member type
+          ctx.fillStyle = '#666';
+          ctx.font = '12px sans-serif';
+          ctx.fillText(qrCanvases[i].type || 'Member', x + cardW / 2, y + 250);
+
+          // Member ID
+          ctx.fillStyle = '#999';
+          ctx.font = '10px sans-serif';
+          ctx.fillText(qrCanvases[i].id, x + cardW / 2, y + 268);
+        }
+
+        // Clean up temp container
+        document.body.removeChild(tempContainer);
+
+        // Show preview
+        previewEl.appendChild(canvas);
+        actionsEl.style.display = 'flex';
+        statusEl.textContent = data.qrData.length + ' QR codes ready.';
+
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Download All QR Codes';
+      }
+    }
+
+    function downloadQrImage() {
+      var canvas = document.querySelector('#qrPreview canvas');
+      if (!canvas) return;
+      var link = document.createElement('a');
+      link.download = 'IN-NOLA-QR-Codes.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function printQrImage() {
+      var canvas = document.querySelector('#qrPreview canvas');
+      if (!canvas) return;
+      var win = window.open('', '_blank');
+      win.document.write('<html><head><title>IN-NOLA QR Codes</title></head><body style="margin:0;text-align:center;"><img src="' + canvas.toDataURL('image/png') + '" style="max-width:100%;"></body></html>');
+      win.document.close();
+      win.onload = function () { win.print(); };
+    }
+  </script>
+
+</body>
+</html>

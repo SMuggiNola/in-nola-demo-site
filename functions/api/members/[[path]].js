@@ -11,7 +11,7 @@ const ADMIN_PASSWORD = 'innola2026!';
 // CORS headers helper
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Content-Type': 'application/json'
 };
@@ -300,6 +300,14 @@ export async function onRequest(context) {
 
   if (path === '/api/members/admin-update' && request.method === 'POST') {
     return handleAdminUpdate(request, env);
+  }
+
+  if (path === '/api/members/roster' && request.method === 'POST') {
+    return handleRosterAdd(request, env);
+  }
+
+  if (path === '/api/members/roster' && request.method === 'DELETE') {
+    return handleRosterDelete(request, env);
   }
 
   return new Response(JSON.stringify({ error: 'Not found' }), {
@@ -864,5 +872,141 @@ async function handleAdminUpdate(request, env) {
       error: 'Update failed',
       details: error.message
     }), { status: 500, headers: corsHeaders });
+  }
+}
+
+// POST /api/members/roster - Add a single member from admin portal
+async function handleRosterAdd(request, env) {
+  try {
+    if (!env.BOARD_KV || !env.MEMBER_SECRET) {
+      return new Response(JSON.stringify({ error: 'Server not configured' }), {
+        status: 500, headers: corsHeaders
+      });
+    }
+
+    const body = await request.json();
+
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
+        status: 401, headers: corsHeaders
+      });
+    }
+
+    const name = (body.name || '').trim();
+    const email = (body.email || '').toLowerCase().trim();
+
+    if (!name || !email) {
+      return new Response(JSON.stringify({ error: 'Name and email are required' }), {
+        status: 400, headers: corsHeaders
+      });
+    }
+
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    let users = raw ? JSON.parse(raw) : [];
+
+    // Check for duplicate email
+    if (users.some(u => u.email && u.email.toLowerCase() === email)) {
+      return new Response(JSON.stringify({ error: 'A member with this email already exists' }), {
+        status: 409, headers: corsHeaders
+      });
+    }
+
+    const existingUsernames = new Set(users.map(u => u.username));
+    const existingMemberIds = new Set(users.filter(u => u.memberId).map(u => u.memberId));
+
+    const memberId = generateMemberId(existingMemberIds);
+    const username = generateUsername(name, existingUsernames);
+    const pin = generatePin();
+    const qrSignature = await generateSignature(memberId, env.MEMBER_SECRET);
+    const salt = generateSalt();
+    const passwordHash = await hashPassword(pin, salt);
+    const today = new Date().toISOString().split('T')[0];
+
+    const user = {
+      username,
+      passwordHash,
+      salt,
+      role: 'member',
+      displayName: name,
+      boardId: null,
+      email,
+      memberId,
+      memberType: body.memberType || 'Individual',
+      joinDate: today,
+      expirationDate: '2026-12-31',
+      qrSignature,
+      createdAt: new Date().toISOString(),
+    };
+
+    users.push(user);
+    await env.BOARD_KV.put(ADMIN_USERS_KEY, JSON.stringify(users));
+
+    return new Response(JSON.stringify({
+      success: true,
+      member: { name, email, username, pin, memberId }
+    }), { headers: corsHeaders });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Failed to add member', details: error.message }), {
+      status: 500, headers: corsHeaders
+    });
+  }
+}
+
+// DELETE /api/members/roster - Remove a member by memberId
+async function handleRosterDelete(request, env) {
+  try {
+    if (!env.BOARD_KV) {
+      return new Response(JSON.stringify({ error: 'Server not configured' }), {
+        status: 500, headers: corsHeaders
+      });
+    }
+
+    const body = await request.json();
+
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
+        status: 401, headers: corsHeaders
+      });
+    }
+
+    if (!body.memberId) {
+      return new Response(JSON.stringify({ error: 'memberId is required' }), {
+        status: 400, headers: corsHeaders
+      });
+    }
+
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    if (!raw) {
+      return new Response(JSON.stringify({ error: 'No members found' }), {
+        status: 404, headers: corsHeaders
+      });
+    }
+
+    let users = JSON.parse(raw);
+    const target = users.find(u => u.memberId === body.memberId);
+
+    if (!target) {
+      return new Response(JSON.stringify({ error: 'Member not found' }), {
+        status: 404, headers: corsHeaders
+      });
+    }
+
+    // Safety: only delete role=member users (not board members)
+    if (target.role !== 'member') {
+      return new Response(JSON.stringify({ error: 'Cannot remove board members from roster' }), {
+        status: 403, headers: corsHeaders
+      });
+    }
+
+    users = users.filter(u => u.memberId !== body.memberId);
+    await env.BOARD_KV.put(ADMIN_USERS_KEY, JSON.stringify(users));
+
+    return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Failed to remove member', details: error.message }), {
+      status: 500, headers: corsHeaders
+    });
   }
 }

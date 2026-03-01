@@ -298,6 +298,10 @@ export async function onRequest(context) {
     return handleSendCredentials(request, env);
   }
 
+  if (path === '/api/members/admin-update' && request.method === 'POST') {
+    return handleAdminUpdate(request, env);
+  }
+
   return new Response(JSON.stringify({ error: 'Not found' }), {
     status: 404,
     headers: corsHeaders
@@ -760,5 +764,62 @@ async function handleSendCredentials(request, env) {
       success: true,
       message: 'If this email is registered, your credentials have been sent.'
     }), { headers: corsHeaders });
+  }
+}
+
+// POST /api/members/admin-update - Update or delete members (admin only)
+async function handleAdminUpdate(request, env) {
+  try {
+    if (!env.MEMBERS_KV) {
+      return new Response(JSON.stringify({ error: 'MEMBERS_KV not configured' }), {
+        status: 500, headers: corsHeaders
+      });
+    }
+
+    const body = await request.json();
+
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
+        status: 401, headers: corsHeaders
+      });
+    }
+
+    const membersData = await env.MEMBERS_KV.get(MEMBERS_KEY, 'json');
+    if (!membersData || !membersData.members) {
+      return new Response(JSON.stringify({ error: 'No members found' }), {
+        status: 404, headers: corsHeaders
+      });
+    }
+
+    // Delete members by ID
+    if (body.deleteIds && Array.isArray(body.deleteIds)) {
+      const deleteSet = new Set(body.deleteIds);
+      membersData.members = membersData.members.filter(m => !deleteSet.has(m.id));
+    }
+
+    // Update member fields by ID
+    if (body.updates && Array.isArray(body.updates)) {
+      for (const update of body.updates) {
+        const member = membersData.members.find(m => m.id === update.id);
+        if (member) {
+          for (const [key, value] of Object.entries(update)) {
+            if (key !== 'id') member[key] = value;
+          }
+        }
+      }
+    }
+
+    await env.MEMBERS_KV.put(MEMBERS_KEY, JSON.stringify(membersData));
+
+    return new Response(JSON.stringify({
+      success: true,
+      totalMembers: membersData.members.length
+    }), { headers: corsHeaders });
+
+  } catch (error) {
+    return new Response(JSON.stringify({
+      error: 'Update failed',
+      details: error.message
+    }), { status: 500, headers: corsHeaders });
   }
 }

@@ -84,7 +84,7 @@ export async function onRequestPost(context) {
           subject: 'Your IN-NOLA Admin Login Credentials',
           html: `
             <h2>Your IN-NOLA Admin Login</h2>
-            <p>Hi ${user.username},</p>
+            <p>Hi ${user.displayName || user.username},</p>
             <p>Here are your login credentials for the IN-NOLA Admin Portal:</p>
             <table style="margin: 20px 0; border-collapse: collapse;">
               <tr><td style="padding: 8px 16px; font-weight: bold;">Username:</td><td style="padding: 8px 16px;">${user.username}</td></tr>

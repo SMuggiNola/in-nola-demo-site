@@ -172,8 +172,9 @@ export async function onRequestPost(context) {
     } else {
       users = JSON.parse(raw);
 
-      // One-time migration: backfill membership fields on legacy users
-      const needsMigration = users.some(u =>
+      // Migration: backfill fields, rename legacy users, ensure scanner exists
+      const hasScanner = users.some(u => u.username === 'scanner' || u.username === 'smuggivan');
+      const needsMigration = !hasScanner || users.some(u =>
         (u.role !== 'scanner' && u.memberId === undefined) ||
         u.role === 'admin' ||
         u.username === 'smuggivan'
@@ -210,6 +211,31 @@ export async function onRequestPost(context) {
           }
           idx++;
         }
+
+        // Create scanner user if missing
+        if (!hasScanner) {
+          const pin = randomPin();
+          const salt = generateSalt();
+          const passwordHash = await hashPassword(pin, salt);
+          users.push({
+            username: 'scanner',
+            passwordHash,
+            salt,
+            pin,
+            authMethod: 'pin',
+            role: 'scanner',
+            displayName: 'Scanner',
+            boardId: null,
+            email: 'sean.muggivan@gmail.com',
+            memberId: null,
+            memberType: null,
+            joinDate: null,
+            expirationDate: null,
+            qrSignature: null,
+            createdAt: new Date().toISOString(),
+          });
+        }
+
         await kv.put('admin_users', JSON.stringify(users));
       }
     }

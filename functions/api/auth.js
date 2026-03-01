@@ -81,7 +81,7 @@ async function seedDefaultUsers(kv, env) {
     { username: 'skelly',  plaintext: randomPin(),    role: 'board',     authMethod: 'pin',      displayName: 'Shannon Kelly',     boardId: 'shannon', email: 'shannonkelly.harp@gmail.com', memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
     { username: 'ckennedy',plaintext: randomPin(),    role: 'board',     authMethod: 'pin',      displayName: 'Colm Kennedy',      boardId: 'colm',    email: 'colm.m.kennedy@gmail.com',    memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
     { username: 'ajones',  plaintext: randomPin(),    role: 'board',     authMethod: 'pin',      displayName: 'Andrew Jones',      boardId: 'andrew',  email: 'ajones27@tulane.edu',         memberType: 'Board Member', joinDate: '2024-01-01', expirationDate: '2026-12-31' },
-    { username: 'smuggivan', plaintext: randomPin(),  role: 'scanner',   authMethod: 'pin',      displayName: 'Sean Muggivan',     boardId: null,      email: 'sean.muggivan@gmail.com',     memberType: null,           joinDate: null,         expirationDate: null },
+    { username: 'scanner',   plaintext: randomPin(),  role: 'scanner',   authMethod: 'pin',      displayName: 'Scanner',           boardId: null,      email: 'sean.muggivan@gmail.com',     memberType: null,           joinDate: null,         expirationDate: null },
   ];
 
   const memberSecret = env?.MEMBER_SECRET || 'default-dev-secret';
@@ -174,7 +174,9 @@ export async function onRequestPost(context) {
 
       // One-time migration: backfill membership fields on legacy users
       const needsMigration = users.some(u =>
-        u.role !== 'scanner' && u.memberId === undefined
+        (u.role !== 'scanner' && u.memberId === undefined) ||
+        u.role === 'admin' ||
+        u.username === 'smuggivan'
       );
       if (needsMigration) {
         const memberSecret = env?.MEMBER_SECRET || 'default-dev-secret';
@@ -200,6 +202,11 @@ export async function onRequestPost(context) {
           // Rename legacy 'admin' role to 'architect'
           if (u.role === 'admin') {
             u.role = 'architect';
+          }
+          // Rename legacy 'smuggivan' username to 'scanner'
+          if (u.username === 'smuggivan') {
+            u.username = 'scanner';
+            u.displayName = 'Scanner';
           }
           idx++;
         }

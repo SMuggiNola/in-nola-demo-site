@@ -51,6 +51,10 @@ export async function onRequestPost(context) {
     // Generate a fresh PIN and save
     const newPin = generatePin();
     user.pin = newPin;
+    // Scanner PINs expire after 24 hours; other PINs don't expire
+    if (user.role === 'scanner') {
+      user.pinExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    }
     await kv.put('admin_users', JSON.stringify(users));
 
     // Send email via Resend
@@ -80,14 +84,17 @@ export async function onRequestPost(context) {
             body: JSON.stringify({
               from: FROM_EMAIL,
               to: boardEmails,
-              subject: 'IN-NOLA Event Scanner PIN',
+              subject: 'IN-NOLA Event Scanner PIN (valid 24 hours)',
               html: `
                 <h2>IN-NOLA Membership Scanner</h2>
-                <p>A fresh PIN has been generated for the membership scanner at IN-NOLA events.</p>
-                <p>If you're helping check memberships at an event, use these credentials to log in to the scanner on your phone:</p>
+                <p>A fresh PIN has been generated for scanning memberships at tonight's IN-NOLA event.</p>
+                <p style="background: rgba(212,167,38,0.15); border: 1px solid rgba(212,167,38,0.4); padding: 12px 16px; border-radius: 8px; margin: 16px 0;">
+                  <strong>This PIN is safe to share.</strong> It only provides access to the membership scanner — nothing else. Feel free to share it with any volunteer helping check memberships at the door.
+                </p>
                 <table style="margin: 20px 0; border-collapse: collapse;">
                   <tr><td style="padding: 8px 16px; font-weight: bold;">Username:</td><td style="padding: 8px 16px;">${user.username}</td></tr>
                   <tr><td style="padding: 8px 16px; font-weight: bold;">PIN:</td><td style="padding: 8px 16px; font-size: 1.2em; letter-spacing: 2px;">${newPin}</td></tr>
+                  <tr><td style="padding: 8px 16px; font-weight: bold;">Expires:</td><td style="padding: 8px 16px;">24 hours from now</td></tr>
                 </table>
                 <h3 style="margin-top: 24px;">How to use the scanner:</h3>
                 <ol style="line-height: 1.8;">
@@ -97,9 +104,9 @@ export async function onRequestPost(context) {
                   <li>Point your camera at a member's QR code to verify their membership</li>
                 </ol>
                 <p><a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background: #d4a726; color: #071a0e; text-decoration: none; border-radius: 8px; font-weight: bold;">Open Scanner Login</a></p>
-                <p style="color: #666; font-size: 12px; margin-top: 20px;">This PIN replaces any previous scanner PIN. It provides scanner-only access (no admin features).</p>
+                <p style="color: #666; font-size: 12px; margin-top: 20px;">This PIN expires in 24 hours and replaces any previous scanner PIN. Request a new one for the next event.</p>
               `,
-              text: `IN-NOLA Membership Scanner\n\nA fresh PIN has been generated for the membership scanner at IN-NOLA events.\n\nIf you're helping check memberships at an event, use these credentials:\n\nUsername: ${user.username}\nPIN: ${newPin}\n\nHow to use:\n1. Open the login page: ${loginUrl}\n2. Enter the username and PIN above\n3. Allow camera access when prompted\n4. Point your camera at a member's QR code to verify their membership\n\nThis PIN replaces any previous scanner PIN. It provides scanner-only access (no admin features).`,
+              text: `IN-NOLA Membership Scanner\n\nA fresh PIN has been generated for scanning memberships at tonight's IN-NOLA event.\n\nThis PIN is safe to share. It only provides access to the membership scanner — nothing else. Feel free to share it with any volunteer helping check memberships at the door.\n\nUsername: ${user.username}\nPIN: ${newPin}\nExpires: 24 hours from now\n\nHow to use:\n1. Open the login page: ${loginUrl}\n2. Enter the username and PIN above\n3. Allow camera access when prompted\n4. Point your camera at a member's QR code to verify their membership\n\nThis PIN expires in 24 hours and replaces any previous scanner PIN. Request a new one for the next event.`,
             }),
           });
         }

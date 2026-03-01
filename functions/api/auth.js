@@ -265,6 +265,13 @@ export async function onRequestPost(context) {
     if (pin) {
       // PIN auth — verify against stored PIN
       if (user.pin && user.pin === pin.trim()) {
+        // Check expiration if set (scanner PINs expire after 24h)
+        if (user.pinExpiresAt && new Date(user.pinExpiresAt) < new Date()) {
+          return Response.json(
+            { error: 'PIN has expired. Please request a new one.' },
+            { status: 401, headers: corsHeaders }
+          );
+        }
         authenticated = true;
       }
     }

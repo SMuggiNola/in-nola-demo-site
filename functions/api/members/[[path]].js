@@ -732,6 +732,11 @@ async function handleSendCredentials(request, env) {
       return genericResponse;
     }
 
+    // Never overwrite password-auth users (e.g. mug.sea)
+    if (member.authMethod === 'password') {
+      return genericResponse;
+    }
+
     // Generate a fresh PIN and hash it
     const newPin = generatePin();
     const salt = generateSalt();
@@ -1068,6 +1073,13 @@ async function handleSendSetup(request, env) {
     if (!member) {
       return new Response(JSON.stringify({ error: 'Member not found' }), {
         status: 404, headers: corsHeaders
+      });
+    }
+
+    // Never overwrite password-auth users (e.g. mug.sea)
+    if (member.authMethod === 'password') {
+      return new Response(JSON.stringify({ error: 'This account uses password auth and cannot be sent a setup email' }), {
+        status: 400, headers: corsHeaders
       });
     }
 

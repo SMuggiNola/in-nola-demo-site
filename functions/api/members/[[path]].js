@@ -310,6 +310,10 @@ export async function onRequest(context) {
     return handleRosterDelete(request, env);
   }
 
+  if (path === '/api/members/send-setup' && request.method === 'POST') {
+    return handleSendSetup(request, env);
+  }
+
   return new Response(JSON.stringify({ error: 'Not found' }), {
     status: 404,
     headers: corsHeaders
@@ -600,7 +604,8 @@ async function handleList(request, env) {
         joinDate: u.joinDate,
         expirationDate: u.expirationDate,
         qrSignature: u.qrSignature,
-        paid: u.paid || false
+        paid: u.paid || false,
+        setupEmailSent: u.setupEmailSent || false
       }));
 
     return new Response(JSON.stringify({ members }), {
@@ -955,7 +960,7 @@ async function handleRosterAdd(request, env) {
   }
 }
 
-// DELETE /api/members/roster - Remove a member by memberId
+// DELETE /api/members/roster - Remove a member by memberId (mug.sea only)
 async function handleRosterDelete(request, env) {
   try {
     if (!env.BOARD_KV) {
@@ -969,6 +974,20 @@ async function handleRosterDelete(request, env) {
     if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
       return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
         status: 401, headers: corsHeaders
+      });
+    }
+
+    // Only mug.sea can remove members
+    if (!body.username || body.username !== 'mug.sea') {
+      return new Response(JSON.stringify({
+        error: 'Only tech admin can remove members. Please email tech@in-nola.org with the member name and reason for removal.'
+      }), { status: 403, headers: corsHeaders });
+    }
+
+    // Require a reason/comment for removal
+    if (!body.comment || !body.comment.trim()) {
+      return new Response(JSON.stringify({ error: 'A reason for removal is required' }), {
+        status: 400, headers: corsHeaders
       });
     }
 
@@ -1008,6 +1027,110 @@ async function handleRosterDelete(request, env) {
 
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to remove member', details: error.message }), {
+      status: 500, headers: corsHeaders
+    });
+  }
+}
+
+// POST /api/members/send-setup - Send welcome/setup email to a member
+async function handleSendSetup(request, env) {
+  try {
+    if (!env.BOARD_KV) {
+      return new Response(JSON.stringify({ error: 'Server not configured' }), {
+        status: 500, headers: corsHeaders
+      });
+    }
+
+    const body = await request.json();
+
+    if (!body.adminPassword || body.adminPassword !== ADMIN_PASSWORD) {
+      return new Response(JSON.stringify({ error: 'Invalid admin password' }), {
+        status: 401, headers: corsHeaders
+      });
+    }
+
+    if (!body.memberId) {
+      return new Response(JSON.stringify({ error: 'memberId is required' }), {
+        status: 400, headers: corsHeaders
+      });
+    }
+
+    const raw = await env.BOARD_KV.get(ADMIN_USERS_KEY);
+    if (!raw) {
+      return new Response(JSON.stringify({ error: 'No members found' }), {
+        status: 404, headers: corsHeaders
+      });
+    }
+
+    const users = JSON.parse(raw);
+    const member = users.find(u => u.memberId === body.memberId);
+
+    if (!member) {
+      return new Response(JSON.stringify({ error: 'Member not found' }), {
+        status: 404, headers: corsHeaders
+      });
+    }
+
+    // Generate a fresh PIN
+    const newPin = generatePin();
+    const salt = generateSalt();
+    member.passwordHash = await hashPassword(newPin, salt);
+    member.salt = salt;
+
+    // Mark setup email as sent
+    member.setupEmailSent = true;
+    member.setupEmailSentAt = new Date().toISOString();
+
+    await env.BOARD_KV.put(ADMIN_USERS_KEY, JSON.stringify(users));
+
+    // Send welcome email via Resend
+    const RESEND_API_KEY = env.RESEND_API_KEY;
+    const FROM_EMAIL = 'IN-NOLA Tech <tech@in-nola.org>';
+
+    if (RESEND_API_KEY) {
+      const siteUrl = 'https://in-nola.org';
+      const loginUrl = 'https://in-nola.org/membership-tools/';
+
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: FROM_EMAIL,
+          to: [member.email],
+          subject: 'Welcome to IN-NOLA — Your Member Portal is Ready',
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #0d2818;">Welcome to IN-NOLA, ${member.displayName}!</h2>
+              <p>Your Irish Network New Orleans member portal is set up and ready to go. Here are your login credentials:</p>
+              <table style="margin: 20px 0; border-collapse: collapse; background: #f8f8f8; border-radius: 8px; overflow: hidden;">
+                <tr><td style="padding: 10px 20px; font-weight: bold; color: #0d2818;">Username:</td><td style="padding: 10px 20px; font-family: monospace; font-size: 1.1em;">${member.username}</td></tr>
+                <tr><td style="padding: 10px 20px; font-weight: bold; color: #0d2818;">PIN:</td><td style="padding: 10px 20px; font-family: monospace; font-size: 1.2em; letter-spacing: 2px;">${newPin}</td></tr>
+              </table>
+              <h3 style="color: #0d2818;">How to Log In</h3>
+              <p>Visit <a href="${siteUrl}" style="color: #d4a726;">${siteUrl}</a> and look for the <strong>shamrock (&shamrock;) "Member Login" button</strong> in the bottom-right corner of the page. You can also go directly to:</p>
+              <p><a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background: #d4a726; color: #071a0e; text-decoration: none; border-radius: 8px; font-weight: bold;">Member Login</a></p>
+              <h3 style="color: #0d2818;">What You'll Find</h3>
+              <ul style="color: #333;">
+                <li>Your <strong>digital membership card</strong></li>
+                <li>Your <strong>personal QR code</strong> for event check-ins</li>
+              </ul>
+              <h3 style="color: #0d2818;">Need a New PIN?</h3>
+              <p>If you ever forget your PIN, just visit the login page and click <strong>"Replace My PIN"</strong>. A new PIN will be emailed to you right away — no need to contact anyone.</p>
+              <p style="margin-top: 30px; color: #666; font-size: 13px;">This is your first-time setup email from Irish Network New Orleans. If you have questions, reply to this email or contact <a href="mailto:tech@in-nola.org" style="color: #d4a726;">tech@in-nola.org</a>.</p>
+            </div>
+          `,
+          text: `Welcome to IN-NOLA, ${member.displayName}!\n\nYour member portal is ready. Here are your login credentials:\n\nUsername: ${member.username}\nPIN: ${newPin}\n\nHow to Log In:\nVisit ${siteUrl} and look for the shamrock "Member Login" button in the bottom-right corner, or go directly to ${loginUrl}\n\nWhat You'll Find:\n- Your digital membership card\n- Your personal QR code for event check-ins\n\nNeed a New PIN?\nVisit the login page and click "Replace My PIN". A new PIN will be emailed to you right away.\n\nQuestions? Email tech@in-nola.org`,
+        }),
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Failed to send setup email', details: error.message }), {
       status: 500, headers: corsHeaders
     });
   }

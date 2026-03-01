@@ -161,34 +161,43 @@
       background: rgba(255, 255, 255, 0.03);
     }
 
-    .paid-badge {
+    .paid-toggle {
+      position: relative;
       display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border-radius: 10px;
-      font-size: 0.8rem;
+      width: 44px;
+      height: 24px;
       cursor: pointer;
-      transition: all var(--transition);
       user-select: none;
     }
 
-    .paid-badge.paid {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-      border: 1px solid rgba(34, 197, 94, 0.3);
+    .paid-toggle .toggle-track {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 12px;
+      transition: background 0.2s;
     }
 
-    .paid-badge.paid:hover {
-      background: rgba(34, 197, 94, 0.25);
+    .paid-toggle .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
     }
 
-    .paid-badge.unpaid {
-      background: rgba(239, 68, 68, 0.1);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.2);
+    .paid-toggle.unpaid .toggle-track {
+      background: rgba(239, 68, 68, 0.35);
     }
 
-    .paid-badge.unpaid:hover {
-      background: rgba(239, 68, 68, 0.2);
+    .paid-toggle.paid .toggle-track {
+      background: rgba(34, 197, 94, 0.5);
+    }
+
+    .paid-toggle.paid .toggle-thumb {
+      transform: translateX(20px);
     }
 
     .remove-btn {
@@ -205,6 +214,53 @@
     .remove-btn:hover {
       background: rgba(239, 68, 68, 0.15);
       border-color: #ef4444;
+    }
+
+    .setup-badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+
+    .setup-badge.unsent {
+      background: rgba(212, 167, 38, 0.15);
+      color: #d4a726;
+      border: 1px solid rgba(212, 167, 38, 0.3);
+    }
+
+    .setup-badge.unsent:hover {
+      background: rgba(212, 167, 38, 0.25);
+    }
+
+    .setup-badge.sent {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .setup-badge.sent:hover {
+      background: rgba(34, 197, 94, 0.25);
+    }
+
+    .send-all-btn {
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      margin-left: 1rem;
+    }
+
+    .remove-msg {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      max-width: 160px;
+      line-height: 1.3;
+    }
+
+    .remove-msg a {
+      color: var(--gold);
     }
 
     .empty-state {
@@ -344,7 +400,9 @@
 
       <!-- Roster table -->
       <div class="roster-section">
-        <h2>Current Members <span id="memberCount" class="roster-count"></span></h2>
+        <h2>Current Members <span id="memberCount" class="roster-count"></span>
+          <button id="sendAllBtn" class="btn btn-gold send-all-btn" style="display:none;">Send All Setup Emails</button>
+        </h2>
         <div class="roster-table-wrap">
           <table class="roster-table">
             <thead>
@@ -354,12 +412,13 @@
                 <th>Member ID</th>
                 <th>Username</th>
                 <th>Paid</th>
+                <th>Setup</th>
                 <th>Expires</th>
                 <th></th>
               </tr>
             </thead>
             <tbody id="rosterBody">
-              <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+              <tr><td colspan="8" class="empty-state">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -392,6 +451,8 @@
   <script src="/js/admin-auth.js"></script>
   <script>
     var adminPassword = getAdminPassword();
+    var boardUser = sessionStorage.getItem('boardUser') || '';
+    var isTechAdmin = (boardUser === 'mug.sea');
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', function () {
@@ -465,13 +526,14 @@
     async function loadRoster() {
       var tbody = document.getElementById('rosterBody');
       var countEl = document.getElementById('memberCount');
+      var sendAllBtn = document.getElementById('sendAllBtn');
 
       try {
         var res = await fetch('/api/members?adminPassword=' + encodeURIComponent(adminPassword));
         var data = await res.json();
 
         if (!res.ok || !data.members) {
-          tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Failed to load roster</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Failed to load roster</td></tr>';
           return;
         }
 
@@ -479,8 +541,17 @@
         countEl.textContent = '(' + members.length + ')';
 
         if (members.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No members yet. Add one above.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No members yet. Add one above.</td></tr>';
           return;
+        }
+
+        // Show Send All button only for mug.sea if any members haven't been sent setup email
+        var unsentCount = members.filter(function (m) { return !m.setupEmailSent; }).length;
+        if (isTechAdmin && unsentCount > 0) {
+          sendAllBtn.style.display = 'inline-block';
+          sendAllBtn.textContent = 'Send All Setup Emails (' + unsentCount + ')';
+        } else {
+          sendAllBtn.style.display = 'none';
         }
 
         // Sort by name
@@ -490,24 +561,31 @@
 
         tbody.innerHTML = members.map(function (m) {
           var paidClass = m.paid ? 'paid' : 'unpaid';
-          var paidLabel = m.paid ? 'Paid' : 'Unpaid';
+          var setupClass = m.setupEmailSent ? 'sent' : 'unsent';
+          var setupLabel = m.setupEmailSent ? 'Sent' : (isTechAdmin ? 'Send' : '—');
+          var removeCell = isTechAdmin
+            ? '<button class="remove-btn" data-id="' + escapeHtml(m.id) + '" data-name="' + escapeHtml(m.name) + '">Remove</button>'
+            : '<span class="remove-msg">Email <a href="mailto:tech@in-nola.org">tech@in-nola.org</a></span>';
           return '<tr>' +
             '<td>' + escapeHtml(m.name) + '</td>' +
             '<td>' + escapeHtml(m.email) + '</td>' +
             '<td>' + escapeHtml(m.id) + '</td>' +
             '<td>' + escapeHtml(m.username) + '</td>' +
-            '<td><span class="paid-badge ' + paidClass + '" data-id="' + escapeHtml(m.id) + '" data-paid="' + (m.paid ? '1' : '0') + '">' + paidLabel + '</span></td>' +
+            '<td><span class="paid-toggle ' + paidClass + '" data-id="' + escapeHtml(m.id) + '" data-paid="' + (m.paid ? '1' : '0') + '"><span class="toggle-track"></span><span class="toggle-thumb"></span></span></td>' +
+            '<td>' + (isTechAdmin
+              ? '<span class="setup-badge ' + setupClass + '" data-id="' + escapeHtml(m.id) + '" data-name="' + escapeHtml(m.name) + '">' + setupLabel + '</span>'
+              : (m.setupEmailSent ? '<span class="setup-badge sent" style="cursor:default;">Sent</span>' : '<span style="color:var(--text-secondary);font-size:0.8rem;">—</span>')) + '</td>' +
             '<td>' + escapeHtml(m.expirationDate) + '</td>' +
-            '<td><button class="remove-btn" data-id="' + escapeHtml(m.id) + '" data-name="' + escapeHtml(m.name) + '">Remove</button></td>' +
+            '<td>' + removeCell + '</td>' +
             '</tr>';
         }).join('');
 
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error loading roster</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Error loading roster</td></tr>';
       }
     }
 
-    // Handle remove button clicks (delegated)
+    // Handle remove button clicks (delegated) — mug.sea only
     document.getElementById('rosterBody').addEventListener('click', async function (e) {
       var btn = e.target.closest('.remove-btn');
       if (!btn) return;
@@ -515,7 +593,12 @@
       var memberId = btn.getAttribute('data-id');
       var memberName = btn.getAttribute('data-name');
 
-      if (!confirm('Remove ' + memberName + ' from the roster? This cannot be undone.')) return;
+      var comment = prompt('Remove ' + memberName + ' from the roster?\n\nThis cannot be undone. Please enter a reason:');
+      if (comment === null) return; // cancelled
+      if (!comment.trim()) {
+        alert('A reason is required to remove a member.');
+        return;
+      }
 
       btn.disabled = true;
       btn.textContent = '...';
@@ -524,7 +607,12 @@
         var res = await fetch('/api/members/roster', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adminPassword: adminPassword, memberId: memberId })
+          body: JSON.stringify({
+            adminPassword: adminPassword,
+            memberId: memberId,
+            username: boardUser,
+            comment: comment.trim()
+          })
         });
 
         var data = await res.json();
@@ -545,16 +633,18 @@
       }
     });
 
-    // Handle paid badge toggle (delegated)
+    // Handle paid toggle (delegated)
     document.getElementById('rosterBody').addEventListener('click', async function (e) {
-      var badge = e.target.closest('.paid-badge');
-      if (!badge) return;
+      var toggle = e.target.closest('.paid-toggle');
+      if (!toggle) return;
 
-      var memberId = badge.getAttribute('data-id');
-      var currentlyPaid = badge.getAttribute('data-paid') === '1';
+      var memberId = toggle.getAttribute('data-id');
+      var currentlyPaid = toggle.getAttribute('data-paid') === '1';
       var newPaid = !currentlyPaid;
 
-      badge.textContent = '...';
+      // Optimistic update
+      toggle.setAttribute('data-paid', newPaid ? '1' : '0');
+      toggle.className = 'paid-toggle ' + (newPaid ? 'paid' : 'unpaid');
 
       try {
         var res = await fetch('/api/members/admin-update', {
@@ -567,17 +657,108 @@
         });
 
         if (!res.ok) {
-          loadRoster();
+          // Revert on failure
+          toggle.setAttribute('data-paid', currentlyPaid ? '1' : '0');
+          toggle.className = 'paid-toggle ' + (currentlyPaid ? 'paid' : 'unpaid');
+        }
+
+      } catch (err) {
+        toggle.setAttribute('data-paid', currentlyPaid ? '1' : '0');
+        toggle.className = 'paid-toggle ' + (currentlyPaid ? 'paid' : 'unpaid');
+      }
+    });
+
+    // Handle setup email badge clicks (delegated)
+    document.getElementById('rosterBody').addEventListener('click', async function (e) {
+      var badge = e.target.closest('.setup-badge');
+      if (!badge) return;
+
+      var memberId = badge.getAttribute('data-id');
+      var memberName = badge.getAttribute('data-name');
+      var alreadySent = badge.classList.contains('sent');
+
+      if (alreadySent) {
+        if (!confirm('Setup email was already sent to ' + memberName + '. Send again? This will generate a new PIN.')) return;
+      }
+
+      badge.textContent = '...';
+
+      try {
+        var res = await fetch('/api/members/send-setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: adminPassword, memberId: memberId })
+        });
+
+        var data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Failed to send setup email');
+          badge.textContent = alreadySent ? 'Sent' : 'Send';
           return;
         }
 
         // Update badge inline
-        badge.setAttribute('data-paid', newPaid ? '1' : '0');
-        badge.className = 'paid-badge ' + (newPaid ? 'paid' : 'unpaid');
-        badge.textContent = newPaid ? 'Paid' : 'Unpaid';
+        badge.className = 'setup-badge sent';
+        badge.textContent = 'Sent';
 
       } catch (err) {
-        loadRoster();
+        alert('Network error. Please try again.');
+        badge.textContent = alreadySent ? 'Sent' : 'Send';
+      }
+    });
+
+    // Handle Send All button
+    document.getElementById('sendAllBtn').addEventListener('click', async function () {
+      var btn = this;
+      var badges = document.querySelectorAll('.setup-badge.unsent');
+
+      if (badges.length === 0) {
+        alert('All members have already received setup emails.');
+        return;
+      }
+
+      if (!confirm('Send setup emails to ' + badges.length + ' member(s) who haven\'t received one yet?\n\nThis will generate a fresh PIN for each member.')) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      var sent = 0;
+      var failed = 0;
+
+      for (var i = 0; i < badges.length; i++) {
+        var badge = badges[i];
+        var memberId = badge.getAttribute('data-id');
+        badge.textContent = '...';
+
+        try {
+          var res = await fetch('/api/members/send-setup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminPassword: adminPassword, memberId: memberId })
+          });
+
+          if (res.ok) {
+            badge.className = 'setup-badge sent';
+            badge.textContent = 'Sent';
+            sent++;
+          } else {
+            badge.textContent = 'Send';
+            failed++;
+          }
+        } catch (err) {
+          badge.textContent = 'Send';
+          failed++;
+        }
+      }
+
+      btn.disabled = false;
+      if (failed === 0) {
+        btn.style.display = 'none';
+        alert('Setup emails sent to ' + sent + ' member(s).');
+      } else {
+        btn.textContent = 'Send All Setup Emails (' + failed + ')';
+        alert('Sent: ' + sent + ', Failed: ' + failed + '. You can retry the failed ones.');
       }
     });
 

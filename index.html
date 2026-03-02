@@ -100,6 +100,20 @@
     </div>
   </section>
 
+  <!-- Featured Article Teaser -->
+  <div class="featured-teaser" id="featured-teaser" onclick="document.getElementById('article-modal').classList.add('active')">
+    <div class="featured-teaser-glow"></div>
+    <div class="featured-teaser-image">
+      <img src="./obrien_image.webp" alt="J.F.X. O'Brien">
+    </div>
+    <div class="featured-teaser-content">
+      <span class="featured-teaser-badge">New from IN-NOLA</span>
+      <span class="featured-teaser-title">An Irish Republican in Louisiana</span>
+      <span class="featured-teaser-author">by Board Member Andrew R. Jones</span>
+    </div>
+    <span class="featured-teaser-arrow">→</span>
+  </div>
+
   <!-- Next Event Banner -->
   <div id="next-event-wrapper" class="next-event-wrapper" style="display:none;">
     <span class="next-event-label">Our Next Event</span>
@@ -182,7 +196,440 @@
   </a>
 </div>
 
+<!-- Article Modal Overlay -->
+<div class="article-modal-backdrop" id="article-modal" onclick="if(event.target===this)closeArticleModal()">
+  <div class="article-modal">
+    <div class="article-modal-celtic-top"></div>
+
+    <button class="article-modal-close" onclick="closeArticleModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+
+    <div class="article-modal-inner">
+      <img class="article-modal-image" src="./obrien_image.webp"
+           alt="J.F.X. O'Brien, Irish nationalist, photographed at the Houses of Parliament">
+
+      <div class="article-modal-overlay"></div>
+
+      <span class="article-modal-credit">National Portrait Gallery, London</span>
+
+      <div class="article-modal-content">
+        <span class="article-modal-tag">Irish Network New Orleans</span>
+
+        <h2 class="article-modal-headline">An Irish Republican<br>in Louisiana</h2>
+        <p class="article-modal-byline">by IN-NOLA Board Member Andrew R. Jones</p>
+
+        <div class="article-modal-divider"></div>
+
+        <p class="article-modal-body">
+          IN-NOLA is proud to share a new feature article by our own <strong>Andrew R. Jones</strong>, telling the remarkable story of <strong>J.F.X. O'Brien</strong> — Irish nationalist, Civil War surgeon, political prisoner, and resident of New Orleans and Baton Rouge.
+        </p>
+
+        <a class="article-modal-cta" href="https://64parishes.org/irish-republican-in-louisiana" target="_blank" rel="noopener">
+          Read the Full Article
+        </a>
+
+        <span class="article-modal-pub">Published in <em>64 Parishes</em> · March 2026</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ======================================================
+   Featured Article Teaser (landing page banner)
+====================================================== */
+.featured-teaser {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 480px;
+  padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+  margin-bottom: 1rem;
+  background: rgba(212, 167, 38, 0.08);
+  border: 1px solid rgba(212, 167, 38, 0.3);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: var(--transition);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  animation: teaserPulse 3s ease-in-out infinite;
+}
+
+.featured-teaser:hover {
+  background: rgba(212, 167, 38, 0.14);
+  border-color: rgba(212, 167, 38, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(212, 167, 38, 0.2);
+}
+
+@keyframes teaserPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 167, 38, 0.0); }
+  50% { box-shadow: 0 0 20px 2px rgba(212, 167, 38, 0.12); }
+}
+
+.featured-teaser-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(212, 167, 38, 0.06) 10%, transparent 20%);
+  animation: teaserGlowSpin 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes teaserGlowSpin {
+  to { transform: rotate(360deg); }
+}
+
+.featured-teaser-image {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(212, 167, 38, 0.4);
+  box-shadow: 0 0 16px rgba(212, 167, 38, 0.15);
+}
+
+.featured-teaser-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  filter: sepia(0.2) contrast(1.1);
+}
+
+.featured-teaser-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  min-width: 0;
+}
+
+.featured-teaser-badge {
+  font-family: 'Libre Franklin', 'Cormorant Garamond', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(212, 167, 38, 0.15);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.featured-teaser-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.featured-teaser-author {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.featured-teaser-arrow {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  color: var(--gold);
+  transition: var(--transition);
+}
+
+.featured-teaser:hover .featured-teaser-arrow {
+  transform: translateX(4px);
+  color: var(--gold-light);
+}
+
+@media (max-width: 768px) {
+  .featured-teaser {
+    max-width: 100%;
+    padding: 0.625rem 1rem 0.625rem 0.625rem;
+  }
+
+  .featured-teaser-image {
+    width: 48px;
+    height: 48px;
+  }
+
+  .featured-teaser-title {
+    font-size: 0.95rem;
+  }
+}
+
+/* ======================================================
+   Article Modal Overlay
+====================================================== */
+.article-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 26, 14, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.article-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.article-modal {
+  max-width: 520px;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(200, 169, 81, 0.3);
+  transform: translateY(30px) scale(0.97);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+.article-modal-backdrop.active .article-modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.article-modal-celtic-top {
+  height: 4px;
+  background: linear-gradient(90deg, #1B6B4A, #C8A951, #1B6B4A);
+  position: relative;
+  z-index: 10;
+}
+
+.article-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.article-modal-close:hover {
+  background: rgba(0,0,0,0.65);
+  transform: scale(1.1);
+}
+
+.article-modal-close svg {
+  width: 14px;
+  height: 14px;
+  stroke: rgba(255,255,255,0.8);
+  stroke-width: 2.5;
+}
+
+.article-modal-inner {
+  position: relative;
+  width: 100%;
+  background: #EDE8DF;
+}
+
+.article-modal-image {
+  width: 100%;
+  display: block;
+  filter: sepia(0.1) contrast(1.05);
+}
+
+.article-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 15%,
+    rgba(237, 232, 223, 0.05) 35%,
+    rgba(237, 232, 223, 0.3) 50%,
+    rgba(237, 232, 223, 0.65) 62%,
+    rgba(237, 232, 223, 0.85) 72%,
+    rgba(237, 232, 223, 0.95) 82%,
+    #EDE8DF 92%
+  );
+}
+
+.article-modal-credit {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  font-size: 9.5px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.04em;
+  z-index: 6;
+  font-family: 'Libre Franklin', sans-serif;
+}
+
+.article-modal-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 32px 30px;
+  text-align: center;
+  z-index: 5;
+}
+
+.article-modal-tag {
+  display: inline-block;
+  font-family: 'Libre Franklin', 'Cormorant Garamond', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #111;
+  margin-bottom: 12px;
+}
+
+.article-modal-tag::before,
+.article-modal-tag::after {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1.5px;
+  background: #111;
+  vertical-align: middle;
+  margin: 0 10px;
+  opacity: 0.3;
+}
+
+.article-modal-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.article-modal-byline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 600;
+  font-style: italic;
+  color: #111;
+  margin-bottom: 16px;
+}
+
+.article-modal-divider {
+  width: 40px;
+  height: 2.5px;
+  background: #111;
+  margin: 0 auto 16px;
+  opacity: 0.25;
+  border-radius: 1px;
+}
+
+.article-modal-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.7;
+  color: #111;
+  margin-bottom: 22px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.article-modal-body strong {
+  font-weight: 800;
+  color: #000;
+}
+
+.article-modal-cta {
+  display: inline-block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #F5F0E8;
+  background: #111;
+  padding: 14px 40px;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.article-modal-cta:hover {
+  background: #000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.article-modal-cta::after {
+  content: '  →';
+}
+
+.article-modal-pub {
+  display: block;
+  margin-top: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #111;
+  letter-spacing: 0.04em;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.article-modal-pub em {
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 580px) {
+  .article-modal-content { padding: 0 20px 24px; }
+  .article-modal-headline { font-size: 23px; }
+  .article-modal-body { font-size: 13.5px; }
+  .article-modal { max-width: 95%; }
+}
+</style>
+
 <script src="./js/main.js"></script>
+
+<script>
+function closeArticleModal() {
+  document.getElementById('article-modal').classList.remove('active');
+  sessionStorage.setItem('articleModalDismissed', '1');
+}
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeArticleModal();
+});
+
+// Auto-show modal on first visit (after splash screen fades)
+if (!sessionStorage.getItem('articleModalDismissed')) {
+  setTimeout(function() {
+    document.getElementById('article-modal').classList.add('active');
+  }, 2400);
+}
+</script>
 
 <script>
 (async function loadNextEvent() {

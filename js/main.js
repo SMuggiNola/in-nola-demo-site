@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainContent = document.getElementById('main-content');
   if (mainContent) {
     const isHomePage = document.body.id === 'landing';
-    const fadeInDelay = isHomePage ? 900 : 100;
+    const fadeInDelay = isHomePage ? 2200 : 100;
     setTimeout(() => mainContent.classList.add('fade-in'), fadeInDelay);
   }
 

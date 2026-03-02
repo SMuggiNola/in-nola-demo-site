@@ -646,64 +646,69 @@
 }
 
 @media (max-width: 620px) {
-  /* Modal becomes full-screen scrollable on mobile */
   .article-modal-backdrop {
-    align-items: flex-start;
     padding: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   .article-modal {
     max-width: 100%;
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
     border-radius: 0;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* Tall image so you see the full photo first */
+  .article-modal-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Image takes top ~40% of the screen */
   .article-modal-image {
-    min-height: 70vh;
+    height: 38vh;
+    height: 38dvh;
     object-fit: cover;
     object-position: center 15%;
+    flex-shrink: 0;
   }
 
-  /* Gradient fades image into the cream content area */
+  /* Content flows below image, not overlaid */
+  .article-modal-content {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #EDE8DF;
+    padding: 16px 24px 24px;
+    margin-top: -60px;
+    z-index: 5;
+  }
+
+  /* Gradient just bridges the image into content */
   .article-modal-overlay {
+    pointer-events: none;
     background: linear-gradient(
       to bottom,
-      transparent 30%,
-      rgba(237, 232, 223, 0.1) 50%,
-      rgba(237, 232, 223, 0.4) 62%,
-      rgba(237, 232, 223, 0.7) 72%,
-      rgba(237, 232, 223, 0.9) 82%,
-      #EDE8DF 92%
+      transparent 40%,
+      rgba(237, 232, 223, 0.3) 60%,
+      rgba(237, 232, 223, 0.7) 75%,
+      #EDE8DF 95%
     );
   }
 
-  /* Content flows below image instead of overlaying it */
-  .article-modal-content {
-    position: relative;
-    margin-top: -100px;
-    background: #EDE8DF;
-    padding: 0 28px 48px;
-  }
-
-  .article-modal-headline { font-size: 26px; }
-  .article-modal-byline { font-size: 15px; }
-  .article-modal-body { font-size: 15px; }
-
-  .article-modal-cta {
-    padding: 16px 44px;
-    font-size: 14px;
-  }
-
-  /* Close button stays visible while scrolling */
-  .article-modal-close {
-    position: fixed;
-    top: 14px;
-    right: 14px;
-  }
+  .article-modal-tag { font-size: 9px; margin-bottom: 8px; }
+  .article-modal-headline { font-size: 22px; margin-bottom: 4px; }
+  .article-modal-byline { font-size: 13px; margin-bottom: 10px; }
+  .article-modal-divider { margin: 0 auto 10px; }
+  .article-modal-body { font-size: 13px; margin-bottom: 16px; line-height: 1.55; }
+  .article-modal-cta { padding: 12px 32px; font-size: 13px; }
+  .article-modal-pub { margin-top: 10px; font-size: 10px; }
+  .article-modal-pub em { font-size: 11.5px; }
 }
 </style>
 

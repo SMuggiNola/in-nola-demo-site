@@ -645,11 +645,65 @@
   font-weight: 700;
 }
 
-@media (max-width: 580px) {
-  .article-modal-content { padding: 0 20px 24px; }
-  .article-modal-headline { font-size: 23px; }
-  .article-modal-body { font-size: 13.5px; }
-  .article-modal { max-width: 95%; }
+@media (max-width: 620px) {
+  /* Modal becomes full-screen scrollable on mobile */
+  .article-modal-backdrop {
+    align-items: flex-start;
+    padding: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .article-modal {
+    max-width: 100%;
+    width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+  }
+
+  /* Tall image so you see the full photo first */
+  .article-modal-image {
+    min-height: 70vh;
+    object-fit: cover;
+    object-position: center 15%;
+  }
+
+  /* Gradient fades image into the cream content area */
+  .article-modal-overlay {
+    background: linear-gradient(
+      to bottom,
+      transparent 30%,
+      rgba(237, 232, 223, 0.1) 50%,
+      rgba(237, 232, 223, 0.4) 62%,
+      rgba(237, 232, 223, 0.7) 72%,
+      rgba(237, 232, 223, 0.9) 82%,
+      #EDE8DF 92%
+    );
+  }
+
+  /* Content flows below image instead of overlaying it */
+  .article-modal-content {
+    position: relative;
+    margin-top: -100px;
+    background: #EDE8DF;
+    padding: 0 28px 48px;
+  }
+
+  .article-modal-headline { font-size: 26px; }
+  .article-modal-byline { font-size: 15px; }
+  .article-modal-body { font-size: 15px; }
+
+  .article-modal-cta {
+    padding: 16px 44px;
+    font-size: 14px;
+  }
+
+  /* Close button stays visible while scrolling */
+  .article-modal-close {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+  }
 }
 </style>
 

@@ -160,9 +160,33 @@
   <!-- Next Event Banner -->
   <div id="next-event-wrapper" class="next-event-wrapper" style="display:none;">
     <span class="next-event-label">Our Next Event</span>
-    <a id="next-event-banner" class="next-event-banner" href="./Our-Village/Events-Page/index.html">
+    <div id="next-event-banner" class="next-event-banner" onclick="openEventModal()" style="cursor:pointer;">
       <span id="next-event-text"></span>
-    </a>
+    </div>
+  </div>
+
+  <!-- Next Event Modal -->
+  <div class="event-modal-backdrop" id="event-modal" onclick="if(event.target===this)closeEventModal()">
+    <div class="event-modal">
+      <div class="event-modal-celtic-top"></div>
+      <button class="event-modal-close" onclick="closeEventModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+      <div class="event-modal-body">
+        <div id="event-modal-image-wrap" style="display:none;">
+          <img id="event-modal-image" alt="Event flyer">
+        </div>
+        <div class="event-modal-details">
+          <h2 id="event-modal-title" class="event-modal-title"></h2>
+          <div class="event-modal-info">
+            <p id="event-modal-date"></p>
+            <p id="event-modal-time" style="display:none;"></p>
+            <p id="event-modal-location"></p>
+          </div>
+          <a href="./Our-Village/Events-Page/index.html" class="event-modal-cta">See All Events</a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Navigation Cards -->
@@ -673,6 +697,144 @@
   .article-modal-pub { margin-top: 8px; font-size: 10px; }
   .article-modal-pub em { font-size: 11px; }
 }
+
+/* ======================================================
+   Next Event Modal
+====================================================== */
+.event-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 26, 14, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.event-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.event-modal {
+  max-width: 420px;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(200, 169, 81, 0.3);
+  transform: translateY(30px) scale(0.97);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  position: relative;
+}
+
+.event-modal-backdrop.active .event-modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.event-modal-celtic-top {
+  height: 4px;
+  background: linear-gradient(90deg, #1B6B4A, #C8A951, #1B6B4A);
+}
+
+.event-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.event-modal-close:hover {
+  background: rgba(0,0,0,0.65);
+  transform: scale(1.1);
+}
+
+.event-modal-close svg {
+  width: 14px;
+  height: 14px;
+  stroke: rgba(255,255,255,0.8);
+  stroke-width: 2.5;
+}
+
+.event-modal-body {
+  background: #0a2818;
+}
+
+#event-modal-image-wrap img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+  background: rgba(0,0,0,0.3);
+}
+
+.event-modal-details {
+  padding: 1.5rem 2rem 2rem;
+  text-align: center;
+}
+
+.event-modal-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  margin: 0 0 1rem;
+  line-height: 1.3;
+}
+
+.event-modal-info {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  color: var(--gold-light);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.event-modal-info p {
+  margin: 0.3rem 0;
+}
+
+.event-modal-cta {
+  display: inline-block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--green-dark);
+  background: var(--gold);
+  padding: 0.7rem 2rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.event-modal-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(212, 167, 38, 0.4);
+}
+
+@media (max-width: 480px) {
+  .event-modal { max-width: 100%; }
+  .event-modal-details { padding: 1.25rem 1.25rem 1.5rem; }
+  .event-modal-title { font-size: 1.1rem; }
+}
 </style>
 
 <script src="./js/main.js"></script>
@@ -689,6 +851,46 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script>
+let nextEventData = null;
+
+function openEventModal() {
+  if (!nextEventData) return;
+  const modal = document.getElementById('event-modal');
+
+  document.getElementById('event-modal-title').textContent = nextEventData.title + (nextEventData.emoji ? ' ' + nextEventData.emoji : '');
+
+  const d = new Date(nextEventData.date + 'T12:00:00');
+  document.getElementById('event-modal-date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+  const timeEl = document.getElementById('event-modal-time');
+  if (nextEventData.time) {
+    timeEl.textContent = nextEventData.time;
+    timeEl.style.display = '';
+  } else {
+    timeEl.style.display = 'none';
+  }
+
+  document.getElementById('event-modal-location').textContent = nextEventData.location;
+
+  const imgWrap = document.getElementById('event-modal-image-wrap');
+  if (nextEventData.image) {
+    document.getElementById('event-modal-image').src = nextEventData.image;
+    imgWrap.style.display = '';
+  } else {
+    imgWrap.style.display = 'none';
+  }
+
+  modal.classList.add('active');
+}
+
+function closeEventModal() {
+  document.getElementById('event-modal').classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeEventModal();
+});
+
 (async function loadNextEvent() {
   const wrapper = document.getElementById('next-event-wrapper');
   const textEl = document.getElementById('next-event-text');
@@ -709,6 +911,7 @@ document.addEventListener('keydown', function(e) {
   }
 
   function show(event) {
+    nextEventData = event;
     let dateStr = formatDate(event.date);
     if (event.time) dateStr += ' at ' + event.time;
     const parts = [event.title, dateStr];

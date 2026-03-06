@@ -75,7 +75,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // 4. Fade in main content
+  // 4. Inject floating login buttons (skip homepage which has them inline)
+  if (document.body.id !== 'landing' && !document.querySelector('.floating-actions')) {
+    const floatingDiv = document.createElement('div');
+    floatingDiv.className = 'floating-actions';
+    floatingDiv.innerHTML = `
+      <a href="${pathPrefix}membership-tools/index.html" class="floating-btn floating-btn-primary">
+        <span class="floating-btn-icon">☘</span> Member Login
+      </a>
+      <a href="${pathPrefix}admin-portal/index.html" class="floating-btn floating-btn-tertiary">
+        <span class="floating-btn-icon">📋</span> Admin Portal
+      </a>
+    `;
+    document.body.appendChild(floatingDiv);
+  }
+
+  // 5. Fade in main content
   const mainContent = document.getElementById('main-content');
   if (mainContent) {
     const isHomePage = document.body.id === 'landing';
@@ -83,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => mainContent.classList.add('fade-in'), fadeInDelay);
   }
 
-  // 5. Event card toggle logic
+  // 6. Event card toggle logic
   document.querySelectorAll('.event-card').forEach(card => {
     card.addEventListener('click', e => {
       if (e.target.closest('.more-btn')) return;

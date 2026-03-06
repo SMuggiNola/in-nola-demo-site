@@ -87,8 +87,31 @@
 
     .event-body img {
       width: 100%;
+      max-height: 500px;
+      object-fit: contain;
       border-radius: 1rem;
       margin-bottom: 1rem;
+    }
+
+    .pdf-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      margin-top: 0.75rem;
+    }
+
+    .pdf-download:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--text-primary);
+      border-color: var(--gold);
     }
 
     .event-card.open .event-body {
@@ -392,6 +415,44 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Edit modal file inputs */
+    .modal input[type="file"] {
+      padding: 0.5rem;
+      border: 1px dashed var(--glass-border);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .modal .file-status {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .modal .current-preview img {
+      max-width: 100%;
+      max-height: 120px;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+    }
+
+    .modal .remove-check {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      color: #fca5a5;
+    }
+
+    .modal .remove-check input[type="checkbox"] {
+      width: auto;
+    }
   </style>
 </head>
 
@@ -480,6 +541,28 @@
           <textarea id="editNotes" style="min-height: 60px;"></textarea>
         </div>
 
+        <div class="form-group">
+          <label for="editImage">Event Image / Flyer</label>
+          <input type="file" id="editImage" accept="image/*">
+          <div class="current-preview" id="editImagePreview" style="display:none;">
+            <img id="editImagePreviewImg" alt="Current image">
+          </div>
+          <div class="remove-check" id="editImageRemoveWrap" style="display:none;">
+            <input type="checkbox" id="editRemoveImage">
+            <label for="editRemoveImage">Remove current image</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editPdf">PDF Attachment</label>
+          <input type="file" id="editPdf" accept=".pdf">
+          <p class="file-status" id="editPdfStatus" style="display:none;"></p>
+          <div class="remove-check" id="editPdfRemoveWrap" style="display:none;">
+            <input type="checkbox" id="editRemovePdf">
+            <label for="editRemovePdf">Remove current PDF</label>
+          </div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label for="editFacebook">Facebook Link</label>
@@ -525,6 +608,76 @@
                     window.location.hostname === 'localhost' ||
                     window.location.port === '5500';
 
+    // ---- Image compression & file utilities ----
+    let editPendingImage = null;
+    let editPendingPdf = null;
+    let editPendingPdfName = null;
+
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_W = 800;
+            let w = img.width, h = img.height;
+            if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
+          };
+          img.onerror = () => reject(new Error('Failed to load image'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Edit modal file input handlers
+    document.getElementById('editImage').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        editPendingImage = await compressImage(file);
+        document.getElementById('editImagePreviewImg').src = editPendingImage;
+        document.getElementById('editImagePreview').style.display = 'block';
+        document.getElementById('editRemoveImage').checked = false;
+      } catch (err) {
+        console.error('Image compression failed:', err);
+      }
+    });
+
+    document.getElementById('editPdf').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert('PDF must be under 2MB.');
+        e.target.value = '';
+        return;
+      }
+      try {
+        editPendingPdf = await readFileAsDataURL(file);
+        editPendingPdfName = file.name;
+        document.getElementById('editPdfStatus').textContent = 'New: ' + file.name;
+        document.getElementById('editPdfStatus').style.display = 'block';
+        document.getElementById('editRemovePdf').checked = false;
+      } catch (err) {
+        console.error('PDF read failed:', err);
+      }
+    });
+
     // Format date nicely
     function formatDate(dateStr) {
       const date = new Date(dateStr + 'T00:00:00');
@@ -543,12 +696,26 @@
       const dateDisplay = formatDate(event.date);
 
       let bodyContent = '';
+
+      // Event image/flyer at top
+      if (event.image) {
+        bodyContent += `<img src="${event.image}" alt="${event.title} flyer">`;
+      }
+
       if (event.time) bodyContent += `<p><strong>Time:</strong> ${event.time}</p>`;
       bodyContent += `<p><strong>Location:</strong> ${event.location}</p>`;
       bodyContent += `<p><strong>Details:</strong> ${event.description}</p>`;
       if (event.cost) bodyContent += `<p><strong>Cost:</strong> ${event.cost}</p>`;
       if (event.contact) bodyContent += `<p><strong>Contact:</strong> ${event.contact}</p>`;
       if (event.notes) bodyContent += `<p>${event.notes}</p>`;
+
+      // PDF attachment download link
+      if (event.attachment && event.attachmentName) {
+        bodyContent += `<a class="pdf-download" href="${event.attachment}" download="${event.attachmentName}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          ${event.attachmentName}
+        </a>`;
+      }
 
       // Social media links
       if (event.facebook || event.instagram) {
@@ -728,6 +895,15 @@
       const event = findEventById(eventId);
       if (!event) return;
 
+      // Reset pending file state
+      editPendingImage = null;
+      editPendingPdf = null;
+      editPendingPdfName = null;
+      document.getElementById('editImage').value = '';
+      document.getElementById('editPdf').value = '';
+      document.getElementById('editRemoveImage').checked = false;
+      document.getElementById('editRemovePdf').checked = false;
+
       document.getElementById('editEventId').value = eventId;
       document.getElementById('editTitle').value = event.title || '';
       document.getElementById('editDate').value = event.date || '';
@@ -739,6 +915,27 @@
       document.getElementById('editNotes').value = event.notes || '';
       document.getElementById('editFacebook').value = event.facebook || '';
       document.getElementById('editInstagram').value = event.instagram || '';
+
+      // Show current image if exists
+      if (event.image) {
+        document.getElementById('editImagePreviewImg').src = event.image;
+        document.getElementById('editImagePreview').style.display = 'block';
+        document.getElementById('editImageRemoveWrap').style.display = 'flex';
+      } else {
+        document.getElementById('editImagePreview').style.display = 'none';
+        document.getElementById('editImageRemoveWrap').style.display = 'none';
+      }
+
+      // Show current PDF if exists
+      if (event.attachment && event.attachmentName) {
+        document.getElementById('editPdfStatus').textContent = 'Current: ' + event.attachmentName;
+        document.getElementById('editPdfStatus').style.display = 'block';
+        document.getElementById('editPdfRemoveWrap').style.display = 'flex';
+      } else {
+        document.getElementById('editPdfStatus').style.display = 'none';
+        document.getElementById('editPdfRemoveWrap').style.display = 'none';
+      }
+
       document.getElementById('editModal').classList.add('active');
     }
 
@@ -764,6 +961,31 @@
 
       const eventId = document.getElementById('editEventId').value;
 
+      const existingEvent = findEventById(eventId);
+
+      // Determine image value
+      let imageVal;
+      if (document.getElementById('editRemoveImage').checked) {
+        imageVal = '';
+      } else if (editPendingImage) {
+        imageVal = editPendingImage;
+      } else {
+        imageVal = undefined; // keep existing
+      }
+
+      // Determine attachment value
+      let attachVal, attachNameVal;
+      if (document.getElementById('editRemovePdf').checked) {
+        attachVal = '';
+        attachNameVal = '';
+      } else if (editPendingPdf) {
+        attachVal = editPendingPdf;
+        attachNameVal = editPendingPdfName;
+      } else {
+        attachVal = undefined; // keep existing
+        attachNameVal = undefined;
+      }
+
       const updateData = {
         adminPassword: sessionStorage.getItem('adminPassword') || '',
         eventId: eventId,
@@ -778,6 +1000,10 @@
         facebook: document.getElementById('editFacebook').value,
         instagram: document.getElementById('editInstagram').value
       };
+
+      if (imageVal !== undefined) updateData.image = imageVal;
+      if (attachVal !== undefined) updateData.attachment = attachVal;
+      if (attachNameVal !== undefined) updateData.attachmentName = attachNameVal;
 
       try {
         const response = await fetch('/api/events', {

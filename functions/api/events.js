@@ -126,6 +126,9 @@ export async function onRequestPost(context) {
       notes: body.notes?.trim() || '',
       facebook: body.facebook?.trim() || '',
       instagram: body.instagram?.trim() || '',
+      image: body.image || '',
+      attachment: body.attachment || '',
+      attachmentName: body.attachmentName?.trim() || '',
       createdAt: new Date().toISOString()
     };
 
@@ -223,6 +226,9 @@ export async function onRequestPut(context) {
       notes: body.notes?.trim() ?? existingEvent.notes,
       facebook: body.facebook?.trim() ?? existingEvent.facebook ?? '',
       instagram: body.instagram?.trim() ?? existingEvent.instagram ?? '',
+      image: body.image !== undefined ? body.image : (existingEvent.image || ''),
+      attachment: body.attachment !== undefined ? body.attachment : (existingEvent.attachment || ''),
+      attachmentName: body.attachmentName !== undefined ? body.attachmentName?.trim() || '' : (existingEvent.attachmentName || ''),
       createdAt: existingEvent.createdAt,
       updatedAt: new Date().toISOString()
     };

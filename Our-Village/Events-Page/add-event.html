@@ -154,6 +154,67 @@
       color: var(--gold);
     }
 
+    /* File input styling */
+    .file-input-wrapper {
+      position: relative;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px dashed var(--glass-border);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .file-input-wrapper input[type="file"]:hover {
+      border-color: var(--gold);
+    }
+
+    .file-preview {
+      margin-top: 0.75rem;
+      position: relative;
+      display: none;
+    }
+
+    .file-preview img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .file-preview .file-name {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    .file-preview .remove-file {
+      position: absolute;
+      top: 0.25rem;
+      right: 0.25rem;
+      background: rgba(239, 68, 68, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .file-preview .remove-file:hover {
+      background: #dc2626;
+    }
+
   </style>
 </head>
 
@@ -221,6 +282,30 @@
           <textarea id="additionalNotes" name="additionalNotes" placeholder="Any other details - parking info, dress code, RSVP instructions, etc." style="min-height: 80px;"></textarea>
         </div>
 
+        <div class="form-group">
+          <label for="eventImage">Event Image / Flyer</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="eventImage" accept="image/*">
+          </div>
+          <div class="file-preview" id="imagePreview">
+            <img id="imagePreviewImg" alt="Image preview">
+            <button type="button" class="remove-file" onclick="removeImage()" title="Remove image">&times;</button>
+          </div>
+          <p class="hint">Optional: Upload a flyer or photo (auto-compressed to ~200KB)</p>
+        </div>
+
+        <div class="form-group">
+          <label for="eventPdf">PDF Attachment</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="eventPdf" accept=".pdf">
+          </div>
+          <div class="file-preview" id="pdfPreview">
+            <p class="file-name" id="pdfFileName"></p>
+            <button type="button" class="remove-file" onclick="removePdf()" title="Remove PDF" style="position:static; margin-top:0.25rem; border-radius:6px; width:auto; height:auto; padding:0.25rem 0.6rem; font-size:0.75rem;">&times; Remove</button>
+          </div>
+          <p class="hint">Optional: Attach a PDF (max 2MB)</p>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label for="facebookLink">Facebook Link</label>
@@ -252,6 +337,92 @@
   <script src="/js/admin-auth.js"></script>
 
   <script>
+    // ---- Image compression & file handling ----
+    let pendingImage = null;   // base64 data URL
+    let pendingPdf = null;     // base64 data URL
+    let pendingPdfName = null; // original filename
+
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_W = 800;
+            let w = img.width, h = img.height;
+            if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
+          };
+          img.onerror = () => reject(new Error('Failed to load image'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Image file input handler
+    document.getElementById('eventImage').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        pendingImage = await compressImage(file);
+        document.getElementById('imagePreviewImg').src = pendingImage;
+        document.getElementById('imagePreview').style.display = 'block';
+      } catch (err) {
+        console.error('Image compression failed:', err);
+        pendingImage = null;
+      }
+    });
+
+    // PDF file input handler
+    document.getElementById('eventPdf').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        statusMessage.textContent = 'PDF must be under 2MB.';
+        statusMessage.className = 'status-message error';
+        e.target.value = '';
+        return;
+      }
+      try {
+        pendingPdf = await readFileAsDataURL(file);
+        pendingPdfName = file.name;
+        document.getElementById('pdfFileName').textContent = file.name;
+        document.getElementById('pdfPreview').style.display = 'block';
+      } catch (err) {
+        console.error('PDF read failed:', err);
+        pendingPdf = null;
+        pendingPdfName = null;
+      }
+    });
+
+    function removeImage() {
+      pendingImage = null;
+      document.getElementById('eventImage').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+    }
+
+    function removePdf() {
+      pendingPdf = null;
+      pendingPdfName = null;
+      document.getElementById('eventPdf').value = '';
+      document.getElementById('pdfPreview').style.display = 'none';
+    }
+
     const form = document.getElementById('eventForm');
     const statusMessage = document.getElementById('statusMessage');
     const submitBtn = document.getElementById('submitBtn');
@@ -302,7 +473,10 @@
         contact: document.getElementById('eventContact').value.trim(),
         notes: document.getElementById('additionalNotes').value.trim(),
         facebook: document.getElementById('facebookLink').value.trim(),
-        instagram: document.getElementById('instagramLink').value.trim()
+        instagram: document.getElementById('instagramLink').value.trim(),
+        image: pendingImage || '',
+        attachment: pendingPdf || '',
+        attachmentName: pendingPdfName || ''
       };
 
       try {

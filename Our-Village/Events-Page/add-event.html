@@ -215,6 +215,33 @@
       background: #dc2626;
     }
 
+    .image-controls {
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    .image-controls label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .image-controls input[type="range"] {
+      width: 100%;
+      margin: 0.25rem 0;
+      accent-color: var(--gold);
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+
+    .image-controls .size-info {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+
   </style>
 </head>
 
@@ -291,7 +318,15 @@
             <img id="imagePreviewImg" alt="Image preview">
             <button type="button" class="remove-file" onclick="removeImage()" title="Remove image">&times;</button>
           </div>
-          <p class="hint">Optional: Upload a flyer or photo (auto-compressed to ~200KB)</p>
+          <div class="image-controls" id="imageControls">
+            <label>Resize: <span id="sizeLabel">800px</span> wide</label>
+            <input type="range" id="sizeSlider" min="300" max="1200" step="50" value="800">
+            <div class="size-info">
+              <span id="dimensionsLabel"></span>
+              <span id="fileSizeLabel"></span>
+            </div>
+          </div>
+          <p class="hint">Optional: Upload a flyer or photo. Drag the slider to resize.</p>
         </div>
 
         <div class="form-group">
@@ -341,22 +376,25 @@
     let pendingImage = null;   // base64 data URL
     let pendingPdf = null;     // base64 data URL
     let pendingPdfName = null; // original filename
+    let rawImageEl = null;     // original Image element for re-processing
 
-    function compressImage(file) {
+    function compressFromImage(img, maxW) {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      return { dataUrl, w, h };
+    }
+
+    function loadImageFromFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_W = 800;
-            let w = img.width, h = img.height;
-            if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
-            canvas.width = w;
-            canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL('image/jpeg', 0.7));
-          };
+          img.onload = () => resolve(img);
           img.onerror = () => reject(new Error('Failed to load image'));
           img.src = e.target.result;
         };
@@ -374,18 +412,38 @@
       });
     }
 
+    function updatePreview(maxW) {
+      if (!rawImageEl) return;
+      const { dataUrl, w, h } = compressFromImage(rawImageEl, maxW);
+      pendingImage = dataUrl;
+      document.getElementById('imagePreviewImg').src = dataUrl;
+      document.getElementById('sizeLabel').textContent = maxW + 'px';
+      document.getElementById('dimensionsLabel').textContent = w + ' × ' + h + 'px';
+      const kb = Math.round(dataUrl.length * 3 / 4 / 1024);
+      document.getElementById('fileSizeLabel').textContent = '~' + kb + ' KB';
+    }
+
     // Image file input handler
     document.getElementById('eventImage').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       try {
-        pendingImage = await compressImage(file);
-        document.getElementById('imagePreviewImg').src = pendingImage;
+        rawImageEl = await loadImageFromFile(file);
+        const slider = document.getElementById('sizeSlider');
+        slider.value = 800;
+        updatePreview(800);
         document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('imageControls').style.display = 'block';
       } catch (err) {
-        console.error('Image compression failed:', err);
+        console.error('Image load failed:', err);
         pendingImage = null;
+        rawImageEl = null;
       }
+    });
+
+    // Slider handler
+    document.getElementById('sizeSlider').addEventListener('input', (e) => {
+      updatePreview(parseInt(e.target.value));
     });
 
     // PDF file input handler
@@ -412,8 +470,10 @@
 
     function removeImage() {
       pendingImage = null;
+      rawImageEl = null;
       document.getElementById('eventImage').value = '';
       document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('imageControls').style.display = 'none';
     }
 
     function removePdf() {

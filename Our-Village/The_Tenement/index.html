@@ -1293,17 +1293,21 @@ async function showTransition(fromScene) {
 // ============================================
 function parseDialogue(text) {
   const messages = [];
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+  // Strip markdown bold/italic markers and section headers
+  const cleaned = text.replace(/\*\*\*/g, '').replace(/\*\*/g, '');
+  const lines = cleaned.split('\n').map(l => l.trim()).filter(l => l);
 
   for (const line of lines) {
-    // MEMBER_PROMPT
-    const promptMatch = line.match(/^MEMBER_PROMPT:\s*\[(.+)\]$/);
+    // Skip markdown headers and horizontal rules
+    if (line.startsWith('#') || line === '---') continue;
+
+    // MEMBER_PROMPT — also handle bold-wrapped version
+    const promptMatch = line.match(/^(?:\*{0,2})MEMBER_PROMPT:?\s*\[(.+)\](?:\*{0,2})$/);
     if (promptMatch) {
       try {
         const options = JSON.parse('[' + promptMatch[1] + ']');
         messages.push({ type: 'prompt', options });
       } catch (e) {
-        // Try splitting by commas between quoted strings
         const opts = promptMatch[1].match(/"([^"]+)"/g);
         if (opts) {
           messages.push({ type: 'prompt', options: opts.map(o => o.replace(/"/g, '')) });
@@ -1312,18 +1316,27 @@ function parseDialogue(text) {
       continue;
     }
 
-    // Stage direction
-    if (line.startsWith('(') && line.endsWith(')')) {
-      messages.push({ type: 'stage', text: line });
+    // Stage direction — starts with ( or *(
+    const stageMatch = line.match(/^\*?\((.+?)\)\*?$/);
+    if (stageMatch) {
+      messages.push({ type: 'stage', text: '(' + stageMatch[1] + ')' });
       continue;
     }
 
-    // Character dialogue
-    const charMatch = line.match(/^([A-Z][A-Za-z\s."']+?):\s*"(.+)"$/);
+    // Character dialogue — flexible format:
+    // NAME: "text"  or  NAME: *(stage)* "text"  or  NAME: text
+    const charMatch = line.match(/^([A-Za-z][A-Za-z\s.'"]+?):\s*(?:\*?\(.*?\)\*?\s*)?["""](.+?)["""]?\s*$/);
     if (charMatch) {
       const rawName = charMatch[1].trim();
-      const text = charMatch[2];
+      const text = charMatch[2].replace(/["""]$/g, '');
       const charKey = getCharKey(rawName);
+
+      // Check for inline stage direction before the quote
+      const inlineStage = line.match(/:\s*\*?\((.+?)\)\*?\s*["""]/);
+      if (inlineStage) {
+        messages.push({ type: 'stage', text: '(' + inlineStage[1] + ')' });
+      }
+
       messages.push({ type: 'dialogue', character: rawName, charKey, text });
       continue;
     }

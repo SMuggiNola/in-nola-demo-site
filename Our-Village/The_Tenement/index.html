@@ -114,22 +114,6 @@ body::after {
   to { opacity: 0; }
 }
 
-.tenement-home-link {
-  position: absolute;
-  top: 1rem;
-  left: 1.2rem;
-  z-index: 10;
-  font-family: 'Cinzel', serif;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color var(--transition);
-}
-
-.tenement-home-link:hover {
-  color: var(--gold);
-}
 
 /* ============================================
    SCREEN 1: ENTRY / LOGIN
@@ -579,13 +563,23 @@ body::after {
   letter-spacing: 0.04em;
 }
 
+.char-hint {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  max-width: 420px;
+}
+
 .char-create-form .entry-input {
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
 }
 
 .char-create-form .door-textarea {
-  min-height: 80px;
-  margin-bottom: 1rem;
+  min-height: 100px;
+  margin-bottom: 1.2rem;
 }
 
 /* ============================================
@@ -1278,6 +1272,114 @@ body::after {
   .chat-messages { padding: 1.5rem 2rem; }
   .chat-msg { max-width: 70%; }
 }
+
+/* Entry columns: stack on mobile, side-by-side on desktop */
+.entry-poster-col,
+.entry-action-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  #entry-screen {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem 4rem;
+    padding: 2rem 4rem;
+  }
+
+  /* Left column: poster info */
+  .entry-poster-col {
+    flex: 0 0 auto;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 1rem;
+  }
+
+  /* Right column: actions */
+  .entry-action-col {
+    flex: 0 0 auto;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 1rem;
+  }
+
+  .entry-links {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  /* Character creation: wider form */
+  #character-screen .char-create-form {
+    max-width: 560px;
+  }
+
+  #character-screen .char-create-sub {
+    max-width: 560px;
+  }
+}
+
+/* Bigger textareas for character creation */
+@media (min-width: 600px) {
+  .char-create-form .door-textarea {
+    min-height: 140px;
+  }
+}
+
+/* ============================================
+   SITE NAVIGATION BAR
+============================================ */
+.tenement-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
+  background: rgba(17, 14, 10, 0.95);
+  border-top: 1px solid rgba(200, 162, 78, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.tenement-nav a {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: 4px;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.tenement-nav a:hover {
+  color: var(--gold-light);
+  background: rgba(200, 162, 78, 0.1);
+}
+
+/* Pad bottom of scrollable screens so nav doesn't cover content */
+#entry-screen { padding-bottom: 3.5rem; }
+#character-screen > div { padding-bottom: 3.5rem; }
+#door-screen > div { padding-bottom: 3.5rem; }
+#end-screen { padding-bottom: 3.5rem; }
+#chat-screen .chat-messages { padding-bottom: 3.5rem; }
 </style>
 </head>
 
@@ -1288,64 +1390,74 @@ body::after {
 ========================================== -->
 <div class="screen active" id="entry-screen">
 
-  <a href="/index.html" class="tenement-home-link">&larr; Home</a>
+  <!-- LEFT COLUMN: Poster info -->
+  <div class="entry-poster-col">
+    <div class="entry-presents">Irish Network New Orleans presents&hellip;</div>
 
-  <div class="entry-presents">Irish Network New Orleans presents&hellip;</div>
+    <div class="entry-title-line">Juno</div>
+    <div class="entry-title-and">and the</div>
+    <div class="entry-title-line">Paycock</div>
 
-  <div class="entry-title-line">Juno</div>
-  <div class="entry-title-and">and the</div>
-  <div class="entry-title-line">Paycock</div>
+    <div class="entry-byline">by</div>
+    <div class="entry-author">Se&aacute;n O'Casey</div>
 
-  <div class="entry-byline">by</div>
-  <div class="entry-author">Se&aacute;n O'Casey</div>
+    <div class="entry-directed">Directed by Sean Muggivan</div>
 
-  <div class="entry-directed">Directed by Sean Muggivan</div>
+    <div class="entry-divider"></div>
 
-  <div class="entry-divider"></div>
+    <div class="entry-interactive">An Interactive Literary Experience</div>
 
-  <div class="entry-interactive">An Interactive Literary Experience</div>
+    <div class="entry-starring">Starring&hellip;</div>
+    <div class="entry-starring-you">YOU!</div>
 
-  <div class="entry-starring">Starring&hellip;</div>
-  <div class="entry-starring-you">YOU!</div>
+    <div class="entry-divider"></div>
 
-  <div class="entry-divider"></div>
+    <div class="entry-opening">Opening</div>
+    <div class="entry-date">March 8th, 2026</div>
 
-  <div class="entry-opening">Opening</div>
-  <div class="entry-date">March 8th, 2026</div>
-
-  <p class="entry-flavour">
-    Dublin, 1922. You live in a tenement on Hilljoy Square.
-    The Boyle family is on your landing. You've got a problem.
-    Sign in to create your character and knock on their door.
-  </p>
-
-  <button class="btn-join" id="btnJoin" onclick="revealLogin()">Join the Action</button>
-
-  <div class="entry-login-section" id="loginSection">
-    <div class="entry-login">
-      <input type="text" class="entry-input" id="loginUsername" placeholder="Username" autocomplete="off">
-      <input type="password" class="entry-input" id="loginPin" placeholder="PIN or password" autocomplete="off">
-      <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Sign In</button>
-      <div class="entry-error" id="entryError"></div>
+    <div class="entry-venue">
+      <div>The Tenement &mdash; IN-NOLA Village</div>
     </div>
   </div>
 
-  <div class="entry-skip" onclick="revealGuestPicker()">Continue as Guest</div>
+  <!-- RIGHT COLUMN: Actions -->
+  <div class="entry-action-col">
+    <p class="entry-flavour">
+      Dublin, 1922. You live in a tenement on Hilljoy Square.
+      The Boyle family is on your landing. You've got a problem.
+      Sign in to create your character and knock on their door.
+    </p>
 
-  <div class="guest-picker" id="guestPicker">
-    <p class="guest-picker-title">Choose Your Character</p>
-    <div class="guest-cards" id="guestCards"></div>
-  </div>
+    <p class="entry-flavour" style="font-size:0.82rem; max-width:360px;">
+      Want to bring the house down? <a href="/Our-Village/Our_Library/stacks" style="color: var(--gold); text-decoration: underline;">Read the play first</a> &mdash;
+      know the characters, know the story, and walk in ready
+      to become part of the action.
+    </p>
 
-  <div class="entry-divider" style="margin-top:1rem;"></div>
+    <button class="btn-join" id="btnJoin" onclick="revealLogin()">Join the Action</button>
 
-  <div class="entry-venue">
-    <div>The Tenement &mdash; IN-NOLA Village</div>
-  </div>
+    <div class="entry-login-section" id="loginSection">
+      <div class="entry-login">
+        <input type="text" class="entry-input" id="loginUsername" placeholder="Username" autocomplete="off">
+        <input type="password" class="entry-input" id="loginPin" placeholder="PIN or password" autocomplete="off">
+        <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Sign In</button>
+        <div class="entry-error" id="entryError"></div>
+      </div>
+    </div>
 
-  <div class="entry-links">
-    <a href="https://muggsoflearning.net" target="_blank" rel="noopener" class="entry-btn-muggs">MuggsOfLearning.net</a>
-    <a href="https://muggsoflearning.net/MuggsOfLearningSite/support" target="_blank" rel="noopener" class="entry-btn-support">Support Our Work</a>
+    <div class="entry-skip" onclick="revealGuestPicker()">Continue as Guest</div>
+
+    <div class="guest-picker" id="guestPicker">
+      <p class="guest-picker-title">Choose Your Character</p>
+      <div class="guest-cards" id="guestCards"></div>
+    </div>
+
+    <div class="entry-divider" style="margin-top:1rem;"></div>
+
+    <div class="entry-links">
+      <a href="https://muggsoflearning.net" target="_blank" rel="noopener" class="entry-btn-muggs">MuggsOfLearning.net</a>
+      <a href="https://muggsoflearning.net/MuggsOfLearningSite/support" target="_blank" rel="noopener" class="entry-btn-support">Support Our Work</a>
+    </div>
   </div>
 
 </div>
@@ -1357,17 +1469,34 @@ body::after {
   <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; overflow-y:auto;">
 
     <h2 class="char-create-title">Create Your Character</h2>
-    <p class="char-create-sub">Who are you in the tenement? Give yourself a name, a story, and a problem to bring to the Boyles.</p>
+    <p class="char-create-sub">
+      You're about to step into a Dublin tenement in 1922. The Civil War is raging.
+      The Boyles have their own troubles &mdash; but you've got yours.
+      The richer your character, the more alive the scene becomes.
+    </p>
 
     <div class="char-create-form">
       <label class="char-label" for="charName">Character Name</label>
-      <input type="text" class="entry-input" id="charName" placeholder="e.g. Paddy Dunne, Bridie Costello" autocomplete="off">
+      <p class="char-hint">Think Irish, 1920s. First name, surname. Who are you on this landing?</p>
+      <input type="text" class="entry-input" id="charName" placeholder="e.g. Paddy Dunne, Bridie Costello, Tommy Kearns" autocomplete="off">
 
-      <label class="char-label" for="charBio">Short Bio</label>
-      <textarea class="door-textarea" id="charBio" placeholder="I'm a schoolteacher living alone up the hallway. Came to Dublin from Galway after the Troubles. I keep a tidy room and go to Mass on Sundays, though lately I've been distracted by matters of the heart..."></textarea>
+      <label class="char-label" for="charBio">Your Story</label>
+      <p class="char-hint">
+        Go deep. What do you do for a living? Docker, seamstress, charwoman, ex-soldier?
+        Where are you from &mdash; a farm in Kerry, a lane in the Liberties?
+        Who have you lost? What keeps you up at night?
+        The more real you make this person, the more the Boyles will notice you.
+      </p>
+      <textarea class="door-textarea" id="charBio" placeholder="I'm a schoolteacher living alone up the hallway. Came to Dublin from Galway after the Troubles. Lost me brother at Kilmichael and never spoke of it since. I keep a tidy room and go to Mass on Sundays, though lately I've been distracted by matters of the heart. The neighbours think I'm quiet. They don't know the half of it."></textarea>
 
       <label class="char-label" for="charProblem">Your Problem</label>
-      <textarea class="door-textarea" id="charProblem" placeholder="I've fallen in love with the headmaster's wife and she's been leaving notes under me door. Her husband drinks at Foley's every night and I'm terrified he'll find out..."></textarea>
+      <p class="char-hint">
+        This is why you're knocking on the Boyles' door. Make it desperate, make it human.
+        Money trouble? A secret? Someone threatening you? A letter you can't read?
+        Think 1920s Dublin &mdash; poverty, politics, love, betrayal, the Church, the IRA.
+        The wilder the problem, the better the scene.
+      </p>
+      <textarea class="door-textarea" id="charProblem" placeholder="I've fallen in love with the headmaster's wife and she's been leaving notes under me door. Her husband drinks at Foley's every night and I'm terrified he'll find out. Last night he looked at me across the bar and said nothin'. Just looked. I need someone to tell me I'm not a fool..."></textarea>
 
       <button class="btn-knock" onclick="handleCharacterDone()">Step onto the Landing</button>
       <div class="entry-error" id="charError"></div>
@@ -2414,6 +2543,15 @@ document.getElementById('loginPin').addEventListener('keydown', e => {
   if (e.key === 'Enter') handleLogin();
 });
 </script>
+
+<!-- Site Navigation -->
+<nav class="tenement-nav">
+  <a href="/index.html">Home</a>
+  <a href="/Our-Village/index.html">Village</a>
+  <a href="/Our-Village/Events-Page/index.html">Events</a>
+  <a href="/About-IN-NOLA/index.html">About</a>
+  <a href="/contact_form.html">Contact</a>
+</nav>
 
 </body>
 </html>

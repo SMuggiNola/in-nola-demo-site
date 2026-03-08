@@ -19,7 +19,7 @@ const MISTRAL_TEMPERATURE = 0.78;
 const MISTRAL_MAX_TOKENS = 5000;
 
 // ─── Rate limiting ────────────────────────────────────────────
-const RATE_LIMIT_MS = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MS = 0; // Disabled for testing
 
 // ─── System Prompts ───────────────────────────────────────────
 

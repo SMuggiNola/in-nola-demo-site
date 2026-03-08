@@ -1206,9 +1206,16 @@ async function startScene(sceneNum) {
   document.getElementById('chatMessages').innerHTML = '';
   showScreen('chat-screen');
 
+  // Show loading state
+  const container0 = document.getElementById('chatMessages');
+  addStageDirection(container0, '(The sounds of Dublin drift up from the street below...)');
+
   // Get dialogue from API or use demo
   let dialogue;
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
     const res = await fetch(`${API_BASE}/api/tenement`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1220,20 +1227,29 @@ async function startScene(sceneNum) {
         memberProblem: state.problem,
         previousChoices: state.choices,
         sessionId: state.sessionId
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
+
     if (res.ok) {
       const data = await res.json();
       dialogue = data.dialogue;
+    } else {
+      const err = await res.json().catch(() => ({}));
+      console.log('Scene API error:', res.status, err.error || '');
     }
   } catch (e) {
-    console.log('API not available, using demo dialogue');
+    console.log('API not available or timed out, using demo dialogue:', e.message);
   }
 
   // Fallback to demo
   if (!dialogue) {
     dialogue = getDemoDialogue(sceneNum);
   }
+
+  // Clear loading message before playing
+  document.getElementById('chatMessages').innerHTML = '';
 
   // Parse and play
   const messages = parseDialogue(dialogue);

@@ -470,35 +470,58 @@ body::after {
   color: var(--text-muted);
 }
 
-.entry-link {
+.entry-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.entry-btn-muggs {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  color: var(--gold-light);
   font-family: 'Cinzel', serif;
-  font-size: 0.55rem;
-  color: var(--text-dim);
+  font-size: 0.7rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-decoration: none;
-  transition: color var(--transition);
-}
-
-.entry-link:hover {
-  color: var(--gold);
-}
-
-.entry-link-support {
-  display: inline-block;
-  padding: 0.3rem 1rem;
-  border: 1px solid rgba(42, 104, 48, 0.4);
-  border-radius: 3px;
-  color: #2a6830;
-  font-size: 0.55rem;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: all var(--transition);
 }
 
-.entry-link-support:hover {
-  background: rgba(42, 104, 48, 0.15);
-  border-color: #2a6830;
-  color: #3a8a42;
+.entry-btn-muggs:hover {
+  background: rgba(200, 162, 78, 0.15);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(200, 162, 78, 0.2);
+}
+
+.entry-btn-support {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  background: #2a6830;
+  border: 1px solid #3a8a42;
+  border-radius: 4px;
+  color: #e8dcc8;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all var(--transition);
+}
+
+.entry-btn-support:hover {
+  background: #357a3d;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(42, 104, 48, 0.3);
 }
 
 /* ============================================
@@ -1066,6 +1089,71 @@ body::after {
 /* ============================================
    SCREEN 5: END
 ============================================ */
+.guest-end-cta {
+  text-align: center;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background: rgba(42, 104, 48, 0.1);
+  border: 1px solid rgba(42, 104, 48, 0.3);
+  border-radius: var(--radius);
+  animation: msgAppear 0.5s ease;
+}
+
+.guest-end-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+
+.guest-end-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+}
+
+.guest-end-text em {
+  color: var(--text-cream);
+  font-weight: 600;
+}
+
+.guest-end-btn {
+  display: inline-block;
+  padding: 0.7rem 2rem;
+  background: #2a6830;
+  color: var(--text-cream);
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.guest-end-btn:hover {
+  background: #357a3d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(42, 104, 48, 0.3);
+}
+
+.guest-end-link {
+  display: block;
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.guest-end-link:hover {
+  color: var(--text-muted);
+}
+
 #end-screen {
   align-items: center;
   justify-content: center;
@@ -1253,12 +1341,11 @@ body::after {
 
   <div class="entry-venue">
     <div>The Tenement &mdash; IN-NOLA Village</div>
-    <div style="margin-top:6px;">
-      <a href="https://muggsoflearning.net" target="_blank" rel="noopener" class="entry-link">A MuggsOfLearning.net Production</a>
-    </div>
-    <div style="margin-top:6px;">
-      <a href="https://muggsoflearning.net/MuggsOfLearningSite/support" target="_blank" rel="noopener" class="entry-link entry-link-support">Support Our Work</a>
-    </div>
+  </div>
+
+  <div class="entry-links">
+    <a href="https://muggsoflearning.net" target="_blank" rel="noopener" class="entry-btn-muggs">MuggsOfLearning.net</a>
+    <a href="https://muggsoflearning.net/MuggsOfLearningSite/support" target="_blank" rel="noopener" class="entry-btn-support">Support Our Work</a>
   </div>
 
 </div>
@@ -1373,6 +1460,7 @@ const state = {
   scene: 0,        // 0 = not started, 1, 2, 3
   choices: [],     // member choices from each scene
   isPlaying: false,
+  isGuest: false,
   junoFinalLine: '',
   sessionId: null,
 };
@@ -1462,6 +1550,7 @@ function revealGuestPicker() {
 function selectGuestCharacter(ch) {
   state.memberCode = 'guest';
   state.memberName = 'Guest';
+  state.isGuest = true;
   state.characterName = ch.name;
   state.characterBio = ch.bio;
   state.problem = ch.problem;
@@ -1556,8 +1645,12 @@ async function handleKnock() {
   await sleep(800);
   door.classList.remove('knocked');
 
-  // Start scene 1
-  await startScene(1);
+  // Guests get a pre-scripted demo — no API calls, no member input
+  if (state.isGuest) {
+    await startGuestDemo();
+  } else {
+    await startScene(1);
+  }
 }
 
 async function handleReturnKnock() {
@@ -1588,6 +1681,96 @@ function showDoorForReturn(sceneNum) {
 // ============================================
 //   SCENE MANAGEMENT — CONVERSATIONAL CHUNKS
 // ============================================
+// ============================================
+//   GUEST DEMO (pre-scripted, no API, no input)
+// ============================================
+async function startGuestDemo() {
+  state.scene = 1;
+  state.isPlaying = true;
+
+  document.getElementById('chatSceneLabel').textContent = 'Act I — A State o\' Chassis (Demo)';
+
+  const chatScreen = document.getElementById('chat-screen');
+  chatScreen.classList.remove('act-1', 'act-2', 'act-3');
+  chatScreen.classList.add('act-1');
+
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+  showScreen('chat-screen');
+
+  // Opening
+  addStageDirection(container, '(You raise your hand and knock on the door of Flat 7.)');
+  scrollToBottom(container);
+  await sleep(2000);
+
+  const charLabel = state.characterName || 'You';
+  addStageDirection(container, `(The door opens. ${charLabel} steps inside.)`);
+  await sleep(1500);
+  addMessage(container, charLabel, 'member', state.problem);
+  scrollToBottom(container);
+  await sleep(2500);
+
+  // Play all 10 pre-scripted chunks
+  for (let round = 1; round <= 10; round++) {
+    if (!state.isPlaying) break;
+
+    const dialogue = getDemoChunk(1, round);
+    const messages = parseDialogue(dialogue);
+
+    for (const msg of messages) {
+      if (!state.isPlaying) break;
+
+      if (msg.type === 'stage') {
+        addStageDirection(container, msg.text);
+        scrollToBottom(container);
+        await sleep(randomBetween(1500, 2500));
+      } else if (msg.type === 'dialogue') {
+        if (msg.charKey === 'juno') state.junoFinalLine = msg.text;
+        const typingEl = addTypingIndicator(container, msg.character, msg.charKey);
+        scrollToBottom(container);
+        await sleep(randomBetween(2500, 4000));
+        typingEl.remove();
+        addMessage(container, msg.character, msg.charKey, msg.text);
+        scrollToBottom(container);
+        await sleep(randomBetween(1500, 3000));
+      }
+    }
+
+    // Brief pause between chunks
+    if (round < 10) await sleep(randomBetween(2000, 3000));
+  }
+
+  state.isPlaying = false;
+  await sleep(2000);
+
+  // Show guest end CTA
+  showGuestEndScreen();
+}
+
+function showGuestEndScreen() {
+  const container = document.getElementById('chatMessages');
+
+  // Dim final line
+  addStageDirection(container, '(The votive light flickers. The scene fades.)');
+  scrollToBottom(container);
+
+  // CTA card
+  const cta = document.createElement('div');
+  cta.className = 'guest-end-cta';
+  cta.innerHTML = `
+    <div class="guest-end-title">That was Act I</div>
+    <div class="guest-end-text">
+      In the full experience, <em>you</em> respond to the characters.<br>
+      Your words shape the conversation. Juno listens.<br>
+      The story continues through all three acts.
+    </div>
+    <a href="/join.html" class="guest-end-btn">Become a Member</a>
+    <a href="/index.html" class="guest-end-link">&larr; Return Home</a>
+  `;
+  container.appendChild(cta);
+  scrollToBottom(container);
+}
+
 const ROUNDS_PER_ACT = 10;
 
 async function startScene(sceneNum) {

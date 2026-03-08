@@ -510,10 +510,11 @@ body::after {
 .chat-messages::-webkit-scrollbar-track { background: transparent; }
 .chat-messages::-webkit-scrollbar-thumb { background: rgba(200, 162, 78, 0.2); border-radius: 2px; }
 
-/* Chat message bubble */
+/* Chat message bubble — characters left, member right */
 .chat-msg {
   max-width: 85%;
   animation: msgAppear 0.3s ease;
+  align-self: flex-start;
 }
 
 @keyframes msgAppear {
@@ -577,22 +578,17 @@ body::after {
   border-left: 3px solid var(--madigan);
 }
 
-.chat-msg[data-char="member"] .chat-msg-name { color: var(--gold-light); }
-.chat-msg[data-char="member"] .chat-msg-bubble {
-  background: rgba(38, 30, 14, 0.88);
-  border-left: 3px solid var(--member);
-  align-self: flex-end;
-}
-
 .chat-msg[data-char="member"] {
   align-self: flex-end;
 }
 .chat-msg[data-char="member"] .chat-msg-name {
+  color: var(--gold-light);
   text-align: right;
   padding-right: 0.75rem;
   padding-left: 0;
 }
 .chat-msg[data-char="member"] .chat-msg-bubble {
+  background: rgba(38, 30, 14, 0.88);
   border-radius: 12px 12px 4px 12px;
   border-left: none;
   border-right: 3px solid var(--member);
@@ -904,13 +900,10 @@ body::after {
   </p>
 
   <div class="entry-login">
-    <input type="text" class="entry-input" id="loginUsername" placeholder="Username" autocomplete="off">
-    <input type="password" class="entry-input" id="loginPin" placeholder="PIN or password" autocomplete="off">
-    <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Enter</button>
+    <input type="text" class="entry-input" id="visitorName" placeholder="Your first name" autocomplete="off">
+    <button class="btn-enter" id="btnEnter" onclick="handleEnter()">Enter the Tenement</button>
     <div class="entry-error" id="entryError"></div>
   </div>
-
-  <div class="entry-skip" onclick="handleSkipLogin()">Continue as guest</div>
 </div>
 
 <!-- ==========================================
@@ -1027,45 +1020,25 @@ function sleep(ms) {
 // ============================================
 //   SCREEN 1: LOGIN
 // ============================================
-async function handleLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const pin = document.getElementById('loginPin').value.trim();
-  const errorEl = document.getElementById('entryError');
-
-  if (!username || !pin) {
-    errorEl.textContent = 'Please enter your username and PIN.';
+function handleEnter() {
+  const name = document.getElementById('visitorName').value.trim();
+  if (!name) {
+    document.getElementById('entryError').textContent = 'Tell us your name, neighbour.';
     return;
   }
 
-  state.memberCode = username;
-  state.memberName = username;
-  errorEl.textContent = '';
+  state.memberCode = name.toLowerCase();
+  state.memberName = name;
 
-  // Auth against the API
-  try {
-    const res = await fetch(`${API_BASE}/api/tenement`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'start', username, pin })
-    });
-    const data = await res.json();
-    if (res.ok && data.success) {
-      state.memberName = data.memberName || username;
-      state.sessionId = data.sessionId || null;
-      showScreen('door-screen');
-    } else {
-      errorEl.textContent = data.error || 'Invalid credentials.';
-    }
-  } catch (e) {
-    // API not available — continue in offline/demo mode
-    console.log('API not available, continuing in demo mode');
-    showScreen('door-screen');
-  }
-}
+  // Try to start a session on the backend (no auth required)
+  fetch(`${API_BASE}/api/tenement`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'start', visitorName: name })
+  }).then(r => r.json()).then(data => {
+    if (data.sessionId) state.sessionId = data.sessionId;
+  }).catch(() => {});
 
-function handleSkipLogin() {
-  state.memberCode = 'guest';
-  state.memberName = 'Neighbour';
   showScreen('door-screen');
 }
 
@@ -1740,11 +1713,8 @@ function scrollToBottom(el) {
 }
 
 // Enter key on inputs
-document.getElementById('loginUsername').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('loginPin').focus();
-});
-document.getElementById('loginPin').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleLogin();
+document.getElementById('visitorName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleEnter();
 });
 
 document.getElementById('problemInput').addEventListener('keydown', e => {

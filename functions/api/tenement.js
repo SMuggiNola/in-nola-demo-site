@@ -489,20 +489,17 @@ async function saveMemberHistory(memberId, session, env) {
 // ─── Action handlers ──────────────────────────────────────────
 
 async function handleStart(body, env) {
-  const { username, pin } = body;
+  const { visitorName } = body;
 
-  if (!username || !pin) {
-    return errorResponse('Username and PIN are required');
+  if (!visitorName) {
+    return errorResponse('visitorName is required');
   }
 
-  // Validate member using same auth as /api/auth
-  const validation = await validateMember(username, pin, env);
-  if (!validation.valid) {
-    return errorResponse(validation.reason, 401);
-  }
+  const memberId = visitorName.toLowerCase().replace(/\s+/g, '_');
+  const memberName = visitorName;
 
   // Check rate limit
-  const rateCheck = await checkRateLimit(validation.memberId, env);
+  const rateCheck = await checkRateLimit(memberId, env);
   if (!rateCheck.allowed) {
     return errorResponse(
       `You can start a new session in ${rateCheck.minutesLeft} minute${rateCheck.minutesLeft === 1 ? '' : 's'}. The Boyles need time to recover between visitors.`,
@@ -511,16 +508,16 @@ async function handleStart(body, env) {
   }
 
   // Set rate limit
-  await setRateLimit(validation.memberId, env);
+  await setRateLimit(memberId, env);
 
   // Check for previous visit summary
-  const previousSummary = await getPreviousSummary(validation.memberId, env);
+  const previousSummary = await getPreviousSummary(memberId, env);
 
   // Create session
   const sessionId = generateSessionId();
   const session = {
-    memberCode: validation.memberId,
-    memberName: validation.memberName,
+    memberCode: memberId,
+    memberName: memberName,
     problem: null,
     scenes: [],
     summary: null,
@@ -535,7 +532,7 @@ async function handleStart(body, env) {
   return jsonResponse({
     success: true,
     sessionId,
-    memberName: validation.memberName,
+    memberName: memberName,
     previousSummary: previousSummary || null
   });
 }

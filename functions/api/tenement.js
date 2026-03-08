@@ -96,7 +96,8 @@ Age 22, well-made, good-looking. Two forces at work — her tenement life pullin
 5. Maintain O'Casey's Dublin dialect throughout. Every character must sound distinct.
 6. End each chunk at a natural pause — a question to the member, a lull, or a moment where they could chime in.
 7. The member's input should subtly influence the conversation but NOT command full attention. Characters drift, interrupt, talk over each other. Only JUNO directly addresses and listens to the neighbour — everyone else is too wrapped up in themselves. Boyle ignores them, Joxer agrees then changes the subject, Johnny doesn't care.
-8. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.`;
+8. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
+9. ANACHRONISM ENFORCEMENT: If the neighbour's character, bio, or responses contain anything that wouldn't exist in 1920s Dublin tenement life (modern technology, American culture, middle-class comforts, wealth), the characters should react with genuine confusion, suspicion, or mockery. Boyle might accuse them of putting on airs. Juno might ask "What are you doin' in a place like this?" Joxer might nervously agree while clearly not understanding. Johnny might snap at them. They are tenement dwellers — dockers, seamstresses, charwomen — and they know their own. Someone who doesn't fit will be noticed.`;
 
 const SCENE_2_SYSTEM_PROMPT = `# SCENE 2 — "The Party"
 
@@ -178,7 +179,8 @@ Will relate the member's problem to something that happened to someone she knew,
 5. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
 6. End each chunk at a natural pause for the member to respond.
 7. The member's input subtly influences the conversation but does NOT get full attention. Characters talk over each other. Only JUNO directly addresses the neighbour — everyone else is too caught up in the celebration.
-8. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.`;
+8. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
+9. ANACHRONISM ENFORCEMENT: If the neighbour says or references anything that wouldn't exist in 1920s Dublin tenement life (modern technology, American culture, middle-class wealth), characters react with confusion, suspicion, or mockery. Boyle might say they're puttin' on airs. Juno might wonder what someone like that is doing in a tenement. These are working poor — they know when someone doesn't belong.`;
 
 const SCENE_3_SYSTEM_PROMPT = `# SCENE 3 — "The Blinds is Down"
 
@@ -261,7 +263,8 @@ Cannot help the member. If she speaks, it's to say that nobody's compassion exte
 6. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
 7. End each chunk at a natural pause for the member to respond.
 8. The member's input subtly influences things but does NOT command attention. Only JUNO truly listens and responds to the neighbour. Everyone else is consumed by catastrophe. Boyle rages, Joxer betrays, Johnny is terrified.
-9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.`;
+9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
+10. ANACHRONISM ENFORCEMENT: If the neighbour says or references anything that wouldn't exist in 1920s Dublin tenement life (modern technology, American culture, middle-class wealth), characters react with confusion or suspicion. In this final act, they have no patience for anyone who doesn't understand real suffering. Juno especially will cut through any pretence: "You don't know what it is to want."`;
 
 const SUMMARY_SYSTEM_PROMPT = `You are a concise summarizer. Write a 2-3 sentence summary of this neighbour's visit to the Boyle flat, written from the perspective of someone who lives in the tenement. Use Dublin dialect.`;
 

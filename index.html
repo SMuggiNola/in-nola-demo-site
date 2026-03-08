@@ -160,8 +160,8 @@
   <!-- The Tenement Teaser -->
   <div class="featured-teaser" id="tenement-teaser" onclick="document.getElementById('tenement-modal').classList.add('active')" style="animation-delay: 1.5s;">
     <div class="featured-teaser-glow"></div>
-    <div class="featured-teaser-image" style="background: #1a1510; display:flex; align-items:center; justify-content:center;">
-      <span style="font-size:1.6rem; filter:none;">&#x1F6AA;</span>
+    <div class="featured-teaser-image" style="background: #1a1510;">
+      <img src="Our-Village/Our_Library/Juno_And_The_Paycock/poster_card/tenement-life-2.jpg" alt="Dublin tenement life, 1920s" style="filter: sepia(0.4) contrast(1.1);">
     </div>
     <div class="featured-teaser-content">
       <span class="featured-teaser-badge">Members Only</span>
@@ -325,17 +325,22 @@
       <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
 
-    <div class="article-modal-inner" style="background: #1a1510;">
+    <div class="article-modal-inner" style="background: #1a1510; position:relative;">
+      <!-- Period photo background -->
+      <div style="position:absolute; inset:0; background: url('Our-Village/Our_Library/Juno_And_The_Paycock/poster_card/tenement-life-2.jpg') center top / cover no-repeat; opacity:0.12; filter: sepia(0.5) contrast(1.1);"></div>
+
       <!-- Poster-style visual -->
-      <div style="width:100%; padding: 2.5rem 2rem 1rem; text-align:center; position:relative; min-height: 360px; display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(ellipse at center, rgba(200,162,78,0.08) 0%, transparent 70%);">
-        <div style="font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(200,162,78,0.7); margin-bottom:1.5rem;">Irish Network New Orleans presents&hellip;</div>
-        <div style="font-family:'Cinzel Decorative',serif; font-size:2.8rem; color:#c8a24e; line-height:1.1; font-weight:700;">Juno</div>
-        <div style="font-family:'Cormorant Garamond',serif; font-size:1rem; font-style:italic; color:rgba(232,220,200,0.6); margin:0.2rem 0;">and the</div>
-        <div style="font-family:'Cinzel Decorative',serif; font-size:2.8rem; color:#c8a24e; line-height:1.1; font-weight:700;">Paycock</div>
-        <div style="font-family:'Cormorant Garamond',serif; font-size:0.85rem; color:rgba(232,220,200,0.5); margin-top:0.75rem;">by Se&aacute;n O'Casey</div>
-        <div style="width:40px; height:2px; background:rgba(200,162,78,0.4); margin:1.2rem auto;"></div>
-        <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:#c8a24e; letter-spacing:0.05em;">An Interactive Literary Experience</div>
-        <div style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:rgba(232,220,200,0.9); margin-top:0.75rem;">Starring&hellip; <span style="font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:#c8a24e; font-weight:700;">YOU!</span></div>
+      <div style="width:100%; padding: 2.5rem 2rem 1rem; text-align:center; position:relative; min-height: 360px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="font-family:'IM Fell English',serif; font-style:italic; font-size:0.8rem; color:rgba(200,162,78,0.7); margin-bottom:1.5rem;">Irish Network New Orleans presents&hellip;</div>
+        <div style="font-family:'Playfair Display',serif; font-size:2.8rem; color:#2a6830; line-height:1; font-weight:900; font-style:italic; text-shadow:1px 2px 3px rgba(0,0,0,0.3);">Juno</div>
+        <div style="font-family:'IM Fell English',serif; font-size:1rem; font-style:italic; color:#c8a24e; margin:0.15rem 0;">and the</div>
+        <div style="font-family:'Playfair Display',serif; font-size:2.8rem; color:#2a6830; line-height:1; font-weight:900; font-style:italic; text-shadow:1px 2px 3px rgba(0,0,0,0.3);">Paycock</div>
+        <div style="font-family:'IM Fell English',serif; font-size:0.85rem; color:rgba(232,220,200,0.5); margin-top:0.6rem;">by</div>
+        <div style="font-family:'Cinzel',serif; font-size:1.2rem; color:#2a6830; font-weight:700; letter-spacing:0.08em;">Se&aacute;n O'Casey</div>
+        <div style="width:100px; height:1px; background:linear-gradient(90deg, transparent, #c8a24e, transparent); margin:1rem auto;"></div>
+        <div style="font-family:'IM Fell English',serif; font-size:0.8rem; font-style:italic; color:rgba(200,162,78,0.7); letter-spacing:0.1em;">An Interactive Literary Experience</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.3rem; font-style:italic; color:#c8a24e; margin-top:0.6rem;">Starring&hellip;</div>
+        <div style="font-family:'Cinzel Decorative',serif; font-size:1.8rem; color:#2a6830; font-weight:700; text-shadow:1px 1px 3px rgba(0,0,0,0.3);">YOU!</div>
       </div>
 
       <div class="article-modal-overlay" style="background: linear-gradient(to bottom, transparent 30%, rgba(26,21,16,0.6) 60%, rgba(26,21,16,0.9) 80%, #1a1510 95%);"></div>

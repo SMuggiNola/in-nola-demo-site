@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>The Tenement | Irish Network NOLA</title>
 <link rel="icon" type="image/png" href="../../assets/in_logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel+Decorative:wght@400;700&family=Libre+Franklin:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Libre+Franklin:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================
@@ -119,20 +119,32 @@ body::after {
 ============================================ */
 #entry-screen {
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
   padding: 2rem;
   background: var(--bg-dark);
   position: relative;
+  overflow-y: auto;
 }
 
-/* Door photo watermark */
+/* Period photo watermark */
 #entry-screen::before {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: url('door.webp') center center / cover no-repeat;
+  background: url('tenement-life-2.jpg') center top / cover no-repeat;
   opacity: 0.1;
+  filter: sepia(0.5) contrast(1.1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Vignette over watermark */
+#entry-screen::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(17,14,10,0.7) 100%);
   pointer-events: none;
   z-index: 0;
 }
@@ -142,45 +154,163 @@ body::after {
   z-index: 1;
 }
 
-.entry-votive {
-  width: 8px;
-  height: 8px;
-  background: var(--votive-red);
-  border-radius: 50%;
-  box-shadow: 0 0 20px var(--votive-glow), 0 0 40px var(--votive-glow);
-  margin: 0 auto 2rem;
-  animation: votiveFlicker 3s ease-in-out infinite alternate;
+.entry-presents {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-@keyframes votiveFlicker {
-  0%, 100% { opacity: 0.8; box-shadow: 0 0 20px var(--votive-glow), 0 0 40px var(--votive-glow); }
-  33% { opacity: 1; box-shadow: 0 0 25px var(--votive-glow), 0 0 50px var(--votive-glow); }
-  66% { opacity: 0.7; box-shadow: 0 0 15px var(--votive-glow), 0 0 30px var(--votive-glow); }
+.entry-title-line {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(2.8rem, 8vw, 3.8rem);
+  color: #2a6830;
+  line-height: 0.95;
+  text-shadow: 1px 2px 4px rgba(0,0,0,0.3);
 }
 
-.entry-title {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 2.2rem;
+.entry-title-and {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 1.2rem;
   color: var(--gold);
-  line-height: 1.2;
+  margin: 3px 0;
+}
+
+.entry-byline {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-top: 0.8rem;
+}
+
+.entry-author {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #2a6830;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.entry-directed {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+
+.entry-divider {
+  width: 140px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0.6rem auto;
+}
+
+.entry-interactive {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
   margin-bottom: 0.3rem;
 }
 
-.entry-subtitle {
+.entry-starring {
   font-family: 'Playfair Display', serif;
-  font-size: 1rem;
+  font-weight: 700;
   font-style: italic;
-  color: var(--text-muted);
-  margin-bottom: 2rem;
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  color: var(--gold);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.entry-starring-you {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  color: #2a6830;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  margin-bottom: 0.5rem;
+}
+
+.entry-opening {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--gold);
+}
+
+.entry-date {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  color: #2a6830;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  margin-bottom: 1rem;
 }
 
 .entry-flavour {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-style: italic;
   color: var(--text-muted);
   max-width: 380px;
   line-height: 1.6;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-join {
+  padding: 0.9rem 2.5rem;
+  background: linear-gradient(135deg, #2a6830, #1e4d24);
+  border: 1px solid rgba(42, 104, 48, 0.6);
+  border-radius: var(--radius-sm);
+  color: var(--text-cream);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.btn-join:hover {
+  background: linear-gradient(135deg, #357a3d, #2a6830);
+  border-color: #4a9a52;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(42, 104, 48, 0.3);
+}
+
+.entry-login-section {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+  opacity: 0;
+}
+
+.entry-login-section.revealed {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.entry-venue {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 1.8;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
 }
 
 .entry-login {
@@ -927,22 +1057,53 @@ body::after {
      SCREEN 1: MEMBER LOGIN
 ========================================== -->
 <div class="screen active" id="entry-screen">
-  <div class="entry-votive"></div>
-  <h1 class="entry-title">The Tenement</h1>
-  <p class="entry-subtitle">Juno and the Paycock &mdash; An Interactive Experience</p>
+
+  <div class="entry-presents">Irish Network New Orleans presents&hellip;</div>
+
+  <div class="entry-title-line">Juno</div>
+  <div class="entry-title-and">and the</div>
+  <div class="entry-title-line">Paycock</div>
+
+  <div class="entry-byline">by</div>
+  <div class="entry-author">Se&aacute;n O'Casey</div>
+
+  <div class="entry-directed">Directed by Sean Muggivan</div>
+
+  <div class="entry-divider"></div>
+
+  <div class="entry-interactive">An Interactive Literary Experience</div>
+
+  <div class="entry-starring">Starring&hellip;</div>
+  <div class="entry-starring-you">YOU!</div>
+
+  <div class="entry-divider"></div>
+
+  <div class="entry-opening">Opening</div>
+  <div class="entry-date">March 8th, 2026</div>
 
   <p class="entry-flavour">
     Dublin, 1922. You live in a tenement on Hilljoy Square.
     The Boyle family is on your landing. You've got a problem.
-    Log in to create your character and knock on their door.
+    Sign in to create your character and knock on their door.
   </p>
 
-  <div class="entry-login">
-    <input type="text" class="entry-input" id="loginUsername" placeholder="Username" autocomplete="off">
-    <input type="password" class="entry-input" id="loginPin" placeholder="PIN or password" autocomplete="off">
-    <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Sign In</button>
-    <div class="entry-error" id="entryError"></div>
+  <button class="btn-join" id="btnJoin" onclick="revealLogin()">Join the Action</button>
+
+  <div class="entry-login-section" id="loginSection">
+    <div class="entry-login">
+      <input type="text" class="entry-input" id="loginUsername" placeholder="Username" autocomplete="off">
+      <input type="password" class="entry-input" id="loginPin" placeholder="PIN or password" autocomplete="off">
+      <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Sign In</button>
+      <div class="entry-error" id="entryError"></div>
+    </div>
   </div>
+
+  <div class="entry-venue">
+    <div>The Tenement &mdash; IN-NOLA Village</div>
+    <div>Members Only Experience</div>
+    <div style="color:#2a6830; margin-top:4px;">www.irishnetworkneworleans.com</div>
+  </div>
+
 </div>
 
 <!-- ==========================================
@@ -956,13 +1117,13 @@ body::after {
 
     <div class="char-create-form">
       <label class="char-label" for="charName">Character Name</label>
-      <input type="text" class="entry-input" id="charName" placeholder="e.g. Paddy Dunne, Mary Costello" autocomplete="off">
+      <input type="text" class="entry-input" id="charName" placeholder="e.g. Paddy Dunne, Bridie Costello" autocomplete="off">
 
       <label class="char-label" for="charBio">Short Bio</label>
-      <textarea class="door-textarea" id="charBio" placeholder="A docker's widow on the second floor. Keeps to herself mostly. Has a son in the National Army and prays for him every night under the votive light on the landing."></textarea>
+      <textarea class="door-textarea" id="charBio" placeholder="I'm a schoolteacher living alone up the hallway. Came to Dublin from Galway after the Troubles. I keep a tidy room and go to Mass on Sundays, though lately I've been distracted by matters of the heart..."></textarea>
 
       <label class="char-label" for="charProblem">Your Problem</label>
-      <textarea class="door-textarea" id="charProblem" placeholder="I lent money to a neighbour three months ago and they won't pay it back. Now I can't make the rent and the landlord is threatening eviction..."></textarea>
+      <textarea class="door-textarea" id="charProblem" placeholder="I've fallen in love with the headmaster's wife and she's been leaving notes under me door. Her husband drinks at Foley's every night and I'm terrified he'll find out..."></textarea>
 
       <button class="btn-knock" onclick="handleCharacterDone()">Step onto the Landing</button>
       <div class="entry-error" id="charError"></div>
@@ -1081,6 +1242,13 @@ function sleep(ms) {
 // ============================================
 //   SCREEN 1: MEMBER LOGIN
 // ============================================
+function revealLogin() {
+  const section = document.getElementById('loginSection');
+  section.classList.add('revealed');
+  document.getElementById('btnJoin').style.display = 'none';
+  setTimeout(() => document.getElementById('loginUsername').focus(), 400);
+}
+
 async function handleLogin() {
   const username = document.getElementById('loginUsername').value.trim();
   const pin = document.getElementById('loginPin').value.trim();

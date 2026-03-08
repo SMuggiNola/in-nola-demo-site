@@ -151,6 +151,40 @@
       display: none;
     }
 
+    .sticky-save {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.75rem 1rem;
+      background: rgba(10, 10, 10, 0.95);
+      border-top: 2px solid #169b62;
+      text-align: center;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .sticky-save.visible {
+      display: block;
+    }
+
+    .sticky-save button {
+      background: #169b62;
+      color: #fff;
+      border: none;
+      padding: 0.7rem 2.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+    }
+
+    .sticky-save button:hover {
+      background: #1bb76e;
+    }
+
     .profile-header {
       display: flex;
       align-items: center;
@@ -497,9 +531,11 @@
             </div>
           </div>
 
-          <div style="margin-top: 2rem;">
-            <button type="button" class="btn-primary" onclick="saveProfile()">Save Changes</button>
-            <button type="button" class="btn-secondary" onclick="adminLogout()">Sign Out</button>
+          <div style="margin-top: 2rem; text-align: center;">
+            <button type="button" class="btn-primary btn-sign-in" onclick="saveProfile()" style="background: #169b62; border-color: #169b62; font-size: 1.2rem; padding: 1rem 3rem;">Save Changes</button>
+            <div style="margin-top: 1rem;">
+              <button type="button" class="btn-secondary" onclick="adminLogout()">Sign Out</button>
+            </div>
           </div>
 
         </div>
@@ -514,6 +550,11 @@
     </main>
 
     <div id="main-footer-placeholder"></div>
+  </div>
+
+  <!-- Sticky save bar (visible when edit form is open and scrolled) -->
+  <div class="sticky-save" id="stickySave">
+    <button onclick="saveProfile()">Save Changes</button>
   </div>
 
   <script src="../js/main.js"></script>
@@ -586,6 +627,7 @@
         document.getElementById('admin-picker').classList.add('hidden');
         document.getElementById('cred-section').classList.add('hidden');
         document.getElementById('edit-section').classList.remove('hidden');
+        document.getElementById('stickySave').classList.add('visible');
 
       } catch (error) {
         console.error('Load error:', error);
@@ -649,6 +691,17 @@
         showMessage('Please log in via the Admin Portal first, then return here to edit your profile.', 'error');
       }
     })();
+
+    // Show sticky save bar when edit form is visible
+    window.addEventListener('scroll', function() {
+      const editSection = document.getElementById('edit-section');
+      const stickyBar = document.getElementById('stickySave');
+      if (editSection && !editSection.classList.contains('hidden')) {
+        stickyBar.classList.add('visible');
+      } else {
+        stickyBar.classList.remove('visible');
+      }
+    });
 
     function updatePhotoPreview(photoUrl) {
       const container = document.getElementById('photo-preview-container');

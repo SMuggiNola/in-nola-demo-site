@@ -1074,6 +1074,22 @@ body::after {
   cursor: default;
 }
 
+.chat-prompt-hint {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 0.3rem 0.5rem;
+  margin-bottom: 0.4rem;
+  animation: hintFade 8s ease forwards;
+}
+
+@keyframes hintFade {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ============================================
    SCREEN 4: SCENE TRANSITION
 ============================================ */
@@ -1622,6 +1638,7 @@ const state = {
   isGuest: false,
   junoFinalLine: '',
   sessionId: null,
+  thoughtHintShown: false,
 };
 
 // API base — empty string for same-origin (Cloudflare Pages), or set for dev
@@ -2246,9 +2263,13 @@ function showMemberInput(container) {
     const div = document.createElement('div');
     div.className = 'chat-prompt';
 
+    const showHint = !state.thoughtHintShown;
+    state.thoughtHintShown = true;
+
     div.innerHTML = `
+      ${showHint ? '<div class="chat-prompt-hint">Tip: wrap your message in (parentheses) to think privately &mdash; the characters won\'t hear it, but it will steer the scene.</div>' : ''}
       <div class="chat-prompt-input-wrap">
-        <input type="text" class="chat-prompt-input" placeholder="Say something... (parentheses = inner thought)" maxlength="300" autocomplete="off">
+        <input type="text" class="chat-prompt-input" placeholder="Say something..." maxlength="300" autocomplete="off">
         <button class="chat-prompt-send">Send</button>
       </div>
     `;

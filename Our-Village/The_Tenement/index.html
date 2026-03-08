@@ -536,48 +536,50 @@ body::after {
   font-size: 0.95rem;
   line-height: 1.5;
   position: relative;
+  color: var(--text-cream);
+  backdrop-filter: blur(4px);
 }
 
-/* Character-specific colors */
-.chat-msg[data-char="boyle"] .chat-msg-name { color: var(--boyle); }
+/* Character-specific colors — solid enough to read over set photos */
+.chat-msg[data-char="boyle"] .chat-msg-name { color: #d06060; }
 .chat-msg[data-char="boyle"] .chat-msg-bubble {
-  background: rgba(168, 64, 64, 0.12);
+  background: rgba(40, 18, 18, 0.85);
   border-left: 3px solid var(--boyle);
 }
 
-.chat-msg[data-char="joxer"] .chat-msg-name { color: var(--joxer); }
+.chat-msg[data-char="joxer"] .chat-msg-name { color: #b0b050; }
 .chat-msg[data-char="joxer"] .chat-msg-bubble {
-  background: rgba(138, 138, 64, 0.12);
+  background: rgba(30, 30, 14, 0.85);
   border-left: 3px solid var(--joxer);
 }
 
-.chat-msg[data-char="juno"] .chat-msg-name { color: var(--juno); }
+.chat-msg[data-char="juno"] .chat-msg-name { color: #7080b0; }
 .chat-msg[data-char="juno"] .chat-msg-bubble {
-  background: rgba(74, 90, 138, 0.12);
+  background: rgba(18, 22, 38, 0.85);
   border-left: 3px solid var(--juno);
 }
 
-.chat-msg[data-char="johnny"] .chat-msg-name { color: var(--johnny); }
+.chat-msg[data-char="johnny"] .chat-msg-name { color: #a0a0a0; }
 .chat-msg[data-char="johnny"] .chat-msg-bubble {
-  background: rgba(122, 122, 122, 0.12);
+  background: rgba(28, 28, 28, 0.85);
   border-left: 3px solid var(--johnny);
 }
 
-.chat-msg[data-char="mary"] .chat-msg-name { color: var(--mary); }
+.chat-msg[data-char="mary"] .chat-msg-name { color: #60a070; }
 .chat-msg[data-char="mary"] .chat-msg-bubble {
-  background: rgba(74, 122, 90, 0.12);
+  background: rgba(16, 30, 20, 0.85);
   border-left: 3px solid var(--mary);
 }
 
-.chat-msg[data-char="madigan"] .chat-msg-name { color: var(--madigan); }
+.chat-msg[data-char="madigan"] .chat-msg-name { color: #a070b0; }
 .chat-msg[data-char="madigan"] .chat-msg-bubble {
-  background: rgba(122, 74, 138, 0.12);
+  background: rgba(30, 18, 36, 0.85);
   border-left: 3px solid var(--madigan);
 }
 
-.chat-msg[data-char="member"] .chat-msg-name { color: var(--member); }
+.chat-msg[data-char="member"] .chat-msg-name { color: var(--gold-light); }
 .chat-msg[data-char="member"] .chat-msg-bubble {
-  background: rgba(200, 162, 78, 0.1);
+  background: rgba(38, 30, 14, 0.88);
   border-left: 3px solid var(--member);
   align-self: flex-end;
 }
@@ -601,11 +603,14 @@ body::after {
   text-align: center;
   font-style: italic;
   font-size: 0.8rem;
-  color: var(--stage);
+  color: #a09080;
   padding: 0.5rem 1rem;
   max-width: 90%;
   align-self: center;
   animation: msgAppear 0.3s ease;
+  background: rgba(17, 14, 10, 0.7);
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
 }
 
 /* Typing indicator */

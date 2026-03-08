@@ -114,6 +114,23 @@ body::after {
   to { opacity: 0; }
 }
 
+.tenement-home-link {
+  position: absolute;
+  top: 1rem;
+  left: 1.2rem;
+  z-index: 10;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.tenement-home-link:hover {
+  color: var(--gold);
+}
+
 /* ============================================
    SCREEN 1: ENTRY / LOGIN
 ============================================ */
@@ -1057,6 +1074,8 @@ body::after {
      SCREEN 1: MEMBER LOGIN
 ========================================== -->
 <div class="screen active" id="entry-screen">
+
+  <a href="/index.html" class="tenement-home-link">&larr; Home</a>
 
   <div class="entry-presents">Irish Network New Orleans presents&hellip;</div>
 

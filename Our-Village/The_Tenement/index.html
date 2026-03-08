@@ -291,15 +291,14 @@ body::after {
 }
 
 .entry-login-section {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.5s ease, opacity 0.5s ease;
-  opacity: 0;
+  display: none;
+  width: 100%;
+  max-width: 300px;
 }
 
 .entry-login-section.revealed {
-  max-height: 400px;
-  opacity: 1;
+  display: block;
+  animation: screenFadeIn 0.5s ease forwards;
 }
 
 .entry-venue {
@@ -1246,7 +1245,10 @@ function revealLogin() {
   const section = document.getElementById('loginSection');
   section.classList.add('revealed');
   document.getElementById('btnJoin').style.display = 'none';
-  setTimeout(() => document.getElementById('loginUsername').focus(), 400);
+  setTimeout(() => {
+    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('loginUsername').focus();
+  }, 100);
 }
 
 async function handleLogin() {

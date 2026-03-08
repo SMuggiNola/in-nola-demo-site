@@ -11,7 +11,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 
   <!-- Global Theme -->
   <link rel="stylesheet" href="./global.css">
@@ -316,49 +316,67 @@
   </div>
 </div>
 
-<!-- Tenement Modal Overlay -->
-<div class="article-modal-backdrop" id="tenement-modal" onclick="if(event.target===this)closeTenementModal()">
-  <div class="article-modal">
-    <div class="article-modal-celtic-top"></div>
+<!-- Tenement Poster Modal -->
+<div class="poster-modal-backdrop" id="tenement-modal" onclick="if(event.target===this)closeTenementModal()">
+  <div class="poster-frame">
 
-    <button class="article-modal-close" onclick="closeTenementModal()" aria-label="Close">
+    <button class="poster-close" onclick="closeTenementModal()" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
 
-    <div class="article-modal-inner" style="background: #1a1510; position:relative;">
-      <!-- Period photo background -->
-      <div style="position:absolute; inset:0; background: url('Our-Village/Our_Library/Juno_And_The_Paycock/poster_card/tenement-life-2.jpg') center top / cover no-repeat; opacity:0.12; filter: sepia(0.5) contrast(1.1);"></div>
+    <div class="poster-card">
+      <!-- Parchment background -->
+      <div class="poster-bg"></div>
+      <!-- Period photo watermark -->
+      <div class="poster-watermark"></div>
+      <!-- Paper grain -->
+      <div class="poster-grain"></div>
+      <!-- Vignette -->
+      <div class="poster-vignette"></div>
 
-      <!-- Poster-style visual -->
-      <div style="width:100%; padding: 2.5rem 2rem 1rem; text-align:center; position:relative; min-height: 360px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <div style="font-family:'IM Fell English',serif; font-style:italic; font-size:0.8rem; color:rgba(200,162,78,0.7); margin-bottom:1.5rem;">Irish Network New Orleans presents&hellip;</div>
-        <div style="font-family:'Playfair Display',serif; font-size:2.8rem; color:#2a6830; line-height:1; font-weight:900; font-style:italic; text-shadow:1px 2px 3px rgba(0,0,0,0.3);">Juno</div>
-        <div style="font-family:'IM Fell English',serif; font-size:1rem; font-style:italic; color:#c8a24e; margin:0.15rem 0;">and the</div>
-        <div style="font-family:'Playfair Display',serif; font-size:2.8rem; color:#2a6830; line-height:1; font-weight:900; font-style:italic; text-shadow:1px 2px 3px rgba(0,0,0,0.3);">Paycock</div>
-        <div style="font-family:'IM Fell English',serif; font-size:0.85rem; color:rgba(232,220,200,0.5); margin-top:0.6rem;">by</div>
-        <div style="font-family:'Cinzel',serif; font-size:1.2rem; color:#2a6830; font-weight:700; letter-spacing:0.08em;">Se&aacute;n O'Casey</div>
-        <div style="width:100px; height:1px; background:linear-gradient(90deg, transparent, #c8a24e, transparent); margin:1rem auto;"></div>
-        <div style="font-family:'IM Fell English',serif; font-size:0.8rem; font-style:italic; color:rgba(200,162,78,0.7); letter-spacing:0.1em;">An Interactive Literary Experience</div>
-        <div style="font-family:'Playfair Display',serif; font-size:1.3rem; font-style:italic; color:#c8a24e; margin-top:0.6rem;">Starring&hellip;</div>
-        <div style="font-family:'Cinzel Decorative',serif; font-size:1.8rem; color:#2a6830; font-weight:700; text-shadow:1px 1px 3px rgba(0,0,0,0.3);">YOU!</div>
-      </div>
+      <div class="poster-content">
+        <div class="poster-presents">Irish Network New Orleans presents&hellip;</div>
 
-      <div class="article-modal-overlay" style="background: linear-gradient(to bottom, transparent 30%, rgba(26,21,16,0.6) 60%, rgba(26,21,16,0.9) 80%, #1a1510 95%);"></div>
+        <div class="poster-title">Juno</div>
+        <div class="poster-title-and">and the</div>
+        <div class="poster-title">Paycock</div>
 
-      <div class="article-modal-content" style="position:absolute; bottom:0; left:0; right:0; padding:0 32px 30px; z-index:5; text-align:center;">
-        <span class="article-modal-tag" style="color:#c8a24e;">Irish Network New Orleans</span>
+        <div class="poster-byline">by</div>
+        <div class="poster-author">Se&aacute;n O'Casey</div>
 
-        <p class="article-modal-body" style="color:rgba(232,220,200,0.85); font-size:14px;">
-          Step inside a Dublin tenement, 1922. Bring your problems to the Boyle family flat. They have enough of their own. An <strong style="color:#e8dcc8;">interactive AI-powered experience</strong> where the characters of O'Casey's masterpiece respond to <em>you</em>.
+        <div class="poster-directed">Directed by Sean Muggivan</div>
+
+        <div class="poster-divider"></div>
+
+        <div class="poster-label">An Interactive Literary Experience</div>
+
+        <div class="poster-starring">Starring&hellip;</div>
+        <div class="poster-starring-you">YOU!</div>
+
+        <div class="poster-divider"></div>
+
+        <div class="poster-opening">Opening</div>
+        <div class="poster-date">March 8th, 2026</div>
+
+        <p class="poster-desc">
+          Step inside a Dublin tenement, 1922. Bring your problems to the Boyle family flat.
+          They have enough of their own. An interactive AI-powered experience where the characters
+          of O'Casey's masterpiece respond to <em>you</em>.
         </p>
 
-        <a class="article-modal-cta" href="./Our-Village/The_Tenement/index.html" style="background:#c8a24e; color:#1a1510;">
+        <a class="poster-cta" href="./Our-Village/The_Tenement/index.html">
           Enter the Tenement
         </a>
 
-        <span class="article-modal-pub" style="color:rgba(232,220,200,0.5);">Members Only &middot; Opening March 2026</span>
+        <div class="poster-venue">
+          <div class="poster-venue-name">The Tenement &mdash; IN-NOLA Village</div>
+          <div>Irish Network New Orleans</div>
+          <div>Members Only Experience</div>
+          <div class="poster-url">www.irishnetworkneworleans.com</div>
+        </div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -492,6 +510,299 @@
 
   .featured-teaser-title {
     font-size: 0.95rem;
+  }
+}
+
+/* ======================================================
+   Tenement Poster Modal
+====================================================== */
+.poster-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 26, 14, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.poster-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.poster-frame {
+  position: relative;
+  width: 380px;
+  max-width: 90vw;
+  max-height: 90vh;
+  transform: translateY(30px) scale(0.95);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+.poster-modal-backdrop.active .poster-frame {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.poster-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 32px;
+  height: 32px;
+  background: rgba(30, 20, 10, 0.85);
+  border: 1px solid rgba(200, 162, 78, 0.4);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.poster-close:hover {
+  background: rgba(30, 20, 10, 1);
+  transform: scale(1.1);
+}
+
+.poster-close svg {
+  width: 13px;
+  height: 13px;
+  stroke: rgba(200, 162, 78, 0.8);
+  stroke-width: 2.5;
+}
+
+.poster-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border: 3px solid #8a7a5a;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(200, 169, 81, 0.15);
+}
+
+.poster-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(210, 190, 150, 0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 70%, rgba(180, 160, 120, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(200, 180, 140, 0.15) 0%, transparent 70%),
+    linear-gradient(180deg, #d4c4a0 0%, #c8b890 30%, #bfad82 60%, #b8a478 100%);
+}
+
+.poster-watermark {
+  position: absolute;
+  inset: 0;
+  background: url('./assets/tenement-life.jpg') center top / cover no-repeat;
+  opacity: 0.15;
+  filter: sepia(0.6) contrast(1.1);
+}
+
+.poster-grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.poster-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(60,40,20,0.35) 100%);
+  pointer-events: none;
+}
+
+.poster-content {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding: 24px 24px 18px;
+  text-align: center;
+}
+
+.poster-presents {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #5a4a2a;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.poster-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(2.2rem, 7vw, 3rem);
+  color: #2a6830;
+  line-height: 0.95;
+  text-shadow: 1px 2px 3px rgba(0,0,0,0.12);
+}
+
+.poster-title-and {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #8a6a20;
+  margin: 2px 0;
+}
+
+.poster-byline {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.85rem;
+  color: #5a4a2a;
+  margin-top: 6px;
+}
+
+.poster-author {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #2a6830;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.poster-directed {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #8a6a10;
+  margin-bottom: 6px;
+}
+
+.poster-divider {
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #8a7a3a, transparent);
+  margin: 6px auto;
+}
+
+.poster-label {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.7rem;
+  color: #7a6a3a;
+  letter-spacing: 0.1em;
+  margin: 4px 0;
+}
+
+.poster-starring {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: clamp(1.3rem, 4vw, 1.6rem);
+  color: #8a6a10;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.08);
+}
+
+.poster-starring-you {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 5.5vw, 2.3rem);
+  color: #2a6830;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.12);
+  margin-bottom: 4px;
+}
+
+.poster-opening {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #8a6a10;
+}
+
+.poster-date {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: clamp(1.3rem, 4.5vw, 1.7rem);
+  color: #2a6830;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.08);
+  margin-bottom: 8px;
+}
+
+.poster-desc {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.7rem;
+  color: #5a4a2a;
+  line-height: 1.5;
+  max-width: 280px;
+  margin-bottom: 8px;
+}
+
+.poster-desc em {
+  color: #2a6830;
+  font-weight: 600;
+}
+
+.poster-cta {
+  display: inline-block;
+  padding: 0.5rem 1.8rem;
+  background: #2a6830;
+  color: #e8dcc8;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.poster-cta:hover {
+  background: #357a3d;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(42, 104, 48, 0.3);
+}
+
+.poster-venue {
+  margin-top: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 0.5rem;
+  color: #6a5a3a;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 1.7;
+}
+
+.poster-venue-name {
+  font-weight: 700;
+  font-size: 0.55rem;
+  color: #4a3a1a;
+}
+
+.poster-url {
+  font-size: 0.48rem;
+  color: #2a6830;
+  letter-spacing: 0.12em;
+  margin-top: 3px;
+}
+
+@media (max-width: 420px) {
+  .poster-frame {
+    width: 100%;
+  }
+
+  .poster-content {
+    padding: 18px 16px 14px;
   }
 }
 

@@ -428,19 +428,36 @@
           <button type="button" class="btn-primary btn-sign-in" onclick="loadMemberProfile()">Edit Profile</button>
         </div>
 
-        <!-- Credential request section (shown when not logged in) -->
-        <div id="cred-section" class="login-form hidden" style="margin-top: 1rem;">
-          <h3 style="margin-bottom: 0.5rem; color: var(--gold-light);">First Time Access / Replace My PIN</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Enter your email to receive your username and a fresh PIN.</p>
+        <!-- Inline login (shown when not logged in) -->
+        <div id="login-section" class="login-form hidden">
+          <h2 style="margin-bottom: 0.5rem;">Sign In</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Enter your board member username and PIN to edit your profile.</p>
 
-          <div id="credMessage" class="message hidden"></div>
+          <div id="loginMessage" class="message hidden"></div>
 
           <div class="form-group">
-            <label for="credEmail">Email Address</label>
-            <input type="email" id="credEmail" placeholder="you@example.com">
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" placeholder="e.g. skelly" autocomplete="off">
           </div>
 
-          <button type="button" class="btn-primary" style="width: 100%;" onclick="sendCredentials()">Send My Credentials</button>
+          <div class="form-group">
+            <label for="login-pin">PIN or Password</label>
+            <input type="password" id="login-pin" placeholder="6-digit PIN" autocomplete="off">
+          </div>
+
+          <button type="button" class="btn-primary btn-sign-in" onclick="handleInlineLogin()">Sign In</button>
+
+          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(212,168,75,0.2);">
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Don't know your PIN?</p>
+
+            <div id="credMessage" class="message hidden"></div>
+
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+              <input type="email" id="credEmail" placeholder="Enter your email to receive credentials">
+            </div>
+
+            <button type="button" class="btn-secondary" style="width: 100; padding: 0.6rem 1.5rem;" onclick="sendCredentials()">Email My Credentials</button>
+          </div>
         </div>
 
         <!-- Edit Form (hidden until logged in) -->
@@ -558,7 +575,18 @@
   </div>
 
   <script src="../js/main.js"></script>
-  <script src="/js/admin-auth.js"></script>
+  <script>
+    // Inline auth helpers (replaces admin-auth.js redirect)
+    function getAdminPassword() { return sessionStorage.getItem('adminPassword') || ''; }
+    function getUserRole() { return sessionStorage.getItem('userRole'); }
+    function getBoardId() { return sessionStorage.getItem('boardId') || null; }
+    function getUserEmail() { return sessionStorage.getItem('userEmail') || ''; }
+    function getDisplayName() { return sessionStorage.getItem('displayName') || ''; }
+    function adminLogout() {
+      ['boardAuth','boardUser','userRole','adminPassword','displayName','boardId','userEmail'].forEach(k => sessionStorage.removeItem(k));
+      window.location.reload();
+    }
+  </script>
 
   <script>
     let currentUser = null;
@@ -625,7 +653,7 @@
         }
 
         document.getElementById('admin-picker').classList.add('hidden');
-        document.getElementById('cred-section').classList.add('hidden');
+        document.getElementById('login-section').classList.add('hidden');
         document.getElementById('edit-section').classList.remove('hidden');
         document.getElementById('stickySave').classList.add('visible');
 
@@ -686,11 +714,68 @@
         // Board member — go straight to editing their own profile
         loadMemberForEdit(boardId);
       } else {
-        // Not logged in — show credential request section
-        document.getElementById('cred-section').classList.remove('hidden');
-        showMessage('Please log in via the Admin Portal first, then return here to edit your profile.', 'error');
+        // Not logged in — show inline login
+        document.getElementById('login-section').classList.remove('hidden');
       }
     })();
+
+    async function handleInlineLogin() {
+      const username = document.getElementById('login-username').value.toLowerCase().trim();
+      const pin = document.getElementById('login-pin').value.trim();
+      const msgEl = document.getElementById('loginMessage');
+
+      if (!username || !pin) {
+        msgEl.textContent = 'Please enter both username and PIN.';
+        msgEl.className = 'message error';
+        msgEl.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const isPin = /^\d{6}$/.test(pin);
+        const payload = { username };
+        if (isPin) { payload.pin = pin; } else { payload.password = pin; }
+
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          // Store session
+          sessionStorage.setItem('boardAuth', 'true');
+          sessionStorage.setItem('boardUser', data.user.username);
+          sessionStorage.setItem('userRole', data.user.role);
+          sessionStorage.setItem('adminPassword', data.apiToken);
+          sessionStorage.setItem('displayName', data.user.displayName || '');
+          sessionStorage.setItem('boardId', data.user.boardId || '');
+          sessionStorage.setItem('userEmail', data.user.email || '');
+
+          // Check they're a board member or architect
+          if (data.user.boardId) {
+            document.getElementById('login-section').classList.add('hidden');
+            loadMemberForEdit(data.user.boardId);
+          } else if (data.user.role === 'architect') {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('admin-picker').classList.remove('hidden');
+          } else {
+            msgEl.textContent = 'This account does not have board edit access.';
+            msgEl.className = 'message error';
+            msgEl.classList.remove('hidden');
+          }
+        } else {
+          msgEl.textContent = data.error || 'Invalid username or PIN.';
+          msgEl.className = 'message error';
+          msgEl.classList.remove('hidden');
+        }
+      } catch (e) {
+        msgEl.textContent = 'Login service unavailable. Please try again.';
+        msgEl.className = 'message error';
+        msgEl.classList.remove('hidden');
+      }
+    }
 
     // Show sticky save bar when edit form is visible
     window.addEventListener('scroll', function() {

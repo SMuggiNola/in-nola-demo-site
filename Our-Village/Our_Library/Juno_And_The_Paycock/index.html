@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Juno and the Paycock | Irish Network NOLA Library</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../../../assets/in_logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       CSS RESET & BASE
+    ============================================ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #d4a726;
+      --gold-light: #f0d78a;
+      --gold-glow: rgba(212, 167, 38, 0.4);
+      --green-900: #071a0e;
+      --green-800: #0d2818;
+      --green-700: #143d24;
+      --page-cream: #fdf8ed;
+      --page-cream-dark: #f5edd5;
+      --ink: #1a1008;
+      --ink-light: #3d2e20;
+      --ink-muted: #5c4c3c;
+      --stage-color: #4a3a2a;
+      --char-color: #6b3010;
+      --radius: 4px;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: var(--green-900);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Subtle background gradient */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, var(--green-700) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(212, 167, 38, 0.06) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    /* ============================================
+       TOP BAR
+    ============================================ */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.5rem;
+      background: rgba(7, 26, 14, 0.95);
+      border-bottom: 1px solid rgba(212, 167, 38, 0.2);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .back-link {
+      color: var(--gold-light);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.25s;
+    }
+
+    .back-link:hover { color: #fff; }
+
+    .top-bar-title {
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .toc-btn, .fullscreen-btn {
+      background: none;
+      border: 1px solid rgba(212, 167, 38, 0.3);
+      color: var(--gold-light);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .toc-btn:hover, .fullscreen-btn:hover {
+      background: rgba(212, 167, 38, 0.15);
+      border-color: var(--gold);
+    }
+
+    /* ============================================
+       BOOK CONTAINER
+    ============================================ */
+    .book-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      perspective: 2000px;
+    }
+
+    .book {
+      width: 100%;
+      max-width: 720px;
+      height: calc(100vh - 80px);
+      max-height: 900px;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    /* ============================================
+       PAGE STYLING
+    ============================================ */
+    .page {
+      position: absolute;
+      inset: 0;
+      background: var(--page-cream);
+      border-radius: 2px 8px 8px 2px;
+      padding: 3rem 3.5rem;
+      overflow: hidden;
+      box-shadow:
+        4px 4px 20px rgba(0,0,0,0.3),
+        -1px 0 3px rgba(0,0,0,0.1),
+        inset -2px 0 8px rgba(0,0,0,0.04);
+      backface-visibility: hidden;
+      transition: opacity 0.1s;
+    }
+
+    /* Page edge effect (stacked pages illusion) */
+    .page::before {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 2%;
+      bottom: 2%;
+      width: 6px;
+      background: linear-gradient(
+        to left,
+        rgba(0,0,0,0.08),
+        rgba(0,0,0,0.02) 2px,
+        transparent
+      );
+      pointer-events: none;
+    }
+
+    /* Subtle page texture */
+    .page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23fdf8ed'/%3E%3Crect width='1' height='1' fill='%23f8f0dd' opacity='0.3'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .page-inner {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Page number */
+    .page-number {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
+    /* ============================================
+       PAGE TURN ANIMATION
+    ============================================ */
+    .page.turning-forward {
+      animation: turnForward 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transform-origin: left center;
+      z-index: 10;
+    }
+
+    .page.turning-backward {
+      animation: turnBackward 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transform-origin: left center;
+      z-index: 10;
+    }
+
+    .page.entering-forward {
+      animation: enterForward 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .page.entering-backward {
+      animation: enterBackward 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes turnForward {
+      0% {
+        transform: rotateY(0deg);
+        box-shadow: 4px 4px 20px rgba(0,0,0,0.3);
+      }
+      40% {
+        box-shadow: 20px 4px 40px rgba(0,0,0,0.4);
+      }
+      100% {
+        transform: rotateY(-180deg);
+        box-shadow: -4px 4px 20px rgba(0,0,0,0.2);
+      }
+    }
+
+    @keyframes turnBackward {
+      0% {
+        transform: rotateY(-180deg);
+      }
+      100% {
+        transform: rotateY(0deg);
+      }
+    }
+
+    @keyframes enterForward {
+      0% { opacity: 0; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes enterBackward {
+      0% { opacity: 0; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Page curl shadow during turn */
+    .page.turning-forward::before {
+      background: linear-gradient(
+        to left,
+        rgba(0,0,0,0.15),
+        rgba(0,0,0,0.05) 4px,
+        transparent
+      );
+      width: 30px;
+      transition: all 0.6s;
+    }
+
+    /* ============================================
+       PLAY TYPOGRAPHY
+    ============================================ */
+    .page-content {
+      column-count: 1;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      text-align: left;
+      color: var(--ink);
+    }
+
+    /* Title page */
+    .title-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+    }
+
+    .title-page h1 {
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--char-color);
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.3rem;
+    }
+
+    .title-page .subtitle {
+      font-size: 1.2rem;
+      color: var(--ink-light);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
+
+    .title-page .author {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      letter-spacing: 0.15em;
+      margin-bottom: 3rem;
+    }
+
+    .title-page .ornament {
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin: 1rem 0;
+    }
+
+    .title-page .production-info {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    .title-page .setting {
+      font-size: 0.95rem;
+      color: var(--ink-light);
+      font-style: italic;
+      margin-top: 1.5rem;
+      line-height: 1.6;
+    }
+
+    /* Cast page */
+    .cast-page h2 {
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--char-color);
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--page-cream-dark);
+    }
+
+    .cast-list {
+      list-style: none;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .cast-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px dotted #ddd5c5;
+      font-size: 1rem;
+    }
+
+    .cast-list .role {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .cast-list .desc {
+      color: var(--ink-muted);
+      font-style: italic;
+      text-align: right;
+    }
+
+    /* Act titles */
+    .act-title {
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--char-color);
+      font-size: 1.8rem;
+      text-align: center;
+      margin: 2rem 0 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #ddd5c5;
+    }
+
+    /* Scene descriptions */
+    .scene-description {
+      font-style: italic;
+      color: var(--stage-color);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(139, 69, 19, 0.03);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* Character names */
+    .char {
+      font-weight: 700;
+      color: var(--char-color);
+      font-variant: small-caps;
+      font-size: 1.05em;
+    }
+
+    /* Stage directions */
+    .stage {
+      font-style: italic;
+      color: var(--stage-color);
+      font-size: 0.92em;
+    }
+
+    /* Dialogue paragraphs */
+    .page-content p {
+      margin-bottom: 0.6rem;
+      text-indent: 0;
+      color: var(--ink);
+      max-width: none;
+      text-align: left;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    /* Songs */
+    .song {
+      font-style: italic;
+      margin: 0.75rem 0 0.75rem 2rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--gold);
+      color: var(--ink-light);
+    }
+
+    /* ============================================
+       NAVIGATION CONTROLS
+    ============================================ */
+    .nav-zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 15%;
+      cursor: pointer;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .nav-zone:hover {
+      background: rgba(0,0,0,0.02);
+    }
+
+    .nav-zone-left {
+      left: 0;
+      justify-content: flex-start;
+      padding-left: 0.5rem;
+      border-radius: 2px 0 0 2px;
+    }
+
+    .nav-zone-right {
+      right: 0;
+      justify-content: flex-end;
+      padding-right: 0.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .nav-arrow {
+      font-size: 1.5rem;
+      color: var(--ink-muted);
+      opacity: 0;
+      transition: opacity 0.3s;
+      user-select: none;
+    }
+
+    .nav-zone:hover .nav-arrow {
+      opacity: 0.6;
+    }
+
+    /* Bottom bar - hidden, controls moved to sides */
+    .bottom-bar {
+      display: none;
+    }
+
+    /* Top bar progress & page indicator */
+    .top-bar-progress {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .page-indicator {
+      color: var(--gold-light);
+      font-size: 0.8rem;
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    .progress-bar {
+      width: 120px;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    /* Side navigation buttons */
+    .side-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      background: rgba(7, 26, 14, 0.7);
+      border: 1px solid rgba(212, 167, 38, 0.3);
+      color: var(--gold-light);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      backdrop-filter: blur(4px);
+      line-height: 1;
+    }
+
+    .side-nav-btn:hover {
+      background: rgba(7, 26, 14, 0.9);
+      border-color: var(--gold);
+      color: #fff;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .side-nav-btn:disabled {
+      opacity: 0.2;
+      cursor: default;
+      transform: translateY(-50%);
+    }
+
+    .side-nav-prev {
+      left: max(0.5rem, calc(50% - 400px));
+    }
+
+    .side-nav-next {
+      right: max(0.5rem, calc(50% - 400px));
+    }
+
+    /* ============================================
+       TABLE OF CONTENTS OVERLAY
+    ============================================ */
+    .toc-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 26, 14, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .toc-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .toc-panel {
+      background: var(--page-cream);
+      border-radius: 12px;
+      padding: 2.5rem;
+      max-width: 450px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .toc-panel h2 {
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--char-color);
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .toc-panel ul {
+      list-style: none;
+    }
+
+    .toc-panel li {
+      margin-bottom: 0.3rem;
+    }
+
+    .toc-panel a {
+      display: block;
+      padding: 0.6rem 1rem;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 1.05rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .toc-panel a:hover {
+      background: rgba(139, 69, 19, 0.08);
+      color: var(--char-color);
+      padding-left: 1.3rem;
+    }
+
+    .toc-panel a .toc-page {
+      float: right;
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    .toc-close {
+      display: block;
+      margin: 1.5rem auto 0;
+      background: var(--char-color);
+      color: var(--page-cream);
+      border: none;
+      padding: 0.6rem 2rem;
+      border-radius: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .toc-close:hover {
+      background: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    /* ============================================
+       RESPONSIVE
+    ============================================ */
+    @media (max-width: 768px) {
+      .book-wrapper { padding: 0.5rem; }
+
+      .page {
+        padding: 2rem 1.5rem;
+        border-radius: 0;
+      }
+
+      .book {
+        max-width: 100%;
+        height: calc(100vh - 70px);
+      }
+
+      .page-content { font-size: 0.95rem; }
+
+      .title-page h1 { font-size: 1.8rem; }
+      .act-title { font-size: 1.4rem; }
+
+      .top-bar-title { display: none; }
+
+      .nav-zone { width: 20%; }
+
+      .toc-panel { padding: 1.5rem; }
+
+      .side-nav-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+      }
+
+      .side-nav-prev { left: 0.25rem; }
+      .side-nav-next { right: 0.25rem; }
+
+      .progress-bar { width: 80px; }
+    }
+
+    @media (max-width: 480px) {
+      .page { padding: 1.5rem 1rem; }
+      .page-content { font-size: 0.9rem; line-height: 1.6; }
+      .scene-description { padding: 0.6rem; font-size: 0.85rem; }
+      .top-bar { padding: 0.4rem 0.8rem; }
+
+      .side-nav-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+      }
+    }
+
+    /* Hide scrollbar in page content */
+    .page-inner::-webkit-scrollbar { display: none; }
+    .page-inner { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Print styles */
+    @media print {
+      body { background: white; overflow: visible; }
+      .top-bar, .bottom-bar, .nav-zone, .toc-overlay { display: none !important; }
+      .book-wrapper { padding: 0; perspective: none; }
+      .book { position: static; height: auto; max-height: none; }
+      .page { position: static; box-shadow: none; height: auto; overflow: visible; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <a href="../stacks.html" class="back-link">&#8592; Library</a>
+      <span class="top-bar-title">Juno and the Paycock</span>
+    </div>
+    <div class="top-bar-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="page-indicator" id="pageIndicator">Page 1</span>
+    </div>
+    <div class="top-bar-right">
+      <button class="toc-btn" onclick="toggleTOC()" aria-label="Table of Contents">Contents</button>
+    </div>
+  </div>
+
+  <!-- BOOK -->
+  <div class="book-wrapper">
+    <!-- Side navigation buttons -->
+    <button class="side-nav-btn side-nav-prev" id="prevBtn" onclick="prevPage()" aria-label="Previous page">&#9664;</button>
+    <button class="side-nav-btn side-nav-next" id="nextBtn" onclick="nextPage()" aria-label="Next page">&#9654;</button>
+
+    <div class="book" id="book">
+
+      <!-- Pages will be generated by JavaScript from the content below -->
+      <div class="page" id="currentPage">
+        <div class="page-inner" id="pageInner">
+          <div class="page-content" id="pageContent"></div>
+        </div>
+        <div class="page-number" id="pageNum"></div>
+
+        <!-- Click zones -->
+        <div class="nav-zone nav-zone-left" onclick="prevPage()" aria-label="Previous page">
+          <span class="nav-arrow">&#8249;</span>
+        </div>
+        <div class="nav-zone nav-zone-right" onclick="nextPage()" aria-label="Next page">
+          <span class="nav-arrow">&#8250;</span>
+        </div>
+      </div>
+
+      <!-- Secondary page for animation -->
+      <div class="page" id="animPage" style="display:none;">
+        <div class="page-inner">
+          <div class="page-content" id="animPageContent"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom bar removed - controls moved to sides and top bar -->
+
+  <!-- TABLE OF CONTENTS OVERLAY -->
+  <div class="toc-overlay" id="tocOverlay" onclick="closeTOCOutside(event)">
+    <div class="toc-panel">
+      <h2>Contents</h2>
+      <ul id="tocList">
+        <!-- Generated by JS -->
+      </ul>
+      <button class="toc-close" onclick="toggleTOC()">Close</button>
+    </div>
+  </div>
+
+  <!-- ============================================
+       PLAY CONTENT (hidden, used as source)
+  ============================================ -->
+  <div id="playSource" style="display:none;">
+
+    <!-- TITLE PAGE -->
+    <section data-page-break="true" data-toc="Title Page">
+      <div class="title-page">
+        <div class="ornament">&#9830;</div>
+        <h1>Juno and<br>the Paycock</h1>
+        <p class="subtitle">A Tragedy in Three Acts</p>
+        <p class="author">Sean O'Casey</p>
+        <div class="ornament">&#10044;</div>
+        <p class="production-info">
+          First produced at the Abbey Theatre, Dublin, on March 3rd, 1924.<br>
+          London premiere at the Royalty Theatre, November 16th, 1925.
+        </p>
+        <p class="setting">
+          Dublin, 1922<br>
+          <em>The living apartment of a two-roomed tenancy<br>
+          of the Boyle family, in a tenement house.</em>
+        </p>
+      </div>
+    </section>
+
+    <!-- CAST OF CHARACTERS -->
+    <section data-page-break="true" data-toc="Dramatis Personae">
+      <div class="cast-page">
+        <h2>Dramatis Personae</h2>
+        <ul class="cast-list">
+          <li><span class="role">Captain "Jack" Boyle</span></li>
+          <li><span class="role">Juno Boyle</span> <span class="desc">his wife</span></li>
+          <li><span class="role">Johnny Boyle</span> <span class="desc">their son</span></li>
+          <li><span class="role">Mary Boyle</span> <span class="desc">their daughter</span></li>
+          <li><span class="role">"Joxer" Daly</span></li>
+          <li><span class="role">Mrs. Maisie Madigan</span></li>
+          <li><span class="role">"Needle" Nugent</span> <span class="desc">a tailor</span></li>
+          <li><span class="role">Mrs. Tancred</span></li>
+          <li><span class="role">Jerry Devine</span></li>
+          <li><span class="role">Charles Bentham</span> <span class="desc">a school teacher</span></li>
+          <li><span class="role">An Irregular Mobilizer</span></li>
+          <li><span class="role">Two Irregulars</span></li>
+          <li><span class="role">A Coal-block Vendor</span></li>
+          <li><span class="role">A Sewing Machine Man</span></li>
+          <li><span class="role">Two Furniture-Removal Men</span></li>
+          <li><span class="role">Two Neighbours</span></li>
+        </ul>
+        <p style="text-align:center; margin-top:2rem; color:var(--ink-muted); font-style:italic;">
+          <strong>Scene:</strong> The living apartment of a two-roomed tenancy of the Boyle family, in a tenement house in Dublin.<br><br>
+          Act I &mdash; The same.<br>
+          Act II &mdash; The same.<br>
+          Act III &mdash; The same.<br><br>
+          A few days elapse between Acts I and II, and two months between Acts II and III.<br>
+          During Act III the curtain is lowered for a few minutes to denote the lapse of one hour.<br><br>
+          Period of the play, 1922.
+        </p>
+      </div>
+    </section>
+
+    <!-- ACT I -->
+    <section data-toc="Act I" id="act1-content">
+      <h2 class="act-title" id="act1">Act I</h2>
+<div class="scene-description">The living room of a two-room tenancy occupied by the BOYLE family in a tenement house in Dublin. Left, a door leading to another part of the house; left of door a window looking into the street; at back a dresser; farther to right at back, a window looking into the back of the house. Between the window and the dresser is a picture of the Virgin; below the picture, on a bracket, is a crimson bowl in which a floating votive light is burning. Farther to the right is a small bed partly concealed by cretonne hangings strung on a twine. To the right is the fireplace; near the fireplace is a door leading to the other room. Beside the fireplace is a box containing coal. On the mantelshelf is an alarm clock lying on its face. In a corner near the window looking into the back is a galvanized bath. A table and some chairs. On the table are breakfast things for one. A teapot is on the hob and a frying-pan stands inside the fender. There are a few books on the dresser and one on the table. Leaning against the dresser is a long-handled shovel — the kind invariably used by labourers when turning concrete or mixing mortar. JOHNNY BOYLE is sitting crouched beside the fire. MARY with her jumper offit is lying on the back of a chair — is arranging her hair before a tiny mirror perched on the table. Beside the mirror is stretched out the morning paper which she looks at when she isn't gazing into the mirror. She is a wellmade and good-looking girl of twenty-two. Two forces are working in her mind — one, through the circumstances of her life, pulling her back; the other, through the influence of books she has read, pushing her forward. The opposing forces are apparent in her speech and her manners, both of which are degraded by her environment, and improved by her acquaintance — slight though it be — with literature. The time is early forenoon.</div>
+<p><span class="char">Mary.</span> <span class="stage">(looking at the paper)</span>. On a little byeroad, out beyant Finglas, he was found.</p>
+
+
+<p>parcel in her hand. She is forty-five years of age, and twenty years ago she must have been a pretty woman; but her face has now assumed that look which ultimately settles down upon the faces of the women of the workingclass; a look of listless monotony and harassed anxiety, blending with an expression of mechanical resistance. Were circumstances favourable, she would probably be a handsome, active and clever woman.')</p>
+<p><span class="char">Mrs. Boyle.</span> Isn't he come in yet?</p>
+<p><span class="char">Mary.</span> No, mother.</p>
+<p><span class="char">Mrs. Boyle.</span> Oh, he'll come in when he likes; struttin' about the town like a paycock with Joxer, I suppose. I hear all about Mrs. Tancred's son is in this mornin's paper.</p>
+<p><span class="char">Mary.</span> The full details are in it this mornin'; seven wounds he had — one entherin' the neck, with an exit wound beneath the left shoulderblade; another in the left breast penethratin' the heart, an' ...</p>
+<p><span class="char">Johnny.</span> <span class="stage">(springing up from the fire]. Oh, quit that readin', for God's sakel Are yous losin' all your feelins? It'll soon be that none of yous'll read anythin' that's not about butcherin'l (He goes quickly into the room on left)</span></p>
+<p><span class="char">Mary.</span> He's gettin' very sensitive, all of a sudden 1</p>
+<p><span class="char">Mrs. Boyle.</span> I'll read it myself, Mary, by an' by, when I come home. Everybody's sayin' that he was a Die-hard — thanks be to God that Johnny had nothin' to do with him this long time. . . . <span class="stage">(Opening the parcel and taking out some sausages, which she places on a plate)</span> Ah, then, if that father o' yours doesn't come in soon for his breakfast, he may go without any; I'll not wait much longer for him.</p>
+<p><span class="char">Mary.</span> Can't you let him get it himself when he comes in?</p>
+<p><span class="char">Mrs. Boyle.</span> Yes, an' let him bring in Joxer Daly along with him? Ay, that's what he'd like, an' that's what he's waitin' for — till he thinks I'm gone to work, an' then sail in with the boul' Joxer, to burn all the coal an' dhrink all the tea in the place, to show them what a good Samaritan he is! But I'll stop here till he comes in, if I have to wait till to-morrow mornin'.</p>
+<p><span class="char">Voice of Johnny.</span> Mother! MRS. BOYLE. Yis?</p>
+<p><span class="char">Voice of Johnny.</span> Bring us in a dhrink o' wather.</p>
+<p><span class="char">Mrs. Boyle.</span> Bring in that fella a dhrink o' wather, for God's sake, Mary,</p>
+<p><span class="char">Mary.</span> Isn't he big an' able enough to come out an' get it himself?</p>
+<p><span class="char">Mrs. Boyle.</span> If you weren't well yourself you'd like somebody to bring you in a dhrink o' wather. <span class="stage">(She brings in drink and returns)</span></p>
+<p><span class="char">Mrs. Boyle.</span> Isn't it terrible to have to be waitin' this wayl You'd think he was bringin' twenty pouns a week into the house the way he's going on. He wore out the Health Insurance long ago, he's afther wearin' out the unemployment dole, an', now, he's thryin' to wear out me! An' constantly singin', no less, when he ought always to be on his knees offerin' up a Novena for a job!</p>
+<p><span class="char">Mary.</span> (tying a ribbon, fillet wise around her head]. I don't like this ribbon, ma; I think I'll wear the green — it looks betther than the blue.</p>
+<p><span class="char">Mrs. Boyle.</span> Ah, wear whatever ribbon you like, girl, only don't be botherin' me. I don't know what a girl on strike wants to be wearin' a ribbon round her head for or silk stockins on her legs either; its wearin' them things that make the employers think they're givin' yous too much money.</p>
+<p><span class="char">Mary.</span> The hour is past now when we'll ask the employers' permission to wear what we like.</p>
+<p><span class="char">Mrs. Boyle.</span> I don't know why you wanted to walk out for Jennie Claffey; up to this you never had a good word for her.</p>
+<p><span class="char">Mary.</span> What's the use of belongin' to a Trades Union if you won't stand up for your principles? Why did they sack her? It was a clear case of victimization. We couldn't let her walk the streets, could we?</p>
+<p><span class="char">Mrs. Boyle.</span> No, of course yous couldn't — yous wanted to keep her company. Wan victim wasn't enough. When the employers sacrifice wan victim, the Trades Unions go wan betther be sacrificin' a hundred.</p>
+<p><span class="char">Mary.</span> It doesn't matther what you say, ma — a principle's a principle.</p>
+<p><span class="char">Mrs. Boyle.</span> Yis; an' when I go into ouT Murphy's to-morrow, an' he gets to know that, instead o' payin' all, I'm goin' to borry more, what'll he say when I tell him a principle's a principle? What'll we do if he refuses to give us any more on tick?</p>
+<p><span class="char">Mary.</span> He daren't refuse — if he does, can't you tell him he's paid?</p>
+<p><span class="char">Mrs. Boyle.</span> It's lookin' as if he was paid, whether he refuses or no,</p>
+<p>(JOHNNY appears at the door on left. He can be plainly seen now; he is a thin delicate fellow, something younger</p>
+
+<p>than MARY. He has evidently gone through a rough time. His face is pale and drawn; there is a tremulous look of indefinite fear in his eyes. The left sleeve of his coat is empty, and he walks with a slight halt. ") JOHNNY. I was lyin' down; I thought yous were gone. OnT Simon Mackay is thrampin' about like a horse over me head, an' I can't sleep with him — they're like thunder-claps in me brain! The curse o' — God forgive me for goin' to curse!</p>
+<p><span class="char">Mrs. Boyle.</span> There, now; go back an' lie down agen, an I'll bring you in a nice cup o' tay.</p>
+<p><span class="char">Johnny.</span> Tay, tay, tay! You're always thinkin' o' tay. If a man was dyin', you'd thry to make him swally a cup o' tay!</p>
+<p><span class="stage">(He goes back)</span></p>
+<p><span class="char">Mrs. Boyle.</span> I don't know what's goin' to be done with him. The bullet he got in the hip in Easter Week was bad enough, but the bomb that shatthered his arm in the fight in O'Connell Street put the finishin' touch on him. I knew he was makin' a fool of himself. God knows I went down on me bended knees to him not to go agen the Free State,</p>
+<p><span class="char">Mary.</span> He stuck to his principles, an', no</p>
+<p>matther how you may argue, ma, a principle's a principle.</p>
+<p><span class="char">Voice of Johnny.</span> Is Mary goin' to stay here?</p>
+<p><span class="char">Mary.</span> No, I'm not goin' to stay here; you can't expect me to be always at your beck an' call, can you?</p>
+<p><span class="char">Voice of Johnny.</span> I won't stop here be meself!</p>
+<p><span class="char">Mrs. Boyle.</span> Amn't I nicely handicapped with the whole o' yous! I don't know what any o' yous ud do without your ma. <span class="stage">(To JOHNNY)</span> Your father'll be here in a minute, an' if you want any thin', he'll get it for you.</p>
+<p><span class="char">Johnny.</span> I hate assin' him for anythin'. . . . He hates to be assed to stir. ... Is the light lightin' before the picture o' the Virgin?</p>
+<p><span class="char">Mrs. Boyle.</span> Yis, yis! The wan inside to St. Anthony isn't enough, but he must have another wan to the Virgin here!</p>
+<p>(JERRY DEVINE enters hastily. He is about twenty-five, well set, active and earnest. He is a type, becoming very common now in the Labour Movement, of a mind knowing enough to make the mass of his associates, who know less, a power, and too little to broaden that power for the benefit of all. MARY</p>
+<p>seizes her jumper and runs hastily into room left.)</p>
+<p><span class="char">Jerry.</span> <span class="stage">(breathless)</span>. Where's the Captain, Mrs. Boyle, where's the Captain?</p>
+<p><span class="char">Mrs. Boyle.</span> You may well ass a body that: he's wherever Joxer Daly is — dhrinkin' in some snug or another.</p>
+<p><span class="char">Jerry.</span> Father Farrell is just afther stoppin' to tell me to run up an' get him to go to the new job that's goin' on in Rathmines; his cousin is foreman o' the job, an' Father Farrell was speakin' to him about poor Johnny an' his father bein' idle so long, an' the foreman told Father Farrell to send the Captain up an' he'd give him a start — I wondher where I'd find him?</p>
+<p><span class="char">Mrs. Boyle.</span> You'll find he's ayther in Ryan's or Foley's.</p>
+<p><span class="char">Jerry.</span> I'll run round to Ryan's — I know it's a great house o' Joxer's. (He rushes out J</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(piteously)</span>. There now, he'll miss that job, or I know for whatl If he gets win' o' the word, he'll not come back till evenin', so that it'll be too late. There'll never be any good got out o' him so long as he goes with that shouldher - shruggin' Joxer. I killin' meself workin', an' he sthruttin' about from mornin' till night like a paycock!</p>
+<p>ii</p>
+<p><span class="stage">(The steps of two persons are heard coming up a flight of stairs. They are the footsteps of CAPTAIN BOYLE and JOXER. CAPTAIN BOYLE is singing in a deep)</span> sonorous, self-honouring voiced) THE CAPTAIN. Sweet Spirit, hear me prayer! Hear ... oh ... hear . . . me prayer . . . hear, oh, hear . . . Oh, he ... ar ... oh, he ... ar ... me . , . pray . . , erl JOXER <span class="stage">(outside)</span>. Ah, that's a darlin' song, a daaarlin' songl</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(viciously)</span>. Sweet spirit hear his prayer! Ah, then, I'll take me solemn affeydavey, it's not for a job he's prayin'l</p>
+<p><span class="stage">(She sits down on the bed so that the cretonne hangings hide her from the 'view of those entering)</span> (THE CAPTAIN comes slowly in. He is a man of about sixty; stout, greyhaired and stocky. His neck is short, and his head looks like a stone ball that one sometimes sees on top of a gate-post. His cheeks, reddish-purple, are puffed out, as if he were always repressing an almost irrepressible ejaculation. On his upper lip is a crisp, tightly cropped moustache, he carries himself with the upper part of his body slightly thrown</p>
+<p>back, and his stomach slightly thrust forward. His walk is a stow, consequential strut. His clothes are dingy, and he wears a faded seaman's cap with a glazed peak.) BOYLE <span class="stage">(to JOXER, who is still outside)</span>. Come on, come on in, Joxer; she's gone out long ago, man. If there's nothing else to be got, we'll furrage out a cup o' tay, anyway. It's the only bit I get in comfort when she's away. 'Tisn't Juno should be her pet name at all, but Deirdre of the Sorras, for she's always grousin'. <span class="stage">(JOXER steps cautiously into the room. He may be younger than THE CAPTAIN but he looks a lot older. His face is like a bundle of crinkled paper; his eyes have a cunning twinkle; he is spare and loosely built; he has a habit of constantly shrugging his shoulders with a peculiar twitching movement, meant to be ingratiating. His face is invariably ornamented with a grin.)</span> JOXER. It's a terrible thing to be tied to a woman that's always grousin'. I don't know how you stick it — it ud put years on me. It's a good job she has to be so of en away, for <span class="stage">(with a shrug)</span> when the cat's away, the mice can play!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(with a commanding and complacent gesture)</span>. Pull over to the fire, Joxer, an' we'll have a cup o' tay in a minute.</p>
+<p><span class="char">Joxer.</span> Ah, a cup o' tay's a darlin' thing, a daaarlin' thing — the cup that cheers but doesn't . . .</p>
+<p><span class="stage">(JOXER' S rhapsody is cut short by the sight of JUNO coming forward and confronting the two cronies. Both are stupefied.)</span> MRS. BOYLE <span class="stage">(with sweet irony — poking the fire', and turning her head to glare at JOXER)</span>. Pull over to the fire, Joxer Daly, an' we'll have a cup o' tay in a minute! Are you sure, now, you wouldn't like an egg?</p>
+<p><span class="char">Joxer.</span> I can't stop, Mrs. Boyle; I'm in a desperate hurry, a desperate hurry.</p>
+<p><span class="char">Mrs. Boyle.</span> Pull over to the fire, Joxer Daly; people is always far more comfortabler here than they are in their own place.</p>
+<p><span class="stage">(JOXER makes hastily for the door. BOYLE stirs to follow him; thinks of something to relieve the situation — stops, and says suddenly)</span></p>
+<p><span class="char">Joxer.</span> !</p>
+<p><span class="char">Joxer.</span> <span class="stage">(at door ready to bolt)</span>. Yis?</p>
+<p><span class="char">Boyle.</span> You know the foreman o' that job that's goin' on down in Killesther, don't you, Joxer?</p>
+
+<p><span class="char">Joxer.</span> <span class="stage">(puzzled)</span>. Foreman — Killesther?</p>
+<p><span class="char">Boyle.</span> <span class="stage">(with a meaning looK)</span>' He's a butty o yours, isn't he?</p>
+<p><span class="char">Joxer.</span> <span class="stage">(the truth dawning on him)</span>. The foreman at Killesther — oh yis, yis. He's an oul' butty o' mine — oh, he's a darlin' man, a daarlin' man.</p>
+<p><span class="char">Boyle.</span> Oh, then, it's a sure thing. It's a pity we didn't go down at breakfast first thing this mornin' — we might ha' been working now; but you didn't know it then.</p>
+<p><span class="char">Joxer.</span> <span class="stage">(with a shrug)</span>. It's betther late than never.</p>
+<p><span class="char">Boyle.</span> It's nearly time we got a start, anyhow; I'm fed up knockin' round, doin' nothin'. He promised you — gave you the straight tip?</p>
+<p><span class="char">Joxer.</span> Yis. " Come down on the blow o' dinner," says he, "an' I'll start you, an' any friend you like to brin' with you." Ah, says I, you're a darlin' man, a daaarlin' man.</p>
+<p><span class="char">Boyle.</span> Well, it couldn't come at a betther time — we're a long time waitin' for it.</p>
+<p><span class="char">Joxer.</span> Indeed we were; but it's a long lane that has no turnin'.</p>
+<p><span class="char">Boyle.</span> The blow up for dinner is at one — wait till I see what time it 'tis. <span class="stage">(He goes over to the mantelpiece, and gingerly lifts the clock.)</span></p>
+<p><span class="char">Mrs. Boyle.</span> Min 1 now, how you go on fiddlin' with that clock — you know the least little thing sets it asthray.</p>
+<p><span class="char">Boyle.</span> The job couldn't come at a betther time; I'm feelin' in great fettle, Joxer. I'd hardly believe I ever had a pain in me legs, an' last week I was nearly crippled with them.</p>
+<p><span class="char">Joxer.</span> That's betther an' betther; ah, God never shut wan door but he opened another!</p>
+<p><span class="char">Boyle.</span> It's only eleven o'clock; we've lashins o' time. I'll slip on me oul' moleskins afther breakfast, an' we can saunther down at our ayse. <span class="stage">(Putting his hand on the shovel)</span> I think, Joxer, we'd betther bring our shovels?</p>
+<p><span class="char">Joxer.</span> Yis, Captain, yis; it's betther to go fully prepared an' ready for all eventualities. You bring your long-tailed shovel, an' I'll bring me navvy. We mighten' want them, an', then agen, we might: for want of a nail the shoe was lost, for want of a shoe the horse was lost, an' for want of a horse the man was lost — aw, that's a darlin' proverb, a daarlin' . . .</p>
+<p><span class="stage">(As JOXER is finishing his sentence, MRS. BOYLE approaches the door and JOXER retreats hurriedly. She shuts the door with a bang.)</span> BOYLE <span class="stage">(suggestively)</span>. We won't be long</p>
+<p>pullin' ourselves together agen when I'm working for a few weeks.</p>
+<p><span class="stage">(MRS. BOYLE takes no notice)</span></p>
+<p><span class="char">Boyle.</span> The foreman on the job is an oul' butty o' Joxer's; I have an idea that I know him meself. <span class="stage">(Silence)</span> . . . There's a button off the back o' me moleskin trousers. ... If you leave out a needle an' thread I'll sew it on meself. . . . Thanks be to God, the pains in me legs is gone, anyhow !</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(with a burst)</span>. Look here, Mr. Jacky Boyle, them yarns won't go down with Juno. I know you an' Joxer Daly of an oul' date, an', if you think you're able to come it over me with them fairy tales, you're in the wrong shop.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(coughing subduedly to relieve the tenseness of the situation)</span>. U-u-u-ugh!</p>
+<p><span class="char">Mrs. Boyle.</span> Butty o' Joxer's ! Oh, you'll do a lot o' good as long as you continue to be a butty o' Joxer's !</p>
+<p><span class="char">Boyle.</span> U-u-u-ugh!</p>
+<p><span class="char">Mrs. Boyle.</span> Shovel ! Ah, then, me boyo, you'd do far more work with a knife an' fork than ever you'll do with a shovel! If there was e'er a genuine job goin' you'd be dh'other way about — not able to lift your arms with the pains in your legs! Your poor wife slavin'</p>
+<p>to keep the bit in your mouth, an' you gallivantin' about all the day like a paycock!</p>
+<p><span class="char">Boyle.</span> It ud be betther for a man to be dead, betther for a man to be dead.</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(ignoring the interruption)</span>. Everybody callin' you " Captain ", an' you only wanst on the wather, in an oul' collier from here to Liverpool, when anybody, to listen or look at you, ud take you for a second Christo For Columbus!</p>
+<p><span class="char">Boyle.</span> Are you never goin' to give us a rest?</p>
+<p><span class="char">Mrs. Boyle.</span> Oh, you're never tired' o' lookin' for a rest.</p>
+<p><span class="char">Boyle.</span> D'ye want to dhrive me out o' the house?</p>
+<p><span class="char">Mrs. Boyle.</span> It ud be easier to dhrive you out o' the house than to dhrive you into a job. Here, sit down an' take your breakfast — it may be the last you'll get, for I don't know where the next is goin' to come from.</p>
+<p><span class="char">Boyle.</span> If I get this job we'll be all right.</p>
+<p>MRS, BOYLE, Did ye see Jerry Devine?</p>
+<p><span class="char">Boyle.</span> <span class="stage">(testily)</span>. No, I didn't see him.</p>
+<p><span class="char">Mrs. Boyle.</span> No, but you seen Joxer. Well, he was here lookin' for you.</p>
+<p><span class="char">Boyle.</span> Well, let him look!</p>
+<p><span class="char">Mrs. Boyle.</span> Oh, indeed, he may well look.</p>
+<p>for it lid be hard for him to see you, an' you stuck in Ryan's snug.</p>
+<p><span class="char">Boyle.</span> I wasn't in Ryan's snug — I don't go into Ryan's.</p>
+<p><span class="char">Mrs. Boyle.</span> Oh, is there a mad dog there? Well, if you weren't in Ryan's you were in Foley's.</p>
+<p><span class="char">Boyle.</span> I'm telling you for the last three weeks I haven't tasted a dhrop of intoxicatin' liquor. I wasn't in ayther wan snug or dh'other — I could swear that on a prayerbook — I'm as innocent as the child unborn!</p>
+<p><span class="char">Mrs. Boyle.</span> Well, if you'd been in for your breakfast you'd ha' seen him.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(suspiciously)</span>. What does he want me for?</p>
+<p><span class="char">Mrs. Boyle.</span> He'll be back any minute an' then you'll soon know.</p>
+<p><span class="char">Boyle.</span> I'll dhrop out an' see if I can meet him.</p>
+<p><span class="char">Mrs. Boyle.</span> You'll sit down an' take your breakfast, an' let me go to me work, for I'm an hour late already waitin' for you.</p>
+<p><span class="char">Boyle.</span> You needn't ha' waited, for I'll take no breakfast — I've a little spirit left in me still !</p>
+<p><span class="char">Mrs. Boyle.</span> Are you goin' to have your breakfast — yes or no?</p>
+<p><span class="char">Boyle.</span> <span class="stage">(too proud to yield)</span>. I'll have no breakfast — yous can keep your breakfast. <span class="stage">(Plaintively)</span> I'll knock out a bit somewhere, never fear.</p>
+<p><span class="char">Mrs. Boyle.</span> Nobody's goin' to coax you — don't think that. <span class="stage">(She vigorously replaces the pan and the sausages in the press.)</span></p>
+<p><span class="char">Boyle.</span> I've a little spirit left in me still.</p>
+<p><span class="stage">(JERRY DEVINE enters hastily)</span></p>
+<p><span class="char">Jerry.</span> Oh, here you are at last! I've been searchin' for you everywhere. The foreman in Foley's told me you hadn't left the snug with Joxer ten minutes before I went in.</p>
+<p><span class="char">Mrs. Boyle.</span> An' he swearin' on the holy prayer-book that he wasn't in no snug!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(to JERRY)</span>. What business is it o' yours whether I was in a snug or no? What do you want to be gallopin' about afther me for? Is a man not to be allowed to leave his house for a minute without havin' a pack o' spies, pimps an' informers cantherin' at his heels?</p>
+<p><span class="char">Jerry.</span> Oh, you're takin' a wrong view of it, Mr. Boyle; I simply was anxious to do you a good turn. I have a message for you from Father Farrell: he says that if you go to the job that's on in Rathmines, an' ask for Foreman Mangan, you'll get a start,</p>
+<p><span class="char">Boyle.</span> That's all right, but I don't want the motions of me body to be watched the way an asthronomer ud watch a star. If you're folleyin' Mary aself, you've no pereeogative to be folleyin' me. <span class="stage">(Suddenly catching his thigh)</span> U-ugh, I'm afther gettin' a terrible twinge in me right leg!</p>
+<p>MRS, BOYLE. Oh, it won't be very long now till it travels into your left wan. It's miraculous that whenever he scents a job in front of him, his legs begin to fail himl Then, me bucko, if you lose this chance, you may go an' furrage for yourself!</p>
+<p><span class="char">Jerry.</span> This job'll last for some time too, Captain, an' as soon as the foundations are in, it'll be cushy enough.</p>
+<p><span class="char">Boyle.</span> Won't it be a climbin' job? How d'ye expect me to be able to go up a ladder with these legs? An', if I get up aself, how am I goin' to get down agen?</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(victous/y)</span>. Get wan o' the labourers to carry you down in a hod! You can't climb a laddher, but you can skip like a goat into a snug!</p>
+<p><span class="char">Jerry.</span> I wouldn't let meself be let down that easy, Mr. Boyle; a little exercise, now, might do you all the good in the world.</p>
+<p><span class="char">Boyle.</span> It's a docthor you should have been,</p>
+<p>Devine — maybe you know more about the pains in me legs than meself that has them?</p>
+<p><span class="char">Jerry.</span> <span class="stage">(irritated)</span>. Oh, I know nothin' about the pains in your legs; I've brought the message that Father Farrell gave me, an' that's all I can do.</p>
+<p><span class="char">Mrs. Boyle.</span> Here, sit down an' take your breakfast, an' go an' get ready; an' don't be actin' as if you couldn't pull a wing out of a dead bee.</p>
+<p><span class="char">Boyle.</span> I want no breakfast, I tell you; it ud choke me afther all that's been said. I've a little spirit left in me still.</p>
+<p><span class="char">Mrs. Boyle.</span> Well, let's see your spirit, then, an' go in at wanst an' put on your moleskin trousers !</p>
+<p><span class="char">Boyle.</span> <span class="stage">(moving towards the door on left)</span>. It ud be betther for a man to be dead! U-ugh! There's another twinge in me other leg! Nobody but meself knows the sufferin' I'm goin' through with the pains in these legs o' mine!</p>
+<p><span class="stage">(He goes into the room on left as MARY comes out with her hat in her hand)</span> MRS. BOYLE. I'll have to push off now, for I'm terrible late already, but I was determined to stay an' hunt that Joxer this time.</p>
+<p><span class="stage">(She goes of)</span></p>
+
+<p><span class="char">Jerry.</span> Are you going out, Mary?</p>
+<p><span class="char">Mary.</span> It looks like it when I'm putting on my hat, doesn't it?</p>
+<p><span class="char">Jerry.</span> The bitther word agen, Mary.</p>
+<p><span class="char">Mary.</span> You won't allow me to be friendly with you; if I thry, you deliberately misundherstand it,</p>
+<p><span class="char">Jerry.</span> I didn't always misundherstand it; you were ofen delighted to have the arms of Jerry around you.</p>
+<p><span class="char">Mary.</span> If you go on talkin' like this, Jerry Devine, you'll make me hate you !</p>
+<p><span class="char">Jerry.</span> Well, let it be either a weddin' or -a wakel Listen, Mary, I'm standin' for the Secretaryship of our Union. There's only one opposin' me; I'm popular with all the men, an' a good speaker — all are sayin' that I'll get elected.</p>
+<p><span class="char">Mary.</span> Well?</p>
+<p><span class="char">Jerry.</span> The job's worth three hundred an' fifty pounds a year, Mary. You an' I could live nice an' cosily on that; it would lift you out o' this place an' . . .</p>
+<p><span class="char">Mary.</span> I haven't time to listen to you now — I have to go.</p>
+<p>(She is going out when JERRY bars the way. J</p>
+<p><span class="char">Jerry.</span> <span class="stage">(appea/ing/y)</span>. Mary, what's come</p>
+<p>over you with me for the last few weeks? You hardly speak to me, an' then only a word with a face o' bittherness on it. Have you forgotten, Mary, all the happy evenins that were as sweet as the scented hawthorn that sheltered the sides o' the road as we saunthered through the country?</p>
+<p><span class="char">Mary.</span> That's all over now. When you get your new job. Jerry, you won't be long findin' a girl far betther than I am for your sweetheart.</p>
+<p><span class="char">Jerry.</span> Never, never, Mary! No matther what happens, you'll always be the same to me.</p>
+<p><span class="char">Mary.</span> I must be off; please let me go, Jerry.</p>
+<p><span class="char">Jerry.</span> I'll go a bit o' the way with you. MARY. You needn't, thanks; I want to be by meself.</p>
+<p><span class="char">Jerry.</span> <span class="stage">(catching her arm)</span>. You're goin' to meet another fella; you've clicked with some one else, me lady!</p>
+<p><span class="char">Mary.</span> That's no concern o' yours, Jerry Devine; let me go!</p>
+<p><span class="char">Jerry.</span> I saw yous comin' out o' the Cornflower Dance Class, an' you hangin' on his arm — a thin, lanky strip of a Micky Dazzler, with a walkin'-stick an' gloves !</p>
+
+<p><span class="char">Voice of Johnny.</span> <span class="stage">(loudly)</span>. What are you doin' there — pullin' about everything!</p>
+<p>VOICE OF BOYLE (loudly and 'viciously]. I'm puttin' on me moleskin trousers!</p>
+<p><span class="char">Mary.</span> You're hurtin' me arm! Let me go, or I'll scream, an' then you'll have the oul' fella out on top of us !</p>
+<p><span class="char">Jerry.</span> Don't be so hard on a fella, Mary, don't be so hard.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(appearing at the door)</span>. What's the meanin' of all this hillabaloo?</p>
+<p><span class="char">Mary.</span> Let me go, let me go!</p>
+<p><span class="char">Boyle.</span> D'ye hear me — what's all this hillabaloo about?</p>
+<p><span class="char">Jerry.</span> <span class="stage">(plaintively)</span>. Will you not give us one kind word, one kind word, Mary?</p>
+<p><span class="char">Boyle.</span> D'ye hear me talkin' to yous? What's all this hillabaloo for?</p>
+<p><span class="char">Jerry.</span> Let me kiss your hand, your little, tiny, white hand!</p>
+<p><span class="char">Boyle.</span> Your little, tiny, white hand — arc you takin' leave o' your senses, man?</p>
+<p><span class="stage">(MARY breaks away and rushes out.)</span></p>
+<p><span class="char">Boyle.</span> This is nice goins on in front of her father!</p>
+<p><span class="char">Jerry.</span> Ah, dhry up, for God's sake! <span class="stage">(He follows MARY.)</span></p>
+<p><span class="char">Boyle.</span> Chiselurs don't care a damn now</p>
+<p>about their parents, they're bringin' their fathers' grey hairs down with sorra to the grave, an' laughin' at it, laughin' at it. Ah? I suppose it's just the same everywhere — the whole worl's in a state o' chassis! <span class="stage">(He sits by the fire)</span> Breakfast! Well, they can keep their breakfast for me. Not if they went down on their bended knees would I take it — I'll show them I've a little spirit left in me still! <span class="stage">(He goes over to the press, takes out a plate and looks at if)</span> Sassigel Well, let her keep her sassige. <span class="stage">(He returns to the fire, takes up the teapot and gives it a gentle shake )</span> The tea's wet right enough. <span class="stage">(A pause; he rises, goes to the press, takes out the sausage, puts it on the pan, and puts both on the fire. He attends the sausage with afork.)</span></p>
+<p><span class="char">Boyle.</span> <span class="stage">(singing)</span>:</p>
+<p class="song">When the robins nest agen,</p>
+<p>And the flowers are in bloom,</p>
+<p>When the Springtime's sunny smile seems to banish</p>
+<p><span class="char">All.</span> sorrow an' gloom; Then me bonny blue-ey'd lad, if me heart be true till</p>
+<p>then —</p>
+<p class="song">He's promised he'll come back to me, When the robins nest agen!</p>
+<p><span class="stage">(He lifts his head at the high note, and then drops his eyes to the pan.)</span></p>
+<p><span class="char">Boyle.</span> <span class="stage">(singing)</span>:</p>
+<p>When the . . .</p>
+<p><span class="stage">(Steps are heard approaching; he whips the pan off the fire and puts it under the bed)</span> then sits down at the fire. The door opens and a bearded man looking in says]:</p>
+<p>You don't happen to want a sewin' machine?</p>
+<p><span class="char">Boyle.</span> <span class="stage">(furiously)</span>. No, I don't want e'er a sewin' machine!</p>
+<p><span class="stage">(He returns the pan to the fire, and commences to sing again.)</span> BOYLE <span class="stage">(singing)</span>:</p>
+<p class="song">When the robins nest agen,</p>
+<p>And the flowers they are in bloom,</p>
+<p>He's . . .</p>
+<p><span class="stage">(A thundering knock is heard at the street door. ")</span></p>
+<p><span class="char">Boyle.</span> There's a terrible tatheraraa — that's a stranger — that's nobody belongin' to the house. <span class="stage">(Another loud knock.)</span></p>
+<p><span class="char">Joxer.</span> <span class="stage">(sticking his head in at the door)</span>. Did ye hear them tatherarahs?</p>
+<p><span class="char">Boyle.</span> Well, Joxer, I'm not deaf.</p>
+<p><span class="char">Johnny.</span> <span class="stage">(appearing in his shirt and trousers at the door on left; his face is anxious and his voice is tremulous)</span>. Who's that at the door;</p>
+<p>who's that at the door? Who gave that knock — d'ye yous hear me — are yous deaf or dhrunk or what?</p>
+<p><span class="char">Boyle.</span> <span class="stage">(to JOHNNY)</span>. How the hell do I know who 'tis? Joxer, stick your head out o' the window an' see.</p>
+<p><span class="char">Joxer.</span> An' mebbe get a bullet in the kisser? Ah, none o' them thricks for Joxerl It's betther to be a coward than a corpse!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(looking cautiously out of the window)</span>. It's a fella in a thrench coat.</p>
+<p><span class="char">Johnny.</span> Holy Mary, Mother o' God, I ...</p>
+<p><span class="char">Boyle.</span> He's goin' away — he must ha' got tired knockin'.</p>
+<p><span class="stage">(JOHNNY returns to the room on left.)</span></p>
+<p><span class="char">Boyle.</span> Sit down an' have a cup o' tay, Joxer.</p>
+<p><span class="char">Joxer.</span> I'm afraid the missus ud pop in on us agen before we'd know where we are. Somethins tellin' me to go at wanst.</p>
+<p><span class="char">Boyle.</span> Don't be superstitious, man; we're Dublin men, an' not boyos that's only afther comin' up from the bog o' Allen — though if she did come in, right enough, we'd be caught like rats in a thrap.</p>
+<p><span class="char">Joxer.</span> An' you know the sort she is — she wouldn't listen to reason — an' wanse bitten twice shy.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(going over to the window at back)</span>. If the worst came to the worst, you could dart out here, Joxer; it's only a dhrop of a few feet to the roof of the return room, an' the first minute she goes into dh'other room, I'll give you the bend, an' you can slip in an' away,</p>
+<p><span class="char">Joxer.</span> <span class="stage">(yielding to the temptation)</span>. Ah, I won't stop very long anyhow. <span class="stage">(Picking up a book from the table)</span> Who's is the buk?</p>
+<p><span class="char">Boyle.</span> Aw, one o' Mary's; she's always readin' lately — nothin' but thrash, too. There's one I was lookin' at dh'other day: three stories, The Doll's House, Ghosts, an' The Wild Duck — buks only fit for chiselurs !</p>
+<p><span class="char">Joxer.</span> Didja ever rade Elizabeth, or TK Exile o' Sibayria ... ah, it's a darlin' story, a daarlin' story !</p>
+<p><span class="char">Boyle.</span> You eat your sassige, an' never min' TV Exile o Sibayria.</p>
+<p><span class="stage">(Both sit down; BOYLE fills out tea, pours gravy on JOXER'S plate, and keeps the sausage for himself)</span></p>
+<p><span class="char">Joxer.</span> What are you wearin' your moleskin trousers for?</p>
+<p><span class="char">Boyle.</span> I have to go to a job, Joxer. Just afther you'd gone, Devine kem runnin' in to tell us that Father Farrell said if I went down to the job that's goin' on in Rathmines I'd get a start.</p>
+<p><span class="char">Joxer.</span> Be the holy, that's good news!</p>
+<p><span class="char">Boyle.</span> How is it good news? I wondher if you were in my condition, would you call it good news?</p>
+<p><span class="char">Joxer.</span> I thought . . .</p>
+<p><span class="char">Boyle.</span> You thought! You think too sudden sometimes, Joxer. D'ye know, I'm hardly able to crawl with the pains in me legs!</p>
+<p><span class="char">Joxer.</span> Yis, yis; I forgot the pains in your legs. I know you can do nothin' while they're at you,</p>
+<p><span class="char">Boyle.</span> You forgot; I don't think any of yous realize the state I'm in with the pains in me legs. What ud happen if I had to carry a bag o' cement?</p>
+<p><span class="char">Joxer.</span> Ah, any man havin' the like of them pains id be down an' out, down an' out.</p>
+<p><span class="char">Boyle.</span> I wouldn't mind if he had said it to meself; but, no, oh no, he rushes in an' shouts it out in front o' Juno, an' you know what Juno is, Joxer. We all know Devine knows a little more than the rest of us, but he doesn't act as if he did; he's a good boy, sober, able to talk an' all that, but still . . .</p>
+<p><span class="char">Joxer.</span> Oh ay; able to argufy, but still . . .</p>
+<p><span class="char">Boyle.</span> If he's runnin' afther Mary, aself, he's not goin' to be runnin' afther me. Captain Boyle's able to take care of himself. Afther</p>
+
+<p><span class="char">All.</span> I'm not gettin' brought up on Virol. I never heard him usin' a curse; I don't believe he was ever dhrunk in his life — sure he's not like a Christian at all!</p>
+<p><span class="char">Joxer.</span> You're afther takin' the word out o' me mouth — afther all, a Christian's natural, but he's unnatural.</p>
+<p><span class="char">Boyle.</span> His ouP fella was just the same — a Wicklow man.</p>
+<p><span class="char">Joxer.</span> A Wicklow manl That explains the whole thing. I've met many a Wicklow man in me time, but I never met wan that was any good.</p>
+<p><span class="char">Boyle.</span> " Father Farrell," says he, " sent me down to tell you." Father Farrell! . . . D'ye know, Joxer, I never like to be beholden to any o' the clergy.</p>
+<p><span class="char">Joxer.</span> It's dangerous, right enough.</p>
+<p><span class="char">Boyle.</span> If they do anything for you, they'd want you to be livin' in the Chapel. . . . I'm goin' to tell you something Joxer, that I wouldn't tell to anybody else — the clergy always had too much power over the people in this unfortunate country.</p>
+<p><span class="char">Joxer.</span> You could sing that if you had an air to it! r</p>
+<p><span class="char">Boyle.</span> <span class="stage">(becoming enthusiastic)</span>. Didn't they prevent the people in " '47 " from seizin' the</p>
+<p>corn, an' they starvin'; didn't they down Parnell; didn't they say that hell wasn't hot enough nor eternity long enough to punish the Fenians? We don't forget, we don't forget them things, Joxer. If they've taken everything else from us, Joxer, they've left us our memory.</p>
+<p><span class="char">Joxer.</span> <span class="stage">(emotionally)</span>. For mem'ry's the only friend that grief can call its own, that grief . , . can . . . call ... its ownl</p>
+<p><span class="char">Boyle.</span> Father Farrell's beginnin' to take a great intherest in Captain Boyle; because of what Johnny did for his country, says he to me wan day. It's a curious way to reward Johnny be makin' his poor oul' father work. But, that's what the clergy want, Joxer — work, work, work for me an' you; havin' us mulin' from mornin' till night, so that they may be in betther fettle when they come hoppin' round for their dues! Job! Well, let him give his job to wan of his hymn-singin', prayer-spoutin', craw-thumpin' Confraternity men !</p>
+<p>.,. <span class="stage">(The voice of a coal-block vendor is heard chanting in the street.)</span></p>
+<p><span class="char">Voice of Coal Vendor.</span> Blocks . • . Coal-</p>
+<p>blocksl Blocks . . . coal-blocks!</p>
+<p><span class="char">Joxer.</span> God be with the young days when you were steppin' the deck of a manly ship, with</p>
+
+<p>the win' blowin' a hurricane through the masts, an' the only sound you'd hear was, " Port your helm! " an' the only answer, " Port it is, sir! "</p>
+<p><span class="char">Boyle.</span> Them was days, Joxer, them was days. Nothin' was too hot or too heavy for me then. Sailin' from the Gulf o' Mexico to the Antanartic Ocean. I seen things, I seen things, Joxer, that no mortal man should speak about that knows his Catechism. Ofen, an' ofen, when I was fixed to the wheel with a marlinspike, an' the wins blowin' fierce an' the waves lashin' an' lashin', till you'd think every minute was goin' to be your last, an' it blowed, an' blowed — blew is the right word, Joxer, but blowed is what the sailors use. . . .</p>
+<p><span class="char">Joxer.</span> Aw, it's a darlin' word, a daarlin' word.</p>
+<p><span class="char">Boyle.</span> An', as it blowed an' blowed, I ofen looked up at the sky an' assed meself the question — what is the stars, what is the stars?</p>
+<p><span class="char">Voice of Coal Vendor.</span> Any blocks, coalblocks;' blocks, coal-blocks !</p>
+<p><span class="char">Joxer.</span> Ah, that's the question, that's the question — what is the stars?</p>
+<p><span class="char">Boyle.</span> An' then, I'd have another look, an' I'd ass meself — what is the moon?</p>
+<p><span class="char">Joxer.</span> Ah, that's the question — what is the moon, what is the moon?</p>
+<p><span class="stage">(Rapid steps are heard coming towards the door. BOYLE makes desperate efforts to hide everything; JOXER rushes to the window in a frantic effort to get out; BOYLE begins to innocently lilt " O/z, me darlin' Jennie, I will be thrue to thee ", when the door is opened, and the black face of the COAL VENDOR appears)</span> THE COAL VENDOR. D'yes want any blocks? BOYLE <span class="stage">(with a roar)</span>. No, we don't want any blocks !</p>
+<p><span class="char">Joxer.</span> <span class="stage">(coming back with a sigh of relief)</span>. That's afther puttin' the heart across me — I could ha' sworn it was Juno, I'd betther be goin', Captain; you couldn't tell the minute Juno'd hop in on us.</p>
+<p><span class="char">Boyle.</span> Let her hop in; we may as well have it out first as at last. I've made up me mind — I'm not goin' to do only what she damn well likes.</p>
+<p><span class="char">Joxer.</span> Them sentiments does you credit. Captain; I don't like to say anything as between man an' wife, but I say as a butty, as a butty, Captain, that you've stuck it too long, an' that it's about time you showed a little spunk.</p>
+<p>How can a man die betther than facin' fearful odds, For th' ashes of his fathers an' the temples of his gods:</p>
+<p><span class="char">Boyle.</span> She has her rights — there's no one denyin' it, but haven't I me rights too?</p>
+<p><span class="char">Joxer.</span> Of course you have — the sacred rights o' man!</p>
+<p><span class="char">Boyle.</span> To-day, Joxer, there's goin' to be issued a proclamation be me, establishin' an independent Republic, an' Juno'll have to take an oath of allegiance.</p>
+<p><span class="char">Joxer.</span> Be firm, be firm, Captain; the first few minutes'll be the worst : — if you gently touch a nettle it'll sting you for your pains; grasp it like a lad of mettle, an' as soft as silk remains!</p>
+<p>VOICE OF JUNO OUTSIDE. Can't stop, Mrs. Madigan — I haven't a minute!</p>
+<p><span class="char">Joxer.</span> <span class="stage">(Jlying out of the window)</span>. Holy God, here she is!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(packing the things away with a rush in the press)</span>. I knew that fella ud stop till she was in on top of us! <span class="stage">(He sits down by the fire)</span> <span class="stage">(JUNO enters hastily; she is flurried and excited)</span></p>
+<p>JUNO. Oh, you're in — you must have been only afther comin' in?</p>
+<p><span class="char">Boyle.</span> No, I never went out.</p>
+<p>JUNO. It's curious, then, you never heard the knockin'.</p>
+<p><span class="stage">(She puts her coat and hat on bed)</span></p>
+<p><span class="char">Boyle.</span> Knockin'? Of course I heard the knockin',</p>
+<p>JUNO. An' why didn't you open the door, then? I suppose you were so busy with Joxer that you hadn't time.</p>
+<p><span class="char">Boyle.</span> I haven't seen Joxer since I seen him before. Joxer ! What ud bring Joxer here?</p>
+<p>JUNO. D'ye mean to tell me that the pair of yous wasn't collogin' together here when me back was turned?</p>
+<p><span class="char">Boyle.</span> What ud we be collogin' together about? I have somethin' else to think of besides collogin' with Joxer. I can swear on all the holy prayer-books . . .</p>
+<p><span class="char">Mrs. Boyle.</span> That you weren't in no snugl Go on in at wanst now, an' take off that moleskin trousers o' yours, an' put on a collar an' tie to smarten yourself up a bit. There's a visitor comin' with Mary in a minute, an' he has great news for you.</p>
+<p><span class="char">Boyle.</span> A job, I suppose; let us get wan first before we start lookin' for another.</p>
+<p><span class="char">Mrs. Boyle.</span> That's the thing that's able to put the win' up you. Well, it's no job, but news that'll give you the chance o' your life.</p>
+<p><span class="char">Boyle.</span> What's all the mysthery about?</p>
+<p><span class="char">Mrs. Boyle.</span> G'win an take off the moleskin trousers when you're told!</p>
+<p><span class="stage">(BOYLE goes into room on left.) (MRS. BOYLE tidies up the room, puts the shovel under the bed, and goes to the press.)</span></p>
+<p><span class="char">Mrs. Boyle.</span> Oh, God bless us, looka the way everything's thrun about! Oh, Joxer was here, Joxer was here!</p>
+<p><span class="stage">(MARY enters with CHARLIE BENTHAM; he is a young man of twenty-five, tall, good-looking, with a very high opinion of himself generally. He is dressed in a brown coat, brown knee-breeches, grey stockings, a brown sweater, with a deep blue tie; he carries gloves and a walking-stick.)</span> MRS. BOYLE <span class="stage">(fussing round)</span>. Come in, Mr. Bentham; sit down, Mr. Bentham, in this chair; it's more comfortabler than that, Mr. Bentham. Himself'll be here in a minute; he's just takin' off his trousers. MARY. Mother!</p>
+<p><span class="char">Bentham.</span> Please don't put yourself to any trouble, Mrs. Boyle — I'm quite all right here, thank you.</p>
+<p><span class="char">Mrs. Boyle.</span> An' to think of you knowin' Mary, an' she knowin' the news you had for</p>
+<p>us, an' wouldn't let on; but it's all the more welcomer now, for we were on our last lap!</p>
+<p><span class="char">Voice of Johnny.</span> What are you kickin' up all the racket for?</p>
+<p><span class="char">Boyle.</span> (roughly]. I'm takin' off me moleskin trousers !</p>
+<p><span class="char">Johnny.</span> Can't you do it, then, without lettin' th' whole house know you're takin' off your trousers? What d'ye want puttin' them on an' takin' them off again?</p>
+<p><span class="char">Boyle.</span> Will you let me alone, will you let me alone? Am I never goin' to be done thryin' to please th' whole o' yous?</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(to BENTHAM)</span>. You must EXCUSE</p>
+<p>th' state o' th' place, Mr. Bentham; th' minute I turn me back that man o' mine always makes a litther o' th' place, a litther o' th' place.</p>
+<p><span class="char">Bentham.</span> Don't worry, Mrs. Boyle; it's all right, I assure . . .</p>
+<p><span class="char">Boyle.</span> <span class="stage">(inside)</span>. Where's me braces; where in th' name o' God did I leave me braces. . . . Ay, did you see where I put me braces?</p>
+<p><span class="char">Johnny.</span> <span class="stage">(inside, calling out)</span>. Ma, will you come in here an' take da away ou' o' this or he'll dhrive me mad.</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(going towards door)</span>. Dear, dear, dear, that man'll be lookin' for somethin'</p>
+<p>on th' day o' Judgement. <span class="stage">(Looking into room and calling to BOYLE)</span> Look at your braces, man, hangin' round your neck!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(inside)</span>. Aw, Holy Godl</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(calling)</span>. Johnny, Johnny, come out here for a minute.</p>
+<p><span class="char">Johnny.</span> Ah, leave Johnny alone, an' don't be annoyin' him!</p>
+<p><span class="char">Mrs. Boyle.</span> Come on, Johnny, till I inthroduce you to Mr. Bentham. <span class="stage">(To BENTHAM)</span> Me son, Mr. Bentham; he's afther goin' through the mill. He was only a chiselur of a Boy Scout in Easter Week, when he got hit in the hip; and his arm was blew off in the fight in O'Connell Street. <span class="stage">(JOHNNY comes in)</span> Here he is, Mr. Bentham; Mr, Bentham, Johnny. None can deny he done his bit for Irelan', if that's goin' to do him any good,</p>
+<p><span class="char">Johnny.</span> <span class="stage">(boastfully)</span>. I'd do it agen, ma, I'd do it agen; for a principle's a principle.</p>
+<p><span class="char">Mrs. Boyle.</span> Ah, you lost your best principle, me boy, when you lost your arm; them's the only sort o' principles that's any good to a workin' man.</p>
+<p><span class="char">Johnny.</span> Ireland only half free'll never be at peace while she has a son left to pull a trigger.</p>
+<p><span class="char">Mrs. Boyle.</span> To be sure, to be sure — no</p>
+<p>bread's a lot betther than half a loaf, <span class="stage">( Calling loudly into BOYLE)</span> Will you hurry up there?</p>
+<p><span class="stage">(BOYLE enters in his best trousers, which arent too good, and looks very uncomfortable in his collar and tie)</span></p>
+<p><span class="char">Mrs. Boyle.</span> This is me husband; Mr. Boyle, Mr. Bentham.</p>
+<p><span class="char">Bentham.</span> Ah, very glad to know you, Mr, Boyle. How are you?</p>
+<p><span class="char">Boyle.</span> Ah, I'm not too well at all; I suffer terrible with pains in me legs. Juno can tell you there what . . .</p>
+<p><span class="char">Mrs. Boyle.</span> You won't have many pains in your legs when you hear what Mr. Bentham has to tell you.</p>
+<p><span class="char">Bentham.</span> Junol What an interesting jiamej It reminds, one of Homer' s~glorious story of ancient gods and heroes ,' BOYLE Yis doesn't it? You see, Juno was born an' christened, in june,I met her in June;' we were married in June an Johnny was born in June, j>o wan day I says to her,l' You. should ha' hfffn cnWeA Tnnn " an' the name stuck to.</p>
+<p><span class="char">Mrs. Boyle.</span> Here, we can talk o' them things agen; let Mr. Bentham say what he has to say now.</p>
+<p><span class="char">Bentham.</span> Well, Mr, Boyle, I suppose</p>
+<p>you'll remember a Mr. Ellison of Santry — he's a relative of yours, I think.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(viciously)</span>. Is it that prognosticator an' procrastinator! Of course I remember him.</p>
+<p><span class="char">Bentham.</span> Well, he's dead, Mr. Boyle . . . BOYLE. Sorra many'll go into mournin' for him.</p>
+<p><span class="char">Mrs. Boyle.</span> Wait till you hear what Mr. Bentham has to say, an' then, maybe, you'll change your opinion.</p>
+<p><span class="char">Bentham.</span> A week before he died he sent for me to write his will for him. He told me that there were two only that he wished to leave his property to: his second cousin, Michael Finnegan of Santry, and John Boyle, his first cousin of Dublin.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(excitedly)</span>. Me, is it me, me?</p>
+<p><span class="char">Bentham.</span> You, Mr. Boyle; I'll read a copy of the will that I have here with me, which has been duly filed in the Court of Probate. (He takes a paper from his pocket and</p>
+<p>reads)' 6th February 1922.</p>
+<p>This is the last Will and Testament of William Ellison, of Santry, in the County of Dublin. 1 hereby order and wish my property to be sold and divided as follows: —</p>
+<p>£20 to the St. Vincent De Paul Society.</p>
+<p>4'</p>
+<p>£60 for Masses for the repose of my soul <span class="stage">('5s. for Each Mass)</span>.</p>
+<p>The rest of my property to be divided between my first and second cousins.</p>
+<p>I hereby appoint Timothy Buddy, of Santry, and Hugh Brierly, of Coolock, to be my Executors.</p>
+<p><span class="stage">(Signed)</span> WILLIAM ELLISON. HUGH BRIERLY. TIMOTHY BUCKLY. CHARLES BENTHAM, NT.</p>
+<p><span class="char">Boyle.</span> (eagerly]. An 1 how much'll be comin' out of it, Mr. Bentham?</p>
+<p><span class="char">Bentham.</span> The Executors told me that half of the property would be anything between £1500 and £2000.</p>
+<p><span class="char">Mary.</span> A fortune, father, a fortune !</p>
+<p><span class="char">Johnny.</span> We'll be able to get out o' this place now, an' go somewhere we're not known.</p>
+<p><span class="char">Mrs. Boyle.</span> You won't have to trouble about a job for awhile, Jack.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(fervently)</span>. I'll never doubt the goodness o' God agen.</p>
+<p><span class="char">Bentham.</span> I congratulate you, Mr. Boyle. <span class="stage">(They shake hands.)</span></p>
+<p><span class="char">Boyle.</span> An' now, Mr. Bentham, you'll have to have a wet.</p>
+<p><span class="char">Bentham.</span> A Wet?</p>
+<p><span class="char">Boyle.</span> A wet — ajar — a boull</p>
+<p><span class="char">Mrs. Boyle.</span> Jack, you're speakin' to Mr. Bentham, an' not to Joxer.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(solemnly)</span>. Juno . . . Mary . . . Johnny . . . we'll have to go into mournin' at wanst. ... I never expected that poor Bill ud die so sudden. . . . Well, we all have to die some day . . . you, Juno, to-day ... an' me, maybe, to-morrow. . . . It's sad, but it can't be helped. . . . Requiescat in pace . . . or, usin' our oul' tongue like St. Patrick or St. Briget, Guh sayereejeea ayera!</p>
+<p><span class="char">Mary.</span> Oh, father, that's not Rest in Peace; that's God save Ireland.</p>
+<p><span class="char">Boyle.</span> U-u-ugh, it's all the same — isn't it a prayer? . . . Juno, I'm done with Joxer; he's nothin' but a prognosticator an' a ...</p>
+<p><span class="char">Joxer.</span> <span class="stage">(climbing angrily through the window and bounding into the room)</span>. You're done with Joxer, are you? Maybe you thought I'd stop on the roof all the night for you! Joxer out on the roof with the win' blowin' through him was nothin' to you an' your friend with the collar an' tie!</p>
+<p><span class="char">Mrs. Boyle.</span> What in the name o' God brought you out on the roof; what were you doin' there?</p>
+<p><span class="char">Joxer.</span> <span class="stage">(ironically)</span>. I was dhreamin' I was standin' on the bridge of a ship, an' she sailin'</p>
+<p>the Antartic Ocean, an' it blowed, an' blowed, an' I lookin' up at the sky an' sayin', what is the stars, what is the stars?</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(opening the door and standing at it)</span>. Here, get ou' o' this, Joxer Daly; I was always thinkin' you had a slate off.</p>
+<p><span class="char">Joxer.</span> <span class="stage">(moving to the door)</span>. I have to laugh every time I look at the deep-sea sailor; an' a row on a river ud make him sea-sick 1</p>
+<p><span class="char">Boyle.</span> Get ou' o' this before I take the law into me own hands 1</p>
+<p><span class="char">Joxer.</span> <span class="stage">(going out)</span>. Say aw rewaeawr, but not good-bye. Lookin' for work, an' prayin' to God he won't get itl <span class="stage">( He goes. ')</span></p>
+<p><span class="char">Mrs. Boyle.</span> I'm tired tellin' you what Joxer was; maybe now you see yourself the kind he is.</p>
+<p><span class="char">Boyle.</span> He'll never blow the froth off a pint o' mine agen, that's a sure thing. Johnny . . . Mary . . . you're to keep yourselves to yourselves for the future. Juno, I'm done with Joxer. . . . I'm a new man from this out. . . . (Clasping JUNO'S hand, and singing emotionally]:</p>
+<p>Oh, me darlin 1 Juno, I will be thrue to thee;</p>
+<p>Me own, me darlin' Juno, you're all the world to me.</p>
+<p style="text-align:center; margin-top:2rem; font-style:italic; color:var(--ink-muted);">CURTAIN</p>
+    </section>
+
+    <!-- ACT II -->
+    <section data-toc="Act II" id="act2-content">
+      <h2 class="act-title" id="act2">Act II</h2>
+<div class="scene-description">SCENE: The same, but the furniture is more plentiful, and of a vulgar nature. A glaringly upholstered arm-chair and lounge; cheap pictures and photos everywhere. Every available spot is ornamented with huge vases filled with artificial flowers. Crossed festoons of coloured paper chains stretch from end to end of ceiling. On the table is an old attache case. It is about six in the evening, and two days after the First Act. BOYLE, in his shirt sleeves, is voluptuously stretched on the sofa; he is smoking a clay pipe. He is half asleep. A lamp is lighting on the table. After a few moments' pause the voice of JOXER is heard singing softly outside at the door — " Me pipe I'll smoke, as I dhrive ,me moke — are you there, Mor . , . ee . . , ar .../.. . teet!"</div>
+<p><span class="char">Boyle.</span> <span class="stage">(leaping up, takes a pen in his hand and busies himself with papers)</span>. Come along, Joxer, me son, come along.</p>
+<p><span class="char">Joxer.</span> <span class="stage">(putting his head in)</span>. Are you be yourself?</p>
+<p><span class="char">Boyle.</span> Come on, come on; that doesn't matther; I'm masther now, an' I'm goin' to remain masther.</p>
+<p><span class="stage">(JOXER comes in.)</span> JOXER. How d'ye feel now, as a man o' money?</p>
+<p><span class="char">Boyle.</span> <span class="stage">(solemnly)</span>. It's a responsibility, Joxer, a great responsibility.</p>
+<p><span class="char">Joxer.</span> I suppose 'tis now, though you wouldn't think it.</p>
+<p><span class="char">Boyle.</span> Joxer, han' me over that attackey case on the table there. <span class="stage">(JOXER hands the case.)</span> Ever since the Will was passed I've run hundhreds o' dockyments through me hans — I tell you, you have to keep your wits about you. <span class="stage">(He busies himself with papers.)</span></p>
+<p><span class="char">Joxer.</span> Well, I won't disturb you; I'll dhrop in when . . .</p>
+<p><span class="char">Boyle.</span> <span class="stage">(hastily)</span>. It's all right, Joxer, this is the last one to be signed to-day. <span class="stage">(He signs a paper, puts it into the case, which he shuts' with a snap, and sits back pompously in the chair.)</span> Now, Joxer, you want to see me; I'm at</p>
+<p>your service — what can I do for you, me man?</p>
+<p><span class="char">Joxer.</span> I've just dhropped in with the £3 : 55. that Mrs. Madigan riz on the blankets an' table for you, an' she says you're to be in no hurry payin' it back.</p>
+<p><span class="char">Boyle.</span> She won't be long without it; I expect the first cheque for a couple o' hundhred any day. There's the five bob for yourself — go on, take it, man; it'll not be the last you'll get from the Captain. Now an' agen we have our differ, but we're there together all the time.</p>
+<p><span class="char">Joxer.</span> Me for you, an' you for me, like the two Musketeers.</p>
+<p><span class="char">Boyle.</span> Father Farrell stopped me to-day an' tole me how glad he was I fell in for the money.</p>
+<p><span class="char">Joxer.</span> He'll be stoppin' you ofen enough now; I suppose it was " Mr. " Boyle with him?</p>
+<p><span class="char">Boyle.</span> He shuk me be the han'. . . .</p>
+<p><span class="char">Joxer.</span> <span class="stage">(ironically)</span>. I met with Napper Tandy, an' he shuk me be the han'!</p>
+<p><span class="char">Boyle.</span> You're seldom asthray, Joxer, but you're wrong shipped this time. What you're sayin' of Father Farrell is very near to blasfeemey. I don't like any one to talk disrespectful of Father Farrell,</p>
+<p><span class="char">Joxer.</span> You're takin' me up wrong. Captain; I wouldn't let a word be said agen Father Farrell — the heart o' the rowl, that's what he is; I always said he was a darlin' man, a daarlin' man.</p>
+<p><span class="char">Boyle.</span> Comin' up the stairs who did I meet but that bummer, Nugent. " I seen you talkin' to Father Farrell," says he, with a grin on him. " He'll be folleyin' you," says he, " like a Guardian Angel from this out " — all the time the oul' grin on him, Joxer.</p>
+<p><span class="char">Joxer.</span> I never seen him yet but he had that oul' grin on him!</p>
+<p><span class="char">Boyle.</span> " Mr. Nugent," says I, " Father Farrell is a man o' the people, an', as far as I know the History o' me country, the priests was always in the van of the fight for Irelan's freedom."</p>
+<p><span class="char">Joxer.</span> <span class="stage">(fervently)</span>:</p>
+<p>Who was it led the van, Soggart Aroon? Since the fight first began, Soggart Aroon?</p>
+<p><span class="char">Boyle.</span> " Who are you tellin'," says he? " Didn't they let down the Fenians, an' didn't they do in Parnell? An' now ..." " You ought to be ashamed o' yourself," says I, interruptin' him, " not to know the History o' your country." An' I left him gawkin' where he was.</p>
+<p><span class="char">Joxer.</span> Where ignorance 's bliss,tis folly to be_wise_;_ I wondher did he ever" read the "Story o' Irelan'.</p>
+<p><span class="char">Boyle.</span> Be J. L. Sullivan? Don't you know he didn't.</p>
+<p><span class="char">Joxer.</span> Ah, it's a darlin' buk, a daarlin' buk!</p>
+<p><span class="char">Boyle.</span> You'd betther be goin', now, Joxer, his Majesty, Bentham, '11 be here any minute, now.</p>
+<p><span class="char">Joxer.</span> Be the way things is lookin', it'll be a match between him an' Mary. She's thrun over Jerry altogether. Well, I hope it will, for he's a darlin' man.</p>
+<p><span class="char">Boyle.</span> I'm glad you think so— I don't. (Irritably] What's darlin' about him?</p>
+<p><span class="char">Joxer.</span> <span class="stage">(nonplussed)</span>. I only seen him twiced; if you want to know me, come an' live with me.</p>
+<p><span class="char">Boyle.</span> He's too ignified for me — to hear him talk you'd think he knew as much as a Boney's Oraculum. He's given up his job as teacher, an' is goin' to become a solicitor in Dublin — he's been studyin' law. I suppose he thinks I'll set him up, but he's wrong shipped. An' th' other fella — Jerry's as bad. The two o' them ud give you a pain in your face, listenin' to them; Jerry believin' in nothin', an' Bentham believin' in everythin',</p>
+<p>One that says all is God an' no man; an' th' other that says all is man an' no God!</p>
+<p><span class="char">Joxer.</span> Well, I'll be off now.</p>
+<p><span class="char">Boyle.</span> Don't forget to dhrop down afther awhile; we'll have a quiet jar, an' a song or two.</p>
+<p><span class="char">Joxer.</span> Never fear.</p>
+<p><span class="char">Boyle.</span> An' tell Mrs. Madigan that I hope we'll have the pleasure of her organization at our little enthertainment.</p>
+<p><span class="char">Joxer.</span> Righto; we'll come down together.</p>
+<p><span class="stage">(He goes out.)</span></p>
+<p><span class="stage">(JOHNNY comes from room on left)</span> and sits down moodily at the fire. BOYLE looks at him for a few moments, and shakes his head. He fills his pipe.) VOICE OF JUNO AT THE DOOR. Open the door. Jack; this thing has me nearly kilt with the weight.</p>
+<p><span class="stage">(BOYLE opens the door. JUNO enters carrying the box of a gramophone, followed by MARY carrying the horn and some parcels. JUNO leaves the box on the table and flops into a chair)</span> JUNO. Carryin' that from Henry Street was no joke.</p>
+<p><span class="char">Boyle.</span> U-u-ugh, that's a grand-lookin' insthrument — how much was it?</p>
+<p>JUNO. Pound down, an' five to be paid at two shillins a week.</p>
+<p><span class="char">Boyle.</span> That's reasonable enough.</p>
+<p>JUNO. I'm afraid we're runnin' into too much debt; first the furniture, an' now this.</p>
+<p><span class="char">Boyle.</span> The whole lot won't be much out of ,£2000.</p>
+<p><span class="char">Mary.</span> I don't know what you wanted a gramophone for — I know Charlie hates them; he says they're destructive of real music.</p>
+<p><span class="char">Boyle.</span> Desthructive of music — that fella ud give you a pain in your face. All a gramophone wants is to be properly played; it's thrue wondher is only felt when everythins quiet — what a gramophone wants is dead silence !</p>
+<p><span class="char">Mary.</span> But, father, Jerry says the same; afther all you can only appreciate music when your ear is properly trained.</p>
+<p><span class="char">Boyle.</span> That's another fella ud give you a pain in your face. Properly thrainedl I suppose you couldn't appreciate football unless your fut was properly thrained.</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(to MARY)</span>. Go on in ower that an' dress, or Charlie '11 be in on you, an' tea nor nothin '11 be ready.</p>
+<p><span class="stage">(MARY goes into room left)</span> 5'</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(arranging table for tea)</span>. You didn't look at our new gramophone, Johnny?</p>
+<p><span class="char">Johnny.</span> "Tisn't gramophones I'm thinking of.</p>
+<p><span class="char">Mrs. Boyle.</span> An' what is it you're thinkin' of, allanna?</p>
+<p><span class="char">Johnny.</span> Nothin', nothin', nothin'.</p>
+<p><span class="char">Mrs. Boyle.</span> Sure, you must be thinkin' of somethin'; it's yourself that has yourself the way y'are; sleepin' wan night in me sisther's, an' the nex' in your father's brother's — you'll get no rest goin' on that way.</p>
+<p><span class="char">Johnny.</span> I can rest nowhere, nowhere, nowhere.</p>
+<p><span class="char">Mrs. Boyle.</span> Sure, you're not thryin' to rest anywhere.</p>
+<p><span class="char">Johnny.</span> Let me alone, let me alone, let me alone, for God's sake.</p>
+<p><span class="stage">(A knock at street door)</span></p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(in a flutter)</span>. Here he is; here's Mr. Bentham!</p>
+<p><span class="char">Boyle.</span> Well, there's room for him; it's a pity there's not a brass band to play him in.</p>
+<p><span class="char">Mrs. Boyle.</span> We'll nan' the tea round, an' not be clusthered round the table, as if we never seen nothin'.</p>
+<p>(Steps are heard approaching, and JUNO,</p>
+<p>opening the door, allows BENTHAM to enter)</p>
+<p>JUNO. Give your hat an' stick to Jack, there ... sit down, Mr. Bentham ... no, not there ... in th' easy chair be the fire . . . there, that's betther. Mary'll be out to you in a minute.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(solemnly)</span>. I seen be the paper this mornin' that Consols was down half per cent. That's serious, min' you, an' shows the whole counthry's in a state o' chassis.</p>
+<p><span class="char">Mrs. Boyle.</span> What's Consols, Jack?</p>
+<p><span class="char">Boyle.</span> Consols? Oh, Consols is— oh, there's no use tellin' women what Consols is — th' wouldn't undherstand.</p>
+<p><span class="char">Bentham.</span> It's just as you were saying, Mr. Boyle ...</p>
+<p><span class="stage">(MARY enters, charmingly dressed)</span> BENTHAM. Oh, good evening, Mary; how pretty you're looking! MARY <span class="stage">(archly)</span>. Am I?</p>
+<p><span class="char">Boyle.</span> We were just talkin' when you kem in, Mary; I was tellin' Mr. Bentham that the whole counthry's in a state o' chassis.</p>
+<p><span class="char">Mary.</span> <span class="stage">(to BENTHAM)</span>. Would you prefer the green or the blue ribbon round me hair, Charlie?</p>
+<p><span class="char">Mrs. Boyle.</span> Mary, your father's speakin'.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(rapidly)</span>. I was jus' tellin' Mr. Bentham that the whole counthry's in a state o' chassis.</p>
+<p><span class="char">Mary.</span> I'm sure you're frettin', da, whether it is or no.</p>
+<p><span class="char">Mrs. Boyle.</span> With all our churches an', religions, the worl's not a bit the betther.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(with a commanding gesture)</span>. Tay! <span class="stage">(MARY and MRS, BOYLE dispense the tea.)</span></p>
+<p><span class="char">Mrs. Boyle.</span> An' Irelan's takin' a leaf out o' the worl's buk; when we got the makin' of our own laws I thought we'd never stop to look behind us, but instead of that we never stopped to look before us 1 If the people ud folley up their religion betther there'd be a betther chance for us — what do you think, Mr. Bentham?</p>
+<p><span class="char">Bentham.</span> I'm afraid I can't venture to express an opinion on that point, Mrs. Boyle; dogma has no attraction for me.</p>
+<p><span class="char">Mrs. Boyle.</span> I forgot you didn't hold with us: what's this you said you were?</p>
+<p><span class="char">Bentham.</span> A Theosophist, Mrs. Boyle.</p>
+<p><span class="char">Mrs. Boyle.</span> An' what in the name o' God 's a Theosophist?</p>
+<p><span class="char">Boyle.</span> A Theosophist, Juno, 's a — tell her, Mr. Bentham, tell her.</p>
+<p><span class="char">Bentham.</span> It's hard to explain in a few</p>
+<p>words: Theosophy's founded on The Vedas, the religious books of the East. It's central theme is the existence of an all-pervading Spirit — the Life-Breath. Nothing really exists but this one Universal Life Breath. And whatever even seems to exist separately from this LifeBreath, doesn't really exist at all. It is all vital force in man, in all animals, and in all vegetation. This Life-Breath is called the Prawna.</p>
+<p><span class="char">Mrs. Boyle.</span> The Prawnal What a comical name!</p>
+<p><span class="char">Boyle.</span> Prawna; yis, the Prawna. (Blowing gently through his lips] That's the Prawna!</p>
+<p><span class="char">Mrs. Boyle.</span> Whist, whist, Jack.</p>
+<p><span class="char">Bentham.</span> The happiness of man depends upon his sympathy with this Spirit. Men who have reached a high state of excellence are called Yogi. Some men become Yogi in a short time, it may take others millions of years.</p>
+<p><span class="char">Boyle.</span> Yogil I seen hundhreds of them in the streets o' San Francisco.</p>
+<p><span class="char">Bentham.</span> It is said by these Yogi that if we practise certain mental exercises that we would have powers denied to others — for instance, the faculty of seeing things that happen miles and miles away.</p>
+<p><span class="char">Mrs. Boyle.</span> I wouldn't care to meddle with</p>
+<p>that sort o' belief; it's a very curious religion, altogether.</p>
+<p><span class="char">Boyle.</span> What's curious about it? Isn't all religions curious; if they weren't, you wouldn't get any one to believe them. But religions is passin' away — they've had their day like everything else. Take the real Dublin people, frinstance: they know more about Charlie Chaplin an' Tommy Mix than they do about SS. Peter an' Paul!</p>
+<p><span class="char">Mrs. Boyle.</span> You don't believe in ghosts, Mr. Bentham?</p>
+<p><span class="char">Mary.</span> Don't you know he doesn't, mother?</p>
+<p><span class="char">Bentham.</span> I don't know that, Mary. Scientists are beginning to think that what we call ghosts are sometimes seen by persons of a certain nature. They say that sensational actions, such as the killing of a person, demands great energy, and that that energy lingers in the place where the action occurred. People may live in the place and see nothing, when some one may come along whose personality has some peculiar connection with the energy of the place, and, in a flash, the person sees the whole affair.</p>
+<p><span class="char">Johnny.</span> <span class="stage">(rising swiftly, pale and affected)</span>. What sort o' talk is this to be goin' on with? Is there nothin' betther to be talkin' about but</p>
+<p>the killin' o' people? My God, isn't it bad enough for these things to happen v/ithout talkin' about them! <span class="stage">(He hurriedly goes into the room on left.)</span></p>
+<p><span class="char">Bentham.</span> Oh, I'm very sorry, Mrs. Boyle; I never thought . . .</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(apologetically)</span>. Never mind, Mr. Bentham, he's very touchy. <span class="stage">(A frightened scream is heardfrom JOHNNY inside)</span></p>
+<p><span class="char">Mrs. Boyle.</span> Mother of God, what's that? <span class="stage">(He rushes out again, his face pale, his lips twitching, his limbs trembling)</span></p>
+<p><span class="char">Johnny.</span> Shut the door, shut the door, quick, for God's sake! Great God, have mercy on mel Blessed Mother o' God, shelter me, shelther your son!</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(catching him in her arms)</span>. What's wrong with you? What ails you? Sit down, sit down, here, on the bed . . . there now . . . there now.</p>
+<p><span class="char">Mary.</span> Johnny, Johnny, what ails you?</p>
+<p><span class="char">Johnny.</span> I seen him, I seen him . . . kneelin' in front o' the statue . . . merciful Jesus, have pity on mel</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(to BOYLE)</span>. Get him a glass o' whisky . . . quick, man, an' don't stand gawkin'.</p>
+<p><span class="stage">(BOYLE gets the whisky)</span></p>
+<p><span class="char">Johnny.</span> Sit here, sit here, mother , . . between me an' the door.</p>
+<p><span class="char">Mrs. Boyle.</span> I'll sit beside you as long as you like, only tell me what was it came across you at all?</p>
+<p><span class="char">Johnny.</span> <span class="stage">(after taking some drink)</span>. I seen him. ... I seen Robbie Tancred kneelin' down before the statue ... an' the red light shinin' on him ... an' when I went in he turned an' looked at me . . . an' I seen the wouns bleedin' in his breast. . . . Oh, why did he look at me like that ... it wasn't my fault that he was done in. ... Mother o' God, keep him away from me!</p>
+<p><span class="char">Mrs. Boyle.</span> There, there, child, you've imagined it all. There was nothin' there at all — it was the red light you seen, an' the talk we had put all the rest into your head. Here, dhrink more o' this — it'll do you good. . . . An', now, stretch yourself down on the bed for a little. <span class="stage">(To BOYLE)</span> Go in, Jack, an' show him it was only in his own head it was.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(making no move)</span>. E-e-e-e-eh; it's all nonsense; it was only a shadda he saw.</p>
+<p><span class="char">Mary.</span> Mother o' God, he made me heart lep!</p>
+<p><span class="char">Bentham.</span> It was simply due to an overwrought imagination — we all get that way at times.</p>
+<p><span class="char">Mrs. Boyle.</span> There, dear, lie down in the bed, an' I'll put the quilt across you . , . e-e-e-eh, that's it . . . you'll be as right as the mail in a few minutes.</p>
+<p><span class="char">Johnny.</span> Mother, go into the room an' see if the light's lightin' before the statue.</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(to BOYLE)</span>. Jack, run in an' see if the light's lightin' before the statue.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(to MARY)</span>. Mary, slip in an' see if the light's lightin' before the statue.</p>
+<p><span class="stage">(MARY hesitates to go in.)</span></p>
+<p><span class="char">Bentham.</span> It's all right; Mary, I'll go.</p>
+<p><span class="stage">(He goes into the room; remains for a few moments, and returns)</span></p>
+<p><span class="char">Bentham.</span> Everything's just as it was — the light burning bravely before the statue.</p>
+<p><span class="char">Boyle.</span> Of course ; I knew it was all nonsense.</p>
+<p><span class="stage">(A knock at the door?] BOYLE (going to open the door)</span>. E-e-e-e-eh. (He opens it, and JOXER, followed by MRS. MADIGAN, enters. MRS. MADIGAN is a strong, dapper little woman of about forty-five; her face is almost always a widespread smile of complacency. She is a woman who, in manner at least, can mourn with them that mourn, and rejoice with them that do rejoice. When</p>
+<p>she is feeling comfortable, she is inclined to be reminiscent; when others say anything, orfollowing a statement made by herself, she has a habit of -putting her head a little to one side, and nodding it rapidly several times in succession, like a bird pecking at a hard berry. Indeed, she has a good deal of the bird in her, but the bird instinct is by no means a melodious one. She is ignorant, vulgar and forward, but her heart is generous withal. For instance, she would help a neighbour's sick child; she would probably kill the child, but her intentions would be to cure it; she would be more at home helping a drayman to lift a fallen horse. She is dressed in a rather soiled grey dress and a vivid purple blouse; in her hair is a huge comb, ornamented with huge coloured beads. She enters with a gliding step, beaming smile and nodding head. BOYLE receives them effusively,] BOYLE. Come on in, Mrs. Madigan; come</p>
+<p>on in; I was afraid you weren't comin'. . . .</p>
+<p>(Slyly] There's some people able to dhress, ay,</p>
+<p><span class="char">Joxer.</span> ?</p>
+<p><span class="char">Joxer.</span> Fair as the blossoms that bloom in</p>
+<p>the May, an' sweet as the scent of the newmown hay. . . . Ah, well she may wear them.</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(looking at MARY)</span>. I know some as are as sweet as the blossoms that bloom in the May — oh, no names, no pack dhrill 1</p>
+<p><span class="char">Boyle.</span> An', now, I'll inthroduce the pair o' yous to Mary's intended: Mr. Bentham, this is Mrs. Madigan, an oul' back-parlour neighbour, that, if she could help it at all, ud never see a body shukl</p>
+<p><span class="char">Bentham.</span> <span class="stage">(rising, and tentatively shaking the hand of MRS. MADIGAN)</span>. I'm sure, it's a great pleasure to know you, Mrs. Madigan.</p>
+<p><span class="char">Mrs. Madigan.</span> An' I'm goin' to tell you, Mr. Bentham, you're goin' to get as nice a bit o' skirt in Mary, there, as ever you seen in your puff. Not like some of the dhressed-up dolls that's knockin' about lookin' for men when it's a skelpin' they want. I remember, as well as I remember yestherday, the day she was born — of a Tuesday, the 25th o' June, in the year 1901, at thirty-three minutes past wan in the day be Foley's clock, the pub at the corner o' the street. A cowld day it was too, for the season o' the year, an' I remember sayin' to Joxer, there, who I met comin' up th stairs, that the new arrival in Boyle's ud grow up a</p>
+<p>hardy chiselur if it lived, an that she'd be somethin' one o' these days that nobody suspected, an' so signs on it, here she is to-day, goin' to be married to a young man lookin' as if he'd be fit to commensurate in any position in life it ud please God to call him!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(effusively)</span>. Sit down, Mrs. Madigan, sit down, me oul' sport. <span class="stage">(To BENTHAM)</span> This is Joxer Daly, Past Chief Ranger of the Dear Little Shamrock Branch of the Irish National Foresters, an oul' front-top neighbour, that never despaired, even in the darkest days of Ireland's sorra.</p>
+<p><span class="char">Joxer.</span> Nil desperandum, Captain, nil desperandum.</p>
+<p><span class="char">Boyle.</span> Sit down, Joxer, sit down. The two of us was ofen in a tight corner.</p>
+<p><span class="char">Mrs. Boyle.</span> Ay, in Foley's snug!</p>
+<p><span class="char">Joxer.</span> An 1 we kem out of it flyin', we kem out of it flyin', Captain.</p>
+<p><span class="char">Boyle.</span> An', now, for a dhrink — I know yous won't refuse an oul' friend.</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(to JUNO)</span>. Is Johnny not well, Mrs. . . .</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(warningly)</span>. S-s-s-sh.</p>
+<p><span class="char">Mrs. Madigan.</span> Oh, the poor darlin'.</p>
+<p><span class="char">Boyle.</span> Well, Mrs. Madigan, is it tea or what?</p>
+
+<p><span class="char">Mrs. Madigan.</span> Well, speakin' for meself, I jus' had me tea a minute ago, an' I'm afraid to dhrink any more — I'm never the same when I dhrink too much tay. Thanks, all the same, Mr. Boyle.</p>
+<p><span class="char">Boyle.</span> Well, what about a bottle o' stout or a dhrop o' whisky?</p>
+<p><span class="char">Mrs. Madigan.</span> A bottle o' stout ud be a little too heavy for me stummock afther me tay. . . . A-a-ah, I'll thry the ball o' malt.</p>
+<p><span class="stage">(BOYLE prepares the whisky.)</span></p>
+<p><span class="char">Mrs. Madigan.</span> There's nothin' like a ball o' malt occasional like — too much of it isn't good. <span class="stage">(To BOYLE, who is adding water)</span> Ah, God, Johnny, don't put too much wather on itl <span class="stage">(She drinks.)</span> I suppose yous'll be lavin' this place.</p>
+<p><span class="char">Boyle.</span> I'm looking for a place near the sea; I'd like the place that you might say was me cradle, to be me grave as well. The sea is always callin' me.</p>
+<p><span class="char">Joxer.</span> She is callin', callin', callin', in the win' an' on the sea.</p>
+<p><span class="char">Boyle.</span> Another dhrop o' whisky, Mrs. Madigan?</p>
+<p><span class="char">Mrs. Madigan.</span> Well, now, it ud be hard to refuse seein' the suspicious times that's in it.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(with a commanding gesture)</span>. Song! . . , Juno . . . Mary ..." Home to Our Mountins " !</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(enthusiastically)</span>. Hear, hear!</p>
+<p><span class="char">Joxer.</span> Oh, tha's a darlin' song, a daarlin' song!</p>
+<p><span class="char">Mary.</span> <span class="stage">(bashfully)</span>. Ah no, da; I'm not in a singin' humour.</p>
+<p><span class="char">Mrs. Madigan.</span> Gawn with you, child, an' you only goin' to be marrid; I remember as well as I remember yestherday, — it was on a lovely August evenin', exactly, accordin' to date, fifteen years ago, come the Tuesday folleyin' the nex' that's comin' on, when me own man <span class="stage">(the Lord be good to him")</span> an' me was sittin' shy together in a doty little nook on a counthry road, adjacent to The Stiles. " That'll scratch your lovely, little white neck," says he, ketchin' hould of a danglin' bramble branch, holdin' clusters of the loveliest flowers you ever seen, an' breakin' it off, so that his arm fell, accidental like, roun' me waist, an' as I felt it tightening an' tightening an' tightening I thought me buzzum was every minute goin' to burst out into a roystherin' song about</p>
+<p>The little green leaves that were shakin' on the threes,</p>
+<p>The gallivantin' buttherflies, an' buzzin' o' the bees!</p>
+<p><span class="char">Boyle.</span> Ordher for the song! JUNO, Come on, Mary — we'll do our best. <span class="stage">(JUNO and MARY stand up, and choosing a suitable position, sing simply "Home to Our Mountains ".)</span> <span class="stage">(They bow to company, and return to their places)</span></p>
+<p><span class="char">Boyle.</span> <span class="stage">(emotionally, at the end of song)</span>. Lull , . . me ... to ... rest!</p>
+<p><span class="char">Joxer.</span> <span class="stage">(clapping his hands)</span>. Bravo, bravo 1 Darlin' girulls, darlin' girulls!</p>
+<p><span class="char">Mrs. Madigan.</span> Juno, I never seen you in betther form.</p>
+<p><span class="char">Bentham.</span> Very nicely rendered indeed. MRS. MADIGAN. A noble call, a noble call! MRS. BOYLE. What about yourself, Mrs. Madigan?</p>
+<p>(After some coaxing, MRS. MADIGAN rises, and in a quavering voice sings the following verse]:</p>
+<p class="song">If I were a blackbird I'd whistle and sing;</p>
+<p>I'd follow the ship that my thrue love was in;</p>
+<p>An' on the top riggin', I'd there build me nest,</p>
+<p>An' at night I would sleep on me Willie's white breast!</p>
+<p><span class="stage">(Becoming husky, amid applause, she sits down.)</span></p>
+<p>MRS, MADIGAN. Ah, me voice is too husky</p>
+<p>now, Juno; though I remember the time when Maisie Madigan could sing like a nightingale at matin' time. I remember as well as I remember yestherday, at a party given to celebrate the comin' of the first chiselur to Annie an' Benny Jimeson — who was the barber, yous may remember, in Henrietta Street, that, afther Easter Week, hung out a green, white an' orange pole, an', then, when the Tans started their Jazz dancin', whipped it in agen, an' stuck out a red, white an' blue wan instead, givin' as an excuse that a barber's pole was strictly non-political — singin' " An' You'll Remember Me ", with the top notes quiverin' in a dead hush of pethrified attention, folleyed be a clappin' o' hans that shuk the tumblers on the table, an' capped be Jimeson, the barber, sayin' that it was the best rendherin' of " You'll Remember Me " he ever heard in his natural!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(peremptorily)</span>. Ordher for Joxer's song!</p>
+<p><span class="char">Joxer.</span> Ah no, I couldn't; don't ass me, Captain.</p>
+<p><span class="char">Boyle.</span> Joxer's song, Joxer's song — give tis wan of your shut-eyed wans. <span class="stage">(JOXER settles himself in his chair; takes a drink; clears his throat; solemnly closes his eyes, and begins to sing in a very querulous voice)</span>:</p>
+<p>She is far from the Ian 1 where her young hero sleeps, An' lovers around her are sighing <span class="stage">(He hesitates.)</span></p>
+<p>An' lovers around her are sighin' . . . sighin' . . . sighin' . . . (Apause.j</p>
+<p><span class="char">Boyle.</span> <span class="stage">(imitating JOXER)</span> :</p>
+<p>And lovers around her are sighing!</p>
+<p>What's the use of you thryin' to sing the song if you don't know it?</p>
+<p><span class="char">Mary.</span> Thry another one, Mr. Daly — maybe you'd be more fortunate.</p>
+<p><span class="char">Mrs. Madigan.</span> Gawn, Joxer; thry another wan.</p>
+<p><span class="char">Joxer.</span> <span class="stage">(starting again)</span> :</p>
+<p>I have heard the mavis singin' his love song to the morn;</p>
+<p>I have seen the dew-dhrop clingin' to the rose jus' newly born; but . . . but . . . <span class="stage">(frantically)</span> To the rose jus' newly born . . . newly born . . . born.</p>
+<p><span class="char">Johnny.</span> Mother, put on the gramophone, for God's sake, an' stop Joxer's bawlin'.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(commandingly)</span>. Gramophone I . . . I hate to see fellas thryin' to do, what they're not able to do.</p>
+<p><span class="stage">(BOYLE arranges the gramophone, and is about to start it, when voices are heard of persons descending the stairs.)</span></p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(warmngly)</span>. Whisht, Jack, don't put it on, don't put it on yet; this must be poor Mrs. Tancred comin' down to go to the hospital — I forgot all about them bringin' the body to the church to-night. Open the door, Mary, an' give them a bit o' light.</p>
+<p><span class="stage">(MARY opens the door, and MRS. TANCRED — a very old woman, obviously shaken by the death of her son — appears, accompanied by several neighbours. The first few phrases are spoken before they appear)</span></p>
+<p><span class="char">First Neighbour.</span> It's a sad journey we're goin' on, but God's good, an' the Republicans won't be always down.</p>
+<p><span class="char">Mrs. Tancred.</span> Ah, what good is that to me now? Whether they're up or down — it won't bring me darlin' boy from the grave.</p>
+<p><span class="char">Mrs. Boyle.</span> Come in an' have a hot cup o' tay, Mrs. Tancred, before you go.</p>
+<p><span class="char">Mrs. Tancred.</span> Ah, I can take nothin' now, Mrs. Boyle — I won't be long afther him.</p>
+<p><span class="char">First Neighbour.</span> Still an' all, he died a noble death, an' we'll bury him like a king,</p>
+<p><span class="char">Mrs. Tancred.</span> An' I'll go on livin' like a pauper. Ah, what's the pains I suffered bringin' him into the world to carry him to his cradle, to the pains I'm sufferin' now, carryin'</p>
+
+<p>him out o' the world to bring him to his grave!</p>
+<p><span class="char">Mary.</span> It would be better for you not to go at all, Mrs. Tancred, but to stay at home beside the fire with some o' the neighbours.</p>
+<p><span class="char">Mrs. Tancred.</span> I seen the first of him, an 1 I'll see the last of him.</p>
+<p><span class="char">Mrs. Boyle.</span> You'd want a shawl, Mrs. Tancred; it's a cowld night, an' the win's blowin' sharp.</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(rushing out)</span>. I've a shawl above.</p>
+<p><span class="char">Mrs. Tancred.</span> Me home is gone, now; he was me only child, an' to think that he was lyin' for a whole night stretched out on the side of a lonely counthry lane, with his head, his darlin' head, that I ofen kissed an' fondled, half hidden in the wather of a runnin' brook. An' I'm told he was the leadher of the ambush where me nex' door neighbour, Mrs. Mannin', lost her Free State soldier son. An' now here's the two of us oul' women, standin' one on each side of a scales o' sorra, balanced be the bodies of our two dead darlin' sons. <span class="stage">(MRS. MADIGAN returns, and wraps a shawl around her. J God bless you, Mrs. Madigan. . . . (She moves slowly towards the door)</span> Mother o' God, Mother o' God, have pity on the pair of usl . . •</p>
+<p>0 Blessed Virgin, where were you when me darlin' son was riddled with bullets, when me darlin' son was riddled with bullets! . . . Sacred Heart of the Crucified Jesus, take away our hearts o' stone ... an' give us hearts o' flesh! . . . Take away this murdherin' hate . . an' give us Thine own eternal love!</p>
+<p><span class="stage">(They pass out of the room.)</span> MRS. BOYLE <span class="stage">(explanatorily to BENTHAM)</span>. That was Mrs. Tancred of the two-pair back; her son was found, e'er yestherday, lyin' out beyant Finglas riddled with bullets. A Die-hard he was, be all accounts. He was a nice quiet boy, but lattherly he went to hell, with his Republic first, an' Republic last an' Republic over all. He ofen took tea with us here, in the oul' days, an' Johnny, there, an' him used to be always together.</p>
+<p><span class="char">Johnny.</span> Am I always to be havin' to tell you that he was no friend o' mine; I never cared for him, an' he could never stick me. It's not because he was Commandant of the Battalion that I was Quarther-Masther of, that we were friends.</p>
+<p><span class="char">Mrs. Boyle.</span> He's gone now— the Lord be good to him! God help his poor oul' creature of 51 mother, for no matther whose friend or enemy he was, he was her poor son.</p>
+<p><span class="char">Bentham.</span> The whole thing is terrible, Mrs. Boyle; but the only way to deal with a mad dog is to destroy him.</p>
+<p><span class="char">Mrs. Boyle.</span> An' to think of me forgettin' about him bein' brought to the church to-night, an' we singin' an' all, but it was well we hadn't the gramophone goin', anyhow.</p>
+<p><span class="char">Boyle.</span> Even if we had aself. We've nothin' to do with these things, one way or t'other. That's the Government's business, an' let them do what we're payin' them for doin'.</p>
+<p><span class="char">Mrs. Boyle.</span> I'd like to know how a body's not to mind these things; look at the way they're afther leavin' the people in this very house. Hasn't the whole house, nearly, been massacreed? There's young Dougherty's husband with his leg off; Mrs. Travers that had her son blew up be a mine in Inchegeela, in Co. Cork; Mrs. Mannin' that lost wan of her sons in an ambush a few weeks ago, an' now, poor Mrs. Tancred's only child gone West with his body made a collandher of. Sure, if it's not our business, I don't know whose business it is.</p>
+<p><span class="char">Boyle.</span> Here, there, that's enough about them things; they don't affect us, an' we needn't give a damn. If they want a tfrake,</p>
+<p>well, let them have a wake. When I was a sailor, I was always resigned to meet with a wathery grave; an', if they want to be soldiers, well, there's no use o' them squealin' when they meet a soldier's fate.</p>
+<p><span class="char">Joxer.</span> Let me like a soldier fall— me breast expandin' to th' ball!</p>
+<p><span class="char">Mrs. Boyle.</span> In wan way, she deserves all she got; for lately, she let th' Die-hards make an open house of th' place; an' for th' last couple of months, either when th' sun was risin', or when th' sun was settin', you had C.I.D. men burstin' into your room, assin' you where were you born, where were you christened, where were you married, an' where would you be buried!</p>
+<p><span class="char">Johnny.</span> For God's sake, let us have no more o' this talk.</p>
+<p><span class="char">Mrs. Madigan.</span> What about Mr. Boyle's song before we start th' gramophone?</p>
+<p><span class="char">Mary.</span> <span class="stage">(getting her hat, and -putting it on)</span>. Mother, Charlie and I are goin' out for a little sthroll.</p>
+<p><span class="char">Mrs. Boyle.</span> All right, darlin'. - BENTHAM <span class="stage">(going out with MARY)</span>. We won't be long away, Mrs. Boyle.</p>
+<p><span class="char">Mrs. Madigan.</span> Gwan, Captain, gwan. BOYLE. E-e-e-e-eh, I'd want to have a few</p>
+<p>more jars in me, before I'd be in fettle for singin'.</p>
+<p><span class="char">Joxer.</span> Give us that poem you writ t'other day. <span class="stage">(To the rest)</span> Aw, it's a darlin' poem, a daarlin' poem.</p>
+<p><span class="char">Mrs. Boyle.</span> God bless us, is he startin' to write poetry!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(rising to his feet)</span>, E-e-e-e-eh. <span class="stage">(He recites in an emotional, consequential manner the following verses')</span>:</p>
+<p>Shawn an' I were friends, sir, to me he was all in all. His work was very heavy and his wages were very small. None betther on th' beach as Docker, I'll go bail, 'Tis now I'm feelin 1 lonely, for to-day he lies injail. He was not what some call pious — seldom at church or prayer;</p>
+<p>For the greatest scoundrels I know, sir, goes every Sunday there.</p>
+<p>Fond of his pint — well, rather, but hated the Boss by creed</p>
+<p>But never refused a copper to comfort a pal in need.</p>
+<p>E-e-e-e-eh. <span class="stage">(He sits down.)</span></p>
+<p><span class="char">Mrs. Madigan.</span> Grand, grand; you should folly that up, you should folly that up.</p>
+<p><span class="char">Joxer.</span> It's a daarlin' poem!</p>
+<p><span class="char">Boyle.</span> <span class="stage">(delightedly)</span>. E-e-e-e-eh.</p>
+<p><span class="char">Johnny.</span> Are yous goin' to put on th' gramophone to-night, or are yous not?</p>
+<p><span class="char">Mrs. Boyle.</span> Gwan, Jack, put on a record. MRS. MADIGAN. Gwan, Captain, gwan. BOYLE. Well, yous'll want to keep a dead silence.</p>
+<p><span class="stage">(He sets a record, starts the machine, and it begins to play "If you're Irish, come into the Parlour" As the tune is in full blare, the door is suddenly opened by a brisk, little bald-headed man, dressed circumspectly in a black suit; he glares fiercely at all in the room; he is " NEEDLE NUGENT ", a tailor. He carries his hat in his hand.)</span> NUGENT (loudly, above the noise of the gramophone]. Are yous goin' to have that thing bawlin' an' the funeral of Mrs. Tancred's son passin' the house? Have none of yous any respect for the Irish people's National regard for the dead?</p>
+<p><span class="stage">(BOYLE stops the gramophone.)</span> MRS. BOYLE. Maybe, Needle Nugent, it's nearly time we had a little less respect for the dead, an' a little more regard for the livin'.</p>
+<p><span class="char">Mrs. Madigan.</span> We don't want you, Mr. Nugent, to teach us what we learned at our mother's knee. You don't look yourself as if you were dyin'of grief; if y'ass Maisie Madigan anything, I'd call you a real thrue Die-hard an'</p>
+<p>live-soft Republican, attendin' Republican funerals in the day, an' stoppin' up half the night makin' suits for the Civic Guards!</p>
+<p><span class="stage">(Persons are heard running down to the street, some saying, " Here it is, here it is. " NUGENT withdraws, and the rest, except JOHNNY, go to the window looking into the street, and look out. Sounds of a crowd coming nearer are heard; portion are singing)</span>:</p>
+<p>To Jesus' Heart all burning With fervent love for men, My heart with fondest yearning Shall raise its joyful strain. While ages course along, Blest be with loudest song, The Sacred Heart of Jesus By every heart and tongue.</p>
+<p><span class="char">Mrs. Boyle.</span> Here's the hearse, here's the hearse!</p>
+<p><span class="char">Boyle.</span> There's foul' mother walkin' behin' the coffin.</p>
+<p><span class="char">Mrs. Madigan.</span> You can hardly see the coffin with the wreaths.</p>
+<p><span class="char">Joxer.</span> Oh, it's a darlin' funeral, a daarlin' funeral!</p>
+<p><span class="char">Mrs. Madigan.</span> We'd have a betther view from the street,</p>
+<p><span class="char">Boyle.</span> Yes — this place ud give you a crick in your neck.</p>
+<p>(They leave the room, and go down.</p>
+<p><span class="char">Johnny.</span> sits moodily by the fire.) <span class="stage">(Ayoung man enters; he looks at JOHNNY for a moment.)</span> THE YOUNG MAN. Quarther-Masther Boyle. JOHNNY <span class="stage">(with a start)</span>. The Mobilizer! THE YOUNG MAN. You're not at the funeral? JOHNNY. I'm not well. THE YOUNG MAN. I'm glad I've found you; you were stoppin' at your aunt's; I called there but you'd gone. I've to give you an ordher to attend a Battalion Staff meetin' the night afther to-morrow. JOHNNY. Where?</p>
+<p>THE YOUNG MAN. I don't know; you're to meet me at the Pillar at eight o'clock; then we're to go to a place I'll be told of to-night; there we'll meet a mother that'll bring us to the meeting. They think you might be able to know somethin' about them that gave the bend where Commandant Tancred was shelterin'.</p>
+<p><span class="char">Johnny.</span> I'm not goin', then. I know nothing about Tancred.</p>
+<p>THE YOUNG MAN <span class="stage">(at the door)</span>. You'd betther come for your own sake — remember your oath.</p>
+<p><span class="char">Johnny.</span> <span class="stage">(passionately)</span>. I won't go! Haven't I done enough for Ireland! I've lost me arm, an' me hip's desthroyed so that I'll never be able to walk right agen! Good God, haven't I done enough for Ireland?</p>
+<p>THE YOUNG MAN. Boyle, no man can do enough for Ireland! <span class="stage">(He goes.)</span></p>
+<p><span class="stage">(Faintly in the distance the crowd is heard saying)</span>:</p>
+<p class="song">Hail, Mary, full of grace, the Lord is with Thee; Blessed art Thou amongst women, and blessed, etc</p>
+<p style="text-align:center; margin-top:2rem; font-style:italic; color:var(--ink-muted);">CURTAIN</p>
+    </section>
+
+    <!-- ACT III -->
+    <section data-toc="Act III" id="act3-content">
+      <h2 class="act-title" id="act3">Act III</h2>
+<div class="scene-description">The same as Act II. It is about half-past six on a November evening; a bright fire is burning in the grate; Mary, dressed to go out, is sitting on a chair by the fire, leaning forward, her hands under her chin, her elbows on her knees. A look of dejection, mingled with uncertain anxiety, is on her face. A lamp, turned low, is lighting on the table. The votive light under the picture of the Virgin gleams more redly than ever. Mrs. Boyle is putting on her hat and coat. It is two months later.</div>
+<div class="scene-description">SCENE : The same as Act II. It is about halfpast six on a November evening; a bright fire is burning in the grate; MARY, dressed to</div>
+
+
+
+
+
+
+
+
+<p><span class="char">Mrs. Boyle.</span> An' has Bentham never even written to you since — not one line for the past month?</p>
+<p><span class="char">Mary.</span> <span class="stage">(tonelessly)</span>. Not even a line, mother.</p>
+<p><span class="char">Mrs. Boyle.</span> That's very curious. . . . What came between the two of yous at all? To leave you so sudden, an' yous so great together.</p>
+<p>... To go away t' England, an' not to even leave you his address. . . . The way he was always bringin' you to dances, I thought he was mad afther you. Are you sure you said nothin' to him?</p>
+<p><span class="char">Mary.</span> No, mother — at least nothing that could possibly explain his givin' me up.</p>
+<p><span class="char">Mrs. Boyle.</span> You know you're a bit hasty at times, Mary, an' say things you shouldn't say.</p>
+<p><span class="char">Mary.</span> I never said to him what I shouldn't say, I'm sure of that.</p>
+<p><span class="char">Mrs. Boyle.</span> How are you sure of it?</p>
+<p><span class="char">Mary.</span> Because I love him with all my heart and soul, mother. Why, I don't know; I often thought to myself that he wasn't the man poor Jerry was, but I couldn't help loving him, all the same.</p>
+<p><span class="char">Mrs. Boyle.</span> But you shouldn't be frettin' the way you are; when a woman loses a man, she never knows what she's afther losin', to be sure, but, then, she never knows what she's afther gainin', either. You're not the one girl of a month ago — you look like one pinin' away. It's long ago I had a right to bring you to the doctor, instead of waitin' till to-night.</p>
+<p><span class="char">Mary.</span> There's no necessity, really, mother, to go to the doctor; nothing serious is wrong</p>
+<p>with me — I'm run down and disappointed, that's all.</p>
+<p><span class="char">Mrs. Boyle.</span> I'll not wait another minute; I don't like the look of you at all. . . . I'm afraid we made a mistake in throwin' over poor Jerry. . . . He'd have been betther for you than that Bentham.</p>
+<p><span class="char">Mary.</span> Mother, the best man for a woman is the one for whom she has the most love, and Charlie had it all.</p>
+<p><span class="char">Mrs. Boyle.</span> Well, there's one thing to be said for him — he couldn't have been thinkin' of the money, or he wouldn't ha' left you . . . it must ha' been somethin' else.</p>
+<p><span class="char">Mary.</span> <span class="stage">(wearily)</span>. I don't know ... I don't know, mother . . . only I think .</p>
+<p><span class="char">Mrs. Boyle.</span> What d'ye think?</p>
+<p><span class="char">Mary.</span> I imagine ... he thought . . . we weren't . . . good enough for him.</p>
+<p><span class="char">Mrs. Boyle.</span> An' what was he himself, only a school teacher? Though I don't blame him for fightin' shy of people like that Joxer fella an' that ouT Madigan wan — nice sort o' people for your father to inthroduce to a man like Mr. Bentham. You might have told me all about this before now, Mary; I don't know why you like to hide everything from your mother; you knew Bentham, an' I'd ha' known</p>
+<p>nothin' about it if it hadn't bin for the Will; an' it was only to-day, afther long coaxin', that you let out that he'd left you.</p>
+<p><span class="char">Mary.</span> It would have been useless to tell you — you wouldn't understand.</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(hurt)</span>. Maybe not. . . . Maybe I wouldn't understand. . . . Well, we'll be off now.</p>
+<p><span class="stage">(She goes over to door /eft, and speaks to BOYLE inside)</span></p>
+<p><span class="char">Mrs. Boyle.</span> We're goin' now to the doctor's. Are you goin' to get up this evenin'?</p>
+<p><span class="char">Boyle.</span> <span class="stage">(from inside)</span>. The pains in me legs is terrible! It's me should be poppin' off to the doctor instead o' Mary, the way I feel.</p>
+<p><span class="char">Mrs. Boyle.</span> Sorra mend you! A nice way you were in last night — carried in in a frog's march, dead to the world. If that's the way you'll go on when you get the money it'll be the grave for you, an asylum for me and the Poorhouse for Johnny.</p>
+<p><span class="char">Boyle.</span> I thought you were goin'?</p>
+<p><span class="char">Mrs. Boyle.</span> That's what has you as you are — you can't bear to be spoken to. Knowin' the way we are, up to our ears in debt, it's a wondher you wouldn't ha' got up to go to th solicitor's an' see if we could ha' gotten a little o' the money even.</p>
+<p>81 o</p>
+<p><span class="char">Boyle.</span> <span class="stage">(shouting)</span>. I can't be goin' up there night, noon an' mornin', can I? He can't give the money till he gets it, can he? I can't get blood out of a turnip, can I?</p>
+<p><span class="char">Mrs. Boyle.</span> It's nearly two months since we heard of the Will, an' the money seems as far off as ever. ... I suppose you know we owe twenty pouns to oul' Murphy?</p>
+<p><span class="char">Boyle.</span> I've a faint recollection of you tellin' me that before.</p>
+<p><span class="char">Mrs. Boyle.</span> Well, you'll go over to the shop yourself for the things in future — I'll face him no more.</p>
+<p><span class="char">Boyle.</span> I thought you said you were goin'?</p>
+<p><span class="char">Mrs. Boyle.</span> I'm goin' now; come on, Mary.</p>
+<p><span class="char">Boyle.</span> Ey, Juno, ey!</p>
+<p><span class="char">Mrs. Boyle.</span> Well, what d'ye want now?</p>
+<p><span class="char">Boyle.</span> Is there e'er a bottle o' stout left?</p>
+<p><span class="char">Mrs. Boyle.</span> There's two o' them here still.</p>
+<p><span class="char">Boyle.</span> Show us in one o' them an' leave t'other there till I get up. An' throw us in the paper that's on the table, an' the bottle o' Sloan's Liniment that's in th' drawer.</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(getting the liniment and the stout)</span>. What paper is it you want — the Messenger")</p>
+<p><span class="char">Boyle.</span> Messenger! The News o' the World! <span class="stage">(MRS. BOYLE brings in the things askedfor and comes out again.)</span> 8*</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(at door)</span>. Mind the candle, now, an' don't burn the house over our heads. I left t'other bottle o' stout on the table.</p>
+<p><span class="stage">(She puts bottle of stout on table. She goes out with MARY. A cork is heard popping inside.)</span> <span class="stage">(A pause; then outside the door is heard the voice of JOXER lilting softly: " Me pipe I'll smoke, as I dhrive me moke . . . are you . . . there . . . More . . . aar .,./... tee!" A gentle knock is heard and, after a pause, the door opens, and JOXER, followed by NUGENT, enters.)</span> JOXER. Be God, they must be all out; I was thinkin' there was somethin' up when he didn't answer the signal. We seen Juno an' Mary goin', but I didn't see him, an' it's very seldom he escapes me.</p>
+<p><span class="char">Nugent.</span> He's not goin' to escape me — he's not goin' to be let go to the fair altogether.</p>
+<p><span class="char">Joxer.</span> Sure, the house couldn't hould them lately; an' he goin' about like a mastherpiece of the Free State counthry; forgettin' their friends; forgettin' God — wouldn't even lift his hat passin' a chapel ! Sure they were bound to get a dhropl An' you really think there's no money comin' to him afther all?</p>
+<p><span class="char">Nugent.</span> Not as much as a red rex, man; I've been a bit anxious this long time over me money, an' I went up to the solicitor's to find out all I could — ah, man, they were goin' to throw me down the stairs. They toul' me that the oul' cock himself had the stairs worn away comin' up afther it, an' they black in the face tellin' him he'd get nothin'. Some way or another that the Will is writ he won't be entitled to get as much as a make!</p>
+<p><span class="char">Joxer.</span> Ah, I thought there was somethin' curious about the whole thing; I've bin havin' sthrange dhreams for the last couple o' weeks. An' I notice that that Bentham fella doesn't be comin' here now — there must be somethin' on the mat there too. Anyhow, who, in the name o' God, ud leave anythin' to that oul' bummer? Sure it ud be unnatural. An' the way Juno an' him's been throwin' their weight about for the last few months! Ah, him that goes a borrowin' goes a sorrowin' !</p>
+<p><span class="char">Nugent.</span> Well, he's not goin' to throw his weight about in the suit I made for him much longer. I'm tellin' you seven pouns aren't to be found growin' on the bushes these days.</p>
+<p><span class="char">Joxer.</span> An' there isn't hardly a neighbour in the whole street that hasn't lent him money</p>
+<p>on the strength of what he was goin' to get, but they're after backing the wrong horse. Wasn't it a mercy o' God that I'd nothin' to give him! The softy I am, you know, I'd ha' lent him me last juice! I must have had somebody's good prayers. Ah, afther all, an honest man's the noblest work o' God!</p>
+<p><span class="stage">(BOYLE coughs inside.)</span> JOXER. Whisht, damn it, he must be inside in bed.</p>
+<p><span class="char">Nugent.</span> Inside o' bed or outside of it he's goin' to pay me for that suit, or give it back — he'll not climb up my back as easily as he thinks.</p>
+<p><span class="char">Joxer.</span> Gwan in at wanst, man, an' get it off him, an' don't be a fool.</p>
+<p><span class="char">Nugent.</span> <span class="stage">(going to door left, opening it and looking in)</span>. Ah, don't disturb yourself, Mr. Boyle; I hope you're not sick?</p>
+<p><span class="char">Boyle.</span> Th' oul' legs, Mr. Nugent, the ouT legs.</p>
+<p><span class="char">Nugent.</span> I just called over to see if you could let me have anything off the suit?</p>
+<p><span class="char">Boyle.</span> E-e-e-eh, how much is this it is?</p>
+<p><span class="char">Nugent.</span> It's the same as it was at the start — seven pouns.</p>
+<p><span class="char">Boyle.</span> I'm glad you kern, Mr. Nugent; I want a good heavy tap-coat — Irish frieze, if</p>
+<p>you have it. How much would a top-coat like that be, now?</p>
+<p><span class="char">Nugent.</span> About six pouns.</p>
+<p><span class="char">Boyle.</span> Six pouns — six an' seven, six an' seven is thirteen — that'll be thirteen pouns I'll owe you.</p>
+<p><span class="stage">(JOXER slips the bottle of stout that is on the table into his pocket. NUGENT rushes into the room, and returns with suit on his arm; he pauses at the door.)</span> NUGENT. You'll owe me no thirteen pouns. Maybe you think you're betther able to owe it than pay it 1</p>
+<p><span class="char">Boyle.</span> <span class="stage">(frantically)</span>. Here, come back to hell ower that — where're you goin' with them clothes o' mine?</p>
+<p><span class="char">Nugent.</span> Where am I goin' with them clothes o' yours? Well, I like your damn cheek !</p>
+<p><span class="char">Boyle.</span> Here, what am I goin' to dhress meself in when I'm goin' out?</p>
+<p><span class="char">Nugent.</span> What do I care what you dhress yourself in! You can put yourself in a bolsther cover, if you like.</p>
+<p><span class="stage">(He goes towards the other door, followed by JOXER.)</span></p>
+<p><span class="char">Joxer.</span> What'll he dhress himself inl Gentleman Jack an' his frieze coat!</p>
+<p><span class="stage">(They go out.)</span></p>
+<p><span class="char">Boyle.</span> <span class="stage">(inside)</span>. Ey, Nugent; ey, Mr, Nugent, Mr. Nugent!</p>
+<p><span class="stage">(After a pause BOYLE enters hastily, buttoning the braces of his moleskin trousers; his coat and vest are on his arm; he throws these on a chair and hurries to the door on right)</span> BOYLE. Ey, Mr. Nugent, Mr. Nugent! JOXER <span class="stage">(meeting him at the door)</span>. What's up, what's wrong, Captain?</p>
+<p><span class="char">Boyle.</span> Nugent' s been here an' took away me suit — the only things I had to go out in!</p>
+<p><span class="char">Joxer.</span> Tuk your suit — for God's sake! An' what were you doin' while he was takin' them?</p>
+<p><span class="char">Boyle.</span> I was in bed when he stole in like a thief in the night, an' before I knew even what he was thinkin' of, he whipped them from the chair, an' was off like a redshank!</p>
+<p><span class="char">Joxer.</span> An' what, in the name o' God, did he do that for?</p>
+<p><span class="char">Boyle.</span> What did he do it for? How the hell do I know what he done it for? — jealousy an' spite, I suppose.</p>
+<p><span class="char">Joxer.</span> Did he not say what he done it for?</p>
+<p><span class="char">Boyle.</span> Amn't I afther tellin' you that he had them whipped up an' was gone before I could open me mouth?</p>
+<p><span class="char">Joxer.</span> That was a very sudden thing to do; there mus' be somethin' behin' it. Did he hear anything I wondher?</p>
+<p><span class="char">Boyle.</span> Did he hear any thin'? — you talk very queer, Joxer — what could he hear?</p>
+<p><span class="char">Joxer.</span> About you not gettin' the money, in some way or t'other?</p>
+<p><span class="char">Boyle.</span> An' what ud prevent me from gettin' th money?</p>
+<p><span class="char">Joxer.</span> That's jus' what I was thinkin' — what ud prevent you from gettin' the money — no thin', as far as I can see.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(looking round for bottle of stout, with an exclamation)</span>. Aw, holy Godl</p>
+<p><span class="char">Joxer.</span> What's up, Jack?</p>
+<p><span class="char">Boyle.</span> He must have afther lifted the bottle o' stout that Juno left on the table!</p>
+<p><span class="char">Joxer.</span> <span class="stage">(horrified)</span>. Ah no, ah no; he wouldn't be afther doin' that now.</p>
+<p><span class="char">Boyle.</span> An' who done it then? Juno left a bottle o' stout here, an' it's gone — it didn't walk, did it?</p>
+<p><span class="char">Joxer.</span> Oh, that's shockin'; ah, man's inhumanity to man makes countless thousands mourn!</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(appearing at the door)</span>. I hope I'm not disturbin' you in any discussion on your forthcomin' legacy — if I may use the</p>
+<p>word — an' that you'll let me have a barny for a minute or two with you, Mr. Boyle.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(uneasily)</span>. To be sure, Mrs. Madigan — an oul' friend's always welcome.</p>
+<p><span class="char">Joxer.</span> Come in the evening come in th' mornin'; come when you're assed, or come without warning Mrs. Madigan.</p>
+<p><span class="char">Boyle.</span> Sit down, Mrs. Madigan.</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(ominously)</span>. Th' few words I have to say can be said standin'. Puttin' aside all formularies, I suppose you remember me lendin' you some time ago three pouns that I raised on blankets an' furniture in me uncle's?</p>
+<p><span class="char">Boyle.</span> I remember it well. I have it recorded in me book — three pouns five shillins from Maisie Madigan, raised on articles pawned; an', item: fourpence, given to make up the price of a pint, on th' principle that no bird ever flew on wan wing; all to be repaid at par, when the ship comes home.</p>
+<p><span class="char">Mrs. Madigan.</span> Well, ever since I shoved in the blankets I've been perishing with th' cowld, an' I've decided, if I'll be too hot in th' nex' world aself, I'm not goin' to be too cowld in this wan; an' consequently, I want me three pouns, if you please.</p>
+<p><span class="char">Boyle.</span> This is a very sudden demand, Mrs.</p>
+<p>Madigan, an' can't be met; but I'm willin' to give you a receipt in full, in full.</p>
+<p><span class="char">Mrs. Madigan.</span> Come on, out with th' money, an' don't be jack-actin'.</p>
+<p><span class="char">Boyle.</span> You can't get blood out of a turnip, can you?</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(rushing over and shaking him)</span>. Gimme me money, y'oul' reprobate, or I'll shake the worth of it out of you!</p>
+<p><span class="char">Boyle.</span> Ey, houl' on, there; houl' on, there 1 You'll wait for your money now, me lassie!</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(looking around the room and seeing the gramophone)</span>. I'll wait for it, will I? Well, I'll not wait long; if I can't get th' cash, I'll get th' worth of it.</p>
+<p><span class="stage">(She catches up the gramophone,)</span></p>
+<p><span class="char">Boyle.</span> Ey, ey, there, wher'r you goin' with that?</p>
+<p><span class="char">Mrs. Madigan.</span> I'm goin' to th' pawn to get me three quid five shillins; Til brin' you th' ticket, an' then you can do what you like, me bucko.</p>
+<p><span class="char">Boyle.</span> You can't touch that, you can't touch thatl It's not my property, an' it's not ped for yetl</p>
+<p><span class="char">Mrs. Madigan.</span> So much th' betther. It'll be an ayse to me conscience, for I'm takin' what doesn't belong to you. You're not goin'</p>
+<p>to be swankin' it like a paycock with Maisie Madigan's money — I'll pull some o' th' gorgeous feathers out o' your tail!</p>
+<p><span class="stage">(She goes off with the gramophone.)</span></p>
+<p><span class="char">Boyle.</span> What's th' world comin' to at all? I ass you, Joxer Daly, is there any morality left anywhere?</p>
+<p><span class="char">Joxer.</span> I wouldn't ha' believed it, only I seen it with me own two eyes. I didn't think Maisie Madigan was that sort of a woman; she has either a sup taken, or she's heard somethin',</p>
+<p><span class="char">Boyle.</span> Heard somethin' — about what, if it's not any harm to ass you?</p>
+<p><span class="char">Joxer.</span> She must ha' heard some rumour or other that you weren't goin' to get th' money.</p>
+<p><span class="char">Boyle.</span> Who says I'm not goin' to get th' money?</p>
+<p><span class="char">Joxer.</span> Sure, I know — I was only sayin'. BOYLE. Only sayin' what? JOXER. Nothin'.</p>
+<p><span class="char">Boyle.</span> You were goin' to say somethin', don't be a twisther.</p>
+<p><span class="char">Joxer.</span> <span class="stage">(angrily)</span>. Who's a twisther?</p>
+<p><span class="char">Boyle.</span> Why don't you speak your mind, then?</p>
+<p><span class="char">Joxer.</span> You never twisted yourself — no, you wouldn't know howl 9*</p>
+<p><span class="char">Boyle.</span> Did you ever know me to twist; did you ever know me to twist?</p>
+<p><span class="char">Joxer.</span> <span class="stage">(fiercely)</span>. Did you ever do anythin' else ! Sure, you can't believe a word that comes out o' your mouth,</p>
+<p><span class="char">Boyle.</span> Here, get out, ower o'this; I always knew you were a prognosticator an' a procrastinator!</p>
+<p><span class="char">Joxer.</span> <span class="stage">(going out as JOHNNY comes in)</span>. The anchor's weighed, farewell, ree . . . mem . . . her . . . me. Jacky Boyle, Esquire, infernal rogue an' damned liar!</p>
+<p><span class="char">Johnny.</span> Joxer an' you at it agenr — when are you goin' to have a little respect for yourself, an' not be always makin' a show of us all?</p>
+<p><span class="char">Boyle.</span> Are you goin' to lecture me now? JOHNNY. Is mother back from the doctor yet, with Mary?</p>
+<p><span class="stage">(MRS. BOYLE enters; it is apparent from the serious look on her face that something has happened. She takes off her hat and coat without a word and puts them by. She then sits down near the fire, and there is a few moments' pause.)</span> BOYLE. Well, what did the doctor say about Mary?</p>
+<p><span class="char">Mrs. Boyle.</span> (in an earnest manner and</p>
+<p>with suppressed agitation). Sit down here, Jack; I've something to say to you . . , about Mary.</p>
+<p><span class="char">Boyle.</span> (awed by her manner]. About . . , Mary?</p>
+<p><span class="char">Mrs. Boyle.</span> Close that door there and sit down here.</p>
+<p><span class="char">Boyle.</span> <span class="stage">(closing the door)</span>. More throuble in our native land, is it? <span class="stage">(He sits down)</span> Well, what is it?</p>
+<p><span class="char">Mrs. Boyle.</span> It's about Mary.</p>
+<p><span class="char">Boyle.</span> Well, what about Mary — there's nothin' wrong with her, is there?</p>
+<p><span class="char">Mrs. Boyle.</span> I'm sorry to say there's a gradle wrong with her.</p>
+<p><span class="char">Boyle.</span> A gradle wrong with her! <span class="stage">(Peevishly)</span> First Johnny an' now Mary; is the whole house goin' to become an hospital! It's not consumption, is it?</p>
+<p><span class="char">Mrs. Boyle.</span> No . . . it's not consumption . . . it's worse.</p>
+<p><span class="char">Johnny.</span> Worse! Well, we'll have to get her into some place ower this, there's no one here to mind her.</p>
+<p><span class="char">Mrs. Boyle.</span> We'll all have to mind her now. You might as well know now, Johnny, as another time. <span class="stage">(To BOYLE)</span> D'ye know what the doctor said to me about her, Jack?</p>
+<p><span class="char">Boyle.</span> How ud I know — I wasn't there, was I?</p>
+<p><span class="char">Mrs. Boyle.</span> He told me to get her married at wanst.</p>
+<p><span class="char">Boyle.</span> Married at wanst! An' why did he say the like o' that?</p>
+<p><span class="char">Mrs. Boyle.</span> Because Mary's goin' to have a baby in a short time.</p>
+<p><span class="char">Boyle.</span> Goin' to have a baby! — my God, what'll Bentham say when he hears that?</p>
+<p><span class="char">Mrs. Boyle.</span> Are you blind, man, that you can't see that it was Bentham that has done this wrong to her?,</p>
+<p><span class="char">Boyle.</span> <span class="stage">(passionately)</span>. Then he'll marry her, he'll have to marry her!</p>
+<p><span class="char">Mrs. Boyle.</span> You know he's gone to England, an' God knows where he is now.</p>
+<p><span class="char">Boyle.</span> I'll folly him, I'll folly him, an' bring him back, an' make him do her justice. The scoundrel, I might ha' known what he was, with his yogees an' his prawnal</p>
+<p><span class="char">Mrs. Boyle.</span> We'll have to keep it quiet till we see what we can do.</p>
+<p><span class="char">Boyle.</span> Oh, isn't this a nice thing to come on top o' me, an' the state I'm in! A pretty show I'll be to Joxer an' to that oul' wan, Madigan! Amn't I afther goin' through enough without havin' to go through thisl</p>
+<p><span class="char">Mrs. Boyle.</span> What you an' I'll have to go through'll be nothin' to what poor Mary'll have to go through; for you an' me is middlin' old, an' most of our years is spent; but Mary'll have maybe forty years to face an' handle, an' every wan of them'II be tainted with a bitther memory.</p>
+<p><span class="char">Boyle.</span> Where is she? Where is she till I tell her off? I'm tellin' you when I'm done with her she'll be a sorry girl !</p>
+<p><span class="char">Mrs. Boyle.</span> I left her in me sisther's till I came to speak to you. You'll say nothin' to her, Jack; ever since she left school she's earned her livin', an' your fatherly care never throubled the poor girl.</p>
+<p><span class="char">Boyle.</span> Gwan, take her part agen her father! But I'll let you see whether Til say nothin' to her or no! Her an' her readin'! That's more o' th' blasted nonsense that has the house fallin' down on top of us! What did th' likes of her, born in a tenement house, want with readin'? Her readin's afther bringin' her to a nice pass — oh, it's madnin', madnin', madnin' !</p>
+<p><span class="char">Mrs. Boyle.</span> When she comes back say nothin' to her, Jack, or she'll leave this place.</p>
+<p><span class="char">Boyle.</span> Leave this place! Ay, she'll leave this place, an' quick too!</p>
+<p><span class="char">Mrs. Boyle.</span> If Mary goes, I'll go with her.</p>
+<p><span class="char">Boyle.</span> Well, go with her! Well, go, th pair o' yous! I lived before I seen yous, an' I can live when yous are gone. Isn't this a nice thing to come rollin' in on top o' me afther all your prayin' to St. Anthony an' The Little Flower. An' she's a child o' Mary, too — I wonder what'll the nuns think of her now? An' it'll be bellows'd all over th' disthrict before you could say Jack Robinson; an' whenever I'm seen they'll whisper, " That's th' father of Mary Boyle that had th' kid be th' swank she used to go with; d'ye know, d'ye know?" To be sure they'll know — more about it than I will meself !</p>
+<p><span class="char">Johnny.</span> She should be dhriven out o' th' house she's brought disgrace on!</p>
+<p><span class="char">Mrs. Boyle.</span> Hush, you, Johnny. We needn't let it be bellows'd all over the place; all we've got to do is to leave this place quietly an' go somewhere where we're not known, an' nobody'll be th' wiser.</p>
+<p><span class="char">Boyle.</span> You're talkin' like a two-year-oul', woman. Where'll we get a place ou' o' this? — places aren't that easily got.</p>
+<p><span class="char">Mrs. Boyle.</span> But, Jack, when we get the money . . .</p>
+<p><span class="char">Boyle.</span> Money — what money? MRS. BOYLE. Why, ouT Ellison's money, of course.</p>
+<p><span class="char">Boyle.</span> There's no money comin' from oul' Ellison, or any one else. Since youVe heard of wan throuble, you might as well hear of another. There's no money comin' to us at all — the Will's a wash out!</p>
+<p><span class="char">Mrs. Boyle.</span> What are you sayin', man — no money?</p>
+<p><span class="char">Johnny.</span> How could it be a wash out?</p>
+<p><span class="char">Boyle.</span> The boyo that's afther doin' it to Mary done it to me as well. The thick made out the Will wrong; he said in th Will, only first cousin an' second cousin, instead of mentionin' our names, an' now any one that thinks he's a first cousin or second cousin t'oul' Ellison can claim the money as well as me, an' they're springin' up in hundreds, an' comin' from America an' Australia, thinkin' to get their whack out of it, while all the time the lawyers is gobblin' it up, till there's not as much as ud buy a stockin' for your lovely daughter's baby!</p>
+<p><span class="char">Mrs. Boyle.</span> I don't believe it, I don't believe it, I don't believe it!</p>
+<p><span class="char">Johnny.</span> Why did you say nothin' about this before?</p>
+<p><span class="char">Mrs. Boyle.</span> You're not serious, Jack; -you're not serious!</p>
+<p><span class="char">Boyle.</span> I'm tellin' you the scholar, Bentham, made a banjax o' th' Will; instead o' sayin', " th' rest o' me property to be divided between me first cousin, Jack Boyle, an' me second cousin, Mick Finnegan, o' Santhry ", he writ down only, " me first an' second cousins ", an' the world an' his wife are afther th' property now.</p>
+<p><span class="char">Mrs. Boyle.</span> Now, I know why Bentham left poor Mary in th' lurch; I can see it all now — oh, is there not even a middlin' honest man left in th' world?</p>
+<p><span class="char">Johnny.</span> <span class="stage">(to BOYLE)</span>. An' you let us run into debt, an' you borreyed money from everybody to fill yourself with beer! An' now, you tell us the whole thing's a wash out! Oh, if it's thrue, I'm done with you, for you're worse than me sisther Mary!</p>
+<p><span class="char">Boyle.</span> You hole your tongue, d'ye hear? I'll not take any lip from you. Go an' get Bentham if you want satisfaction for all that's afther happenin' us.</p>
+<p><span class="char">Johnny.</span> I won't hole me tongue, I won't hole me tongue! I'll tell you what I think of you, father an' all as you are ... you , . .</p>
+<p><span class="char">Mrs. Boyle.</span> Johnny, Johnny, Johnny, for God's sake, be quiet!</p>
+<p><span class="char">Johnny.</span> I'll not be quiet, I'll not be quiet; he's a nice father, isn't he? Is it any wondher Mary went asthray, when . . .</p>
+<p><span class="char">Mrs. Boyle.</span> Johnny, Johnny, for my sake be quiet — for your mother's sake 1</p>
+<p><span class="char">Boyle.</span> I'm goin' out now to have a few dhrinks with th last few makes I have, an' tell that lassie o' yours not to be here when I come back; for if I lay me eyes on her, I'll lay me hans on her, an' if I lay me hans on her, I won't be accountable for me actions!</p>
+<p><span class="char">Johnny.</span> Take care somebody doesn't lay his hans on you — y'oul' . . .</p>
+<p><span class="char">Mrs. Boyle.</span> Johnny, Johnny !</p>
+<p><span class="char">Boyle.</span> <span class="stage">(at door, about to go out)</span>. Oh, a nice son, an' a nicer daughter, I have.- <span class="stage">(Calling loudly upstairs)</span> Joxer, Joxer, are you there?</p>
+<p><span class="char">Joxer.</span> <span class="stage">(from a distance)</span>. I'm here, More . . . ee . . . aar ... i ... tee!</p>
+<p><span class="char">Boyle.</span> I'm goin' down to Foley's — are you comin'?</p>
+<p><span class="char">Joxer.</span> Come with you? With that sweet call me heart is stirred; I'm only waiting for the word, an' I'll be with you, like a birdl</p>
+<p><span class="stage">(BOYLE and JOXER pass the door going out.)</span> JOHNNY <span class="stage">(throwing himself on the bed)</span>. I've a nice sisther, an' a nice father, there's no bettin' on it. I wish to God a bullet or a bomb</p>
+<p>had whipped me ou' o' this long ago! Not one o' yous, not one o' yous, have any thought for me!</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(with passionate remonstrance)</span>. If you don't whisht, Johnny, you'll drive me mad. Who has kep th home together for the past few years — only me. An' who'll have to bear th' biggest part o' this throuble but me — but whinin' an' whingin' isn't goin' to do any good.</p>
+<p><span class="char">Johnny.</span> You're to blame yourself for a gradle of it — givin' him his own way in everything, an' never assin' to check him, no matther what he done. Why didn't you look afther th' money? why . . .</p>
+<p><span class="stage">(There is a knock at the door; MRS. BOYLE opens it; JOHNNY rises on his elbow to look and listen; two men enter.)</span> FIRST MAN. We've been sent up be th' Manager of the Hibernian Furnishing Co., Mrs. Boyle, to take back the furniture that was got a while ago.</p>
+<p><span class="char">Mrs. Boyle.</span> Yous'll touch nothin' here— how do I know who yous are?</p>
+<p><span class="char">First Man.</span> <span class="stage">(showing a paper)</span>. There's the ordher, ma'am. <span class="stage">(Reading)</span> A chest o' drawers, a table, wan easy an' two ordinary chairs; wan mirror; wan chestherfield divan, an' a wardrobe</p>
+<p>an' two vases. <span class="stage">(To his comrade)</span> Come on, Bill, it's afther knockin' off time already.</p>
+<p><span class="char">Johnny.</span> For God's sake, mother, run down to Foley's an' bring father back, or we'll be left without a stick.</p>
+<p><span class="stage">(The men carry out the table.)</span></p>
+<p><span class="char">Mrs. Boyle.</span> What good would it be— you heard what he said before he went out.</p>
+<p><span class="char">Johnny.</span> Can't you thry; he ought to be here, an' the like of this goin' on.</p>
+<p><span class="stage">(MRS. BOYLE puts a shawl around her, as MARY enters.)</span></p>
+<p><span class="char">Mary.</span> What's up, mother? I met men carryin' away the table, an' everybody's talking about us not gettin' the money after all.</p>
+<p><span class="char">Mrs. Boyle.</span> Everythin's gone wrong, Mary, everythin'. We're not gettin' a penny out o' the Will, not a penny — I'll tell you all when I come back; I'm goin' for your father. <span class="stage">(She runs out)</span></p>
+<p><span class="char">Johnny.</span> <span class="stage">(to MARY, who has sat down by the fire)</span>. It's a wondher you're not ashamed to show your face here, afther what has happened. <span class="stage">(JERRY enters slowly; there is a look of earnest hope on his face. He looks at MARY for a few moments.)</span> JERRY <span class="stage">(softly)</span>. Maryl</p>
+<p><span class="stage">(MARY does not answer.)</span></p>
+<p><span class="char">Jerry.</span> Mary, I want to speak to you for a few moments, may I?</p>
+<p><span class="stage">(MARY remains silent; JOHNNY goes slowly into room on left.)</span></p>
+<p><span class="char">Jerry.</span> Your mother has told me everything, Mary, and I have come to you. ... I have come to tell you, Mary, that my love for you is greater and deeper than ever. . . .</p>
+<p><span class="char">Mary.</span> <span class="stage">(with a sob)</span>. Oh, Jerry, Jerry, say no more; all that is over now; anything like that is impossible nowl</p>
+<p><span class="char">Jerry.</span> Impossible? Why do you talk like that, Mary?</p>
+<p><span class="char">Mary.</span> After all that has happened.</p>
+<p><span class="char">Jerry.</span> What does it matter what has happened? We are young enough to be able to forget all those things. <span class="stage">(He catches her hand)</span> Mary, Mary, I am pleading for your love. With Labour, Mary, humanity is above everything; we are the Leaders in the fight for a new life. I want to forget Bentham, I want to forget that you left me — even for a while.</p>
+<p><span class="char">Mary.</span> Oh, Jerry, Jerry, you haven't the bitter word of scorn for me after all.</p>
+<p><span class="char">Jerry.</span> <span class="stage">(passionately)</span>. Scorn 1 I love you, love you, Mary!</p>
+<p><span class="char">Mary.</span> <span class="stage">(rising, and looking him in the eyes)</span>. Even though</p>
+<p><span class="char">Jerry.</span> Even though you threw me over for another man; even though you gave me many a bitter word!</p>
+<p><span class="char">Mary.</span> Yes, yes, I know; but you love me, even though . . . even though . . . I'm . . . goin' . . . goin' . . . <span class="stage">(He looks at her questioning,, andjear gathers in his eyes)</span> Ah, I was thinkin' so. ... You don't know everything!</p>
+<p><span class="char">Jerry.</span> (poignantly]. Surely to God, Mary, you don't mean that . . . that . . . that . . .</p>
+<p><span class="char">Mary.</span> Now you know all, Jerry; now you know all!</p>
+<p><span class="char">Jerry.</span> My God, Mary, have you fallen as low as that?</p>
+<p><span class="char">Mary.</span> Yes, Jerry, as you say, I have fallen as low as that.</p>
+<p><span class="char">Jerry.</span> I didn't mean it that way, Mary . . . it came on me so sudden, that I didn't mind what I was sayin'. ... I never expected this — you're mother never told me. . . . I'm sorry . . . God knows, I'm sorry for you, Mary.</p>
+<p><span class="char">Mary.</span> Let us say no more, Jerry; I don't blame you for thinkin' it's terrible. ... I suppose it is. ... Everybody'll think the same . . . it's only as I expected — your humanity is just as narrow as the humanity of the others.</p>
+<p><span class="char">Jerry.</span> I'm sorry, all the same. ... I shouldn't have troubled you. ... I wouldn't if I'd known. ... If I can do anything for you , . . Mary ... I will. <span class="stage">(He turns to go, and halts at the door)</span></p>
+<p><span class="char">Mary.</span> Do you remember, Jerry, the verses you read when you gave the lecture in the Socialist Rooms some time ago, on Humanity's Strife with Nature?</p>
+<p><span class="char">Jerry.</span> The verses — no; I don't remember them.</p>
+<p><span class="char">Mary.</span> I do. They're runnin' in me head now —</p>
+<p>An' we felt the power that fashion'd All the lovely things we saw, That created all the murmur Of an everlasting law, Was a hand of force an' beauty, With an eagle's tearin' claw.</p>
+<p>Then we saw our globe of beauty Was an ugly thing as well, A hymn divine whose chorus Was an agonizin' yell; Like the story of a demon, That an angel had to tell;</p>
+<p>Like a glowin' picture by a Hand unsteady, brought to ruin;</p>
+<p>Like her craters, if their deadness Could give life unto the moonj Like the agonizing horror Of a violin out of tune.</p>
+<p><span class="stage">(There is a pause, and DEVINE goes slowly out.)</span></p>
+<p><span class="char">Johnny.</span> <span class="stage">(returning)</span>. Is he gone? MARY. Yes.</p>
+<p><span class="stage">(The two men re-enter.)</span> FIRST MAN. We can't wait any longer for t'oul' fella — sorry, Miss, but we have to live as well as th' nex' man.</p>
+<p><span class="stage">(They carry out some things)</span> JOHNNY. Oh, isn't this terrible! ... I suppose you told him everything . . . couldn't you have waited for a few days . . . he'd have stopped th' takin' of the things, if you'd kep your mouth shut. Are you burnin' to tell every one of the shame you've brought on us?</p>
+<p><span class="char">Mary.</span> <span class="stage">(snatching up her hat and coat)</span>. Oh, this is unbearable! <span class="stage">(She rushes out)</span></p>
+<p><span class="char">First Man.</span> <span class="stage">(re-entering)</span>. We'll take the chest o' drawers next — it's the heaviest.</p>
+<p><span class="stage">(The votive light flickers for a moment, and goes out] JOHNNY (in a cry of fear)</span>. Mother o' God, the light's afther goin' out!</p>
+<p><span class="char">First Man.</span> You put the win 1 up me the</p>
+<p>way you bawled that time. The oil's all gone, that's all.</p>
+<p><span class="char">Johnny.</span> <span class="stage">(with an agonizing cry)</span>. Mother o' God, there's a shot I'm afther gettin'l</p>
+<p><span class="char">First Man.</span> What's wrong with you, man? Is it a fit you're takin'?</p>
+<p><span class="char">Johnny.</span> I'm afther feelin' a pain in me breast, like the tearin' by of a bullet!</p>
+<p><span class="char">First Man.</span> He's goin' mad — it's a wondher they'd leave a chap like that here be himself.</p>
+<p><span class="stage">(Two IRREGULARS enter swiftly; they carry revolvers; one goes over to JOHNNY; the other covers the two furniture men)</span></p>
+<p><span class="char">First Irregular.</span> <span class="stage">(to the men, quietly and incisively)</span>. Who are you — what are yous doin' here — quick !</p>
+<p><span class="char">First Man.</span> Removin' furniture that's not paid for.</p>
+<p>IRREGULAR. Get over to the other end of the room an' turn your faces to the wall — quick.</p>
+<p><span class="stage">(The two men turn theirfaces to the wall, with their hands up.)</span></p>
+<p><span class="char">Second Irregular.</span> <span class="stage">(to JOHNNY)</span>. Come On,</p>
+<p>Sean Boyle, you're wanted; some of us have a word to say to you.</p>
+<p><span class="char">Johnny.</span> I'm sick, I can't— what do you want with me?</p>
+<p><span class="char">Second Irregular.</span> Come on, come on;</p>
+<p>we've a distance to go, an' haven't much time — come on.</p>
+<p><span class="char">Johnny.</span> I'm an oul' comrade — yous wouldn't shoot an oul' comrade.</p>
+<p><span class="char">Second Irregular.</span> Poor Tancred was an oul' comrade o' yours, but you didn't think o' that when you gave him away to the gang that sent him to his grave. But we've no time to waste; come on — here, Dermot, ketch his arm. <span class="stage">(To JOHNNY)</span> Have you your beads?</p>
+<p><span class="char">Johnny.</span> Me beads! Why do you ass me that, why do you ass me that?</p>
+<p><span class="char">Second Irregular.</span> Go on, go on, march 1 JOHNNY. Are yous goin' to do in a comrade — look at me arm, I lost it for Ireland.</p>
+<p><span class="char">Second Irregular.</span> Commandant Tancred lost his life for Ireland.</p>
+<p><span class="char">Johnny.</span> Sacred Heart of Jesus, have mercy on me! Mother o' God pray for me — be with me now in the agonies o'death 1 . . . Hail, Mary, full o' grace ... the Lord is ... with Thee.</p>
+<p><span class="stage">(They drag out JOHNNY BOYLE, and the curtain falls. When it rises again the most of the furniture is gone. MARY and MRS. BOYLE, one on each side, are sitting in a darkened room, by the fire; tt is an hour later)</span> MRS. BOYLE. I'll not wait much longer . . '</p>
+<p>what did they bring him away in the mothor for? Nugent says he thinks they had guns ... is me throubles never goin' to be over? ... If anything ud happen to poor Johnny, I think I'd lose me mind. . . . I'll go to the Police Station, surely they ought to be able to do somethin'.</p>
+<p><span class="stage">(Below is heard the sound of voices. ")</span></p>
+<p><span class="char">Mrs. Boyle.</span> Whisht, is that something? Maybe, it's your father, though when I left him in Foley's he was hardly able to lift his head. Whisht!</p>
+<p><span class="stage">(A knock at the door, and the 'voice of MRS. MADIGAN, speaking very softly)</span>: Mrs. Boyle, Mrs. Boyle.</p>
+<p><span class="stage">(MRS. BOYLE opens the door.)</span></p>
+<p><span class="char">Mrs. Madigan.</span> Oh, Mrs. Boyle, God an' His Blessed Mother be with you this night 1</p>
+<p><span class="char">Mrs. Boyle.</span> <span class="stage">(calmly)</span>. What is it, Mrs. Madigan? It's Johnny — something about Johnny.</p>
+<p><span class="char">Mrs. Madigan.</span> God send it's not, God send it's not Johnny!</p>
+<p><span class="char">Mrs. Boyle.</span> Don't keep me waitin', Mrs. Madigan; I've gone through so much lately that I feel able for anything.</p>
+<p><span class="char">Mrs. Madigan.</span> Two polismen below wantin' you.</p>
+<p><span class="char">Mrs. Boyle.</span> Wantin' me; an' why do they want me?</p>
+<p><span class="char">Mrs. Madigan.</span> Some poor fella's been found, an' they think it's, it's . . .</p>
+<p><span class="char">Mrs. Boyle.</span> Johnny, Johnny!</p>
+<p><span class="char">Mary.</span> <span class="stage">( with her arms round her mother)</span>. Oh, mother, mother, me poor, darlin' mother.</p>
+<p><span class="char">Mrs. Boyle.</span> Hush, hush, darlin'; you'll shortly have your own throuble to bear. <span class="stage">(To MRS. MADIGAN)</span> An' why do the polis think it's Johnny, Mrs. Madigan?</p>
+<p><span class="char">Mrs. Madigan.</span> Because one o' the doctors knew him when he was attendin' with his poor arm.</p>
+<p><span class="char">Mrs. Boyle.</span> Oh, it's thrue, then; it's Johnny, it's me son, me own son!</p>
+<p><span class="char">Mary.</span> Oh, it's thrue, it's thrue what Jerry Devine says — there isn't a God, there isn't a God; if there was He wouldn't let these things happen!</p>
+<p><span class="char">Mrs. Boyle.</span> Mary, Mary, you musn't say them things. We'll want all the help we can get from God an' His Blessed Mother now! These things have nothin' to do with the Will o' God. Ah, what can God do agen the stupidity o' men 1</p>
+<p><span class="char">Mrs. Madigan.</span> The polis want you to go with them to the hospital to see the poor body — they're waitin' below,</p>
+<p><span class="char">Mrs. Boyle.</span> We'll go. Come, Mary, an' we'll never come back here agen. Let your father furrage for himself now; I've done all I could an' it was all no use — he'll be hopeless till the end of his days. I've got a little room in me sisther's where we'll stop till your throuble is over, an' then we'll work together for the sake of the baby.</p>
+<p><span class="char">Mary.</span> My poor little child that'll have no father !</p>
+<p><span class="char">Mrs. Boyle.</span> It'll have what's far betther— • it'll have two mothers.</p>
+<p><span class="stage">(A rough 'voice shoutingfrom below)</span>: Are yous goin' to keep us waitin' for yous all night?</p>
+<p><span class="char">Mrs. Madigan.</span> <span class="stage">(going to the door, and shouting down)</span>. Take your hour, there, take your hour! If yous are in such a hurry, skip off, then, for nobody wants you here — if they did yous wouldn't be found. For you're the same as yous were undher the British Government — never where yous are wanted! As far as I can see, the Polls as Polis, in this city, is Null an' Void!</p>
+<p><span class="char">Mrs. Boyle.</span> We'll go, Mary, we'll go; you to see your poor dead brother, an' me to see me poor dead son!</p>
+<p><span class="char">Mary.</span> I dhread it, mother, I dhread itl</p>
+<p><span class="char">Mrs. Boyle.</span> I forgot, Mary, I forgot; your poor oul' selfish mother was only thinkin' of herself. No, no, you musn't come — it wouldn't be good for you. You go on to me sisther's an' I'll face th' ordeal meself. Maybe I didn't feel sorry enough for Mrs. Tancred when her poor son was found as Johnny's been found now — because he was a Die-hard! Ah, why didn't I remember that then he wasn't a Diehard or a Stater, but only a poor dead sonl It's well I remember all that she said — an' it's my turn to say it now: What was the pain I suffered, Johnny, bringin' you into the world to carry you to your cradle to the pains I'll suffer carryin' you out o' the world to bring you to your grave! Mother o' God, Mother o' God, have pity on us all! Blessed Virgin, where were you when me darlin' son was riddled with bullets, when me darlin' son was riddled with bullets? Sacred Heart o' Jesus, take away our hearts o' stone, and give us hearts o' flesh! Take away this murdherin' hate, an' give us Thine own eternal love!</p>
+<p><span class="stage">(They all go slowly out)</span> (There is a pause; then a sound of shuffling steps on the stairs outside. The door opens and BOYLE and JOXER, both of them very drunk, enter?] Ill</p>
+<p><span class="char">Boyle.</span> I'm able to go no farther. . , . Two polls, ey . . . what were they doin' here, I wondher? ... Up to no good, anyhow . , . an' Juno an' that lovely daughter o' mine 'with them. <span class="stage">(Taking a sixpence from his pocket and looking at it)</span> Wan single, solithary tanner left out of all I borreyed. . . . <span class="stage">(He lets it fa//.)</span> The last o' the Mohicans. . . . The blinds is down, Joxer, the blinds is downl</p>
+<p><span class="char">Joxer.</span> (walking unsteadily across the room, and anchoring at the bed]. Put all . . . your throubles ... in your oul' kit bag ... an' smile . . . smile . . . smile !</p>
+<p><span class="char">Boyle.</span> The counthry'll have to steady itself . . . it's goin' ... to hell. . . . Where'r all , . . the chairs . . . gone to ... steady itself, Joxer. . , . Chairs'll . . . have to . . . steady themselves. . . , No matther . . . what any one may . . . say. . . . Irelan' sober ... is Irelan' . . . free.</p>
+<p><span class="char">Joxer.</span> <span class="stage">(stretching himself on the bed)</span>. Chains ... an' ... slaveree . . . that's a darlin' motto ... a daaarlin' . . . motto!</p>
+<p><span class="char">Boyle.</span> If th'worst comes . . . to th'worse ... I can join a ... flyin' . . . column. ... I done . . . me bit ... in Easther Week . . . had no business ... to ... be ... there . . . but Captain Boyle's Captain Boyle!</p>
+<p><span class="char">Joxer.</span> Breathes there a man with soul . . . so . . . de . . . ad . . . this . . . me . . . o . . . wn, me nat . . . ive . . . an' !</p>
+<p><span class="char">Boyle.</span> <span class="stage">(subsiding into a sitting posture on the floor)</span>. Commandant Kelly died . . . in them . . . arms . . . Joxer . . . . Tell me Volunteer Butties . . . says he . . . that . . . I died for . . . Irelan'!</p>
+<p><span class="char">Joxer.</span> D'jever rade Willie . . . Reilly . . . an' his . . . own . . . Colleen . . . Bawn? It's a darlin' story, a daarlin' story!</p>
+<p><span class="char">Boyle.</span> I'm telling you . . . Joxer . . . th' whole worl's . . . in a terr . . . ible state o' . . . chassis!</p>
+<p style="text-align:center; margin-top:2rem; font-style:italic; color:var(--ink-muted);">CURTAIN</p>
+</section>
+
+  </div>
+
+  <!-- ============================================
+       JAVASCRIPT
+  ============================================ -->
+  <script>
+    // ---- STATE ----
+    let pages = [];
+    let currentPageIndex = 0;
+    let isAnimating = false;
+    let tocEntries = []; // {label, pageIndex}
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    // ---- DOM REFS ----
+    const pageContent = document.getElementById('pageContent');
+    const pageNum = document.getElementById('pageNum');
+    const pageIndicator = document.getElementById('pageIndicator');
+    const progressFill = document.getElementById('progressFill');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const currentPageEl = document.getElementById('currentPage');
+    const animPage = document.getElementById('animPage');
+    const animPageContent = document.getElementById('animPageContent');
+    const bookEl = document.getElementById('book');
+
+    // ---- PAGINATION ----
+    function paginate() {
+      const source = document.getElementById('playSource');
+      const sections = source.querySelectorAll('section');
+      pages = [];
+      tocEntries = [];
+
+      // Get usable page height
+      const pageInner = document.getElementById('pageInner');
+      const style = getComputedStyle(currentPageEl);
+      const padTop = parseFloat(style.paddingTop);
+      const padBot = parseFloat(style.paddingBottom);
+      const availableHeight = currentPageEl.clientHeight - padTop - padBot - 40; // 40px for page number
+
+      sections.forEach(section => {
+        const isPageBreak = section.getAttribute('data-page-break') === 'true';
+        const tocLabel = section.getAttribute('data-toc');
+
+        if (isPageBreak) {
+          // Forced page break sections get their own page
+          if (tocLabel) {
+            tocEntries.push({ label: tocLabel, pageIndex: pages.length });
+          }
+          pages.push(section.innerHTML);
+          return;
+        }
+
+        // For content sections, we need to split into pages
+        // Create a temporary measuring container
+        const measurer = document.createElement('div');
+        measurer.className = 'page-content';
+        measurer.style.cssText = `
+          position: absolute;
+          visibility: hidden;
+          width: ${pageContent.clientWidth}px;
+          top: 0;
+          left: -9999px;
+        `;
+        document.body.appendChild(measurer);
+
+        // Get all child elements of the section
+        const children = Array.from(section.children);
+        let currentPageHTML = '';
+        let currentHeight = 0;
+        let firstPageOfSection = true;
+
+        children.forEach((child, idx) => {
+          // Measure this element
+          measurer.innerHTML = currentPageHTML + child.outerHTML;
+          const newHeight = measurer.scrollHeight;
+
+          if (newHeight > availableHeight && currentPageHTML !== '') {
+            // This element would overflow - start a new page
+            if (firstPageOfSection && tocLabel) {
+              tocEntries.push({ label: tocLabel, pageIndex: pages.length });
+              firstPageOfSection = false;
+            }
+            pages.push(currentPageHTML);
+            currentPageHTML = child.outerHTML;
+            measurer.innerHTML = child.outerHTML;
+            currentHeight = measurer.scrollHeight;
+          } else {
+            currentPageHTML += child.outerHTML;
+            currentHeight = newHeight;
+          }
+
+          // If this is a forced page break element
+          if (child.classList && child.classList.contains('act-title')) {
+            if (firstPageOfSection && tocLabel) {
+              tocEntries.push({ label: tocLabel, pageIndex: pages.length });
+              firstPageOfSection = false;
+            }
+          }
+        });
+
+        // Don't forget the last page
+        if (currentPageHTML) {
+          if (firstPageOfSection && tocLabel) {
+            tocEntries.push({ label: tocLabel, pageIndex: pages.length });
+          }
+          pages.push(currentPageHTML);
+        }
+
+        document.body.removeChild(measurer);
+      });
+
+      // Build TOC
+      buildTOC();
+    }
+
+    // ---- RENDER PAGE ----
+    function renderPage(index, targetEl) {
+      if (index < 0 || index >= pages.length) return;
+      targetEl = targetEl || pageContent;
+      targetEl.innerHTML = pages[index];
+
+      // Update page number
+      if (index === 0) {
+        pageNum.textContent = '';
+      } else {
+        pageNum.textContent = index;
+      }
+
+      // Update indicators
+      pageIndicator.textContent = `Page ${index + 1} of ${pages.length}`;
+      progressFill.style.width = `${((index + 1) / pages.length) * 100}%`;
+
+      // Update button states
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === pages.length - 1;
+    }
+
+    // ---- PAGE NAVIGATION ----
+    function nextPage() {
+      if (isAnimating || currentPageIndex >= pages.length - 1) return;
+      isAnimating = true;
+
+      const nextIndex = currentPageIndex + 1;
+
+      // Set up animation page with new content
+      animPage.style.display = 'block';
+      renderPage(nextIndex, animPageContent);
+
+      // Animate current page turning forward
+      currentPageEl.classList.add('turning-forward');
+      animPage.classList.add('entering-forward');
+
+      setTimeout(() => {
+        currentPageIndex = nextIndex;
+        renderPage(currentPageIndex);
+        currentPageEl.classList.remove('turning-forward');
+        animPage.classList.remove('entering-forward');
+        animPage.style.display = 'none';
+        currentPageEl.style.transform = '';
+        isAnimating = false;
+        savePosition();
+      }, 600);
+    }
+
+    function prevPage() {
+      if (isAnimating || currentPageIndex <= 0) return;
+      isAnimating = true;
+
+      const prevIndex = currentPageIndex - 1;
+
+      // Set up animation page with new content
+      animPage.style.display = 'block';
+      renderPage(prevIndex, animPageContent);
+
+      // Animate
+      currentPageEl.classList.add('turning-forward');
+      animPage.classList.add('entering-backward');
+
+      setTimeout(() => {
+        currentPageIndex = prevIndex;
+        renderPage(currentPageIndex);
+        currentPageEl.classList.remove('turning-forward');
+        animPage.classList.remove('entering-backward');
+        animPage.style.display = 'none';
+        currentPageEl.style.transform = '';
+        isAnimating = false;
+        savePosition();
+      }, 600);
+    }
+
+    function goToPage(index) {
+      if (isAnimating || index < 0 || index >= pages.length) return;
+      currentPageIndex = index;
+      renderPage(currentPageIndex);
+      savePosition();
+    }
+
+    // ---- TABLE OF CONTENTS ----
+    function buildTOC() {
+      const tocList = document.getElementById('tocList');
+      tocList.innerHTML = '';
+      tocEntries.forEach(entry => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.innerHTML = `${entry.label} <span class="toc-page">p. ${entry.pageIndex + 1}</span>`;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          goToPage(entry.pageIndex);
+          toggleTOC();
+        });
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+    }
+
+    function toggleTOC() {
+      const overlay = document.getElementById('tocOverlay');
+      overlay.classList.toggle('active');
+    }
+
+    function closeTOCOutside(e) {
+      if (e.target === e.currentTarget) toggleTOC();
+    }
+
+    // ---- KEYBOARD NAVIGATION ----
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('tocOverlay').classList.contains('active')) {
+        if (e.key === 'Escape') toggleTOC();
+        return;
+      }
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'PageDown':
+        case ' ':
+          e.preventDefault();
+          nextPage();
+          break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault();
+          prevPage();
+          break;
+        case 'Home':
+          e.preventDefault();
+          goToPage(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          goToPage(pages.length - 1);
+          break;
+        case 'Escape':
+          break;
+      }
+    });
+
+    // ---- TOUCH/SWIPE NAVIGATION ----
+    bookEl.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    bookEl.addEventListener('touchend', (e) => {
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+      // Only handle horizontal swipes (not vertical scrolling)
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (deltaX < 0) {
+          nextPage();
+        } else {
+          prevPage();
+        }
+      }
+    }, { passive: true });
+
+    // ---- PERSIST POSITION ----
+    function savePosition() {
+      try {
+        localStorage.setItem('juno-paycock-page', currentPageIndex);
+      } catch (e) {}
+    }
+
+    function loadPosition() {
+      try {
+        const saved = localStorage.getItem('juno-paycock-page');
+        if (saved !== null) {
+          const idx = parseInt(saved, 10);
+          if (idx >= 0 && idx < pages.length) {
+            currentPageIndex = idx;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // ---- RESIZE HANDLER ----
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const savedTocLabel = tocEntries.find(e => e.pageIndex <= currentPageIndex);
+        paginate();
+        // Try to stay roughly in the same place
+        if (savedTocLabel) {
+          const newEntry = tocEntries.find(e => e.label === savedTocLabel.label);
+          if (newEntry) {
+            const offset = currentPageIndex - savedTocLabel.pageIndex;
+            currentPageIndex = Math.min(newEntry.pageIndex + offset, pages.length - 1);
+          }
+        }
+        currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
+        renderPage(currentPageIndex);
+      }, 300);
+    });
+
+    // ---- INIT ----
+    function init() {
+      paginate();
+      loadPosition();
+      renderPage(currentPageIndex);
+    }
+
+    // Wait for fonts to load for accurate pagination
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(init);
+    } else {
+      window.addEventListener('load', init);
+    }
+  </script>
+
+</body>
+</html>

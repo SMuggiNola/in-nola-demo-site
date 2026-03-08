@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Tenement | Irish Network NOLA</title>
+<link rel="icon" type="image/png" href="../../assets/in_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel+Decorative:wght@400;700&family=Libre+Franklin:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================
+   RESET & BASE
+============================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-dark: #110e0a;
+  --bg-warm: #1a1510;
+  --bg-panel: #231c14;
+  --bg-card: #2e2518;
+  --text-cream: #e8dcc8;
+  --text-muted: #8a7a6a;
+  --text-dim: #5a4e40;
+  --gold: #c8a24e;
+  --gold-light: #dfc070;
+  --gold-glow: rgba(200, 162, 78, 0.15);
+  --door-wood: #5c3a1e;
+  --door-dark: #3a2410;
+  --votive-red: #cc4422;
+  --votive-glow: rgba(204, 68, 34, 0.3);
+
+  /* Character colors */
+  --boyle: #a84040;
+  --joxer: #8a8a40;
+  --juno: #4a5a8a;
+  --johnny: #7a7a7a;
+  --mary: #4a7a5a;
+  --madigan: #7a4a8a;
+  --member: #c8a24e;
+  --stage: #6a5a4a;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.3s ease;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: var(--bg-dark);
+  color: var(--text-cream);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Warm ambient glow */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 20%, rgba(200, 162, 78, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(204, 68, 34, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grain texture overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================
+   SCREENS (shown/hidden by JS)
+============================================ */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.screen.active {
+  display: flex;
+}
+
+.screen-fade-in {
+  animation: screenFadeIn 0.8s ease forwards;
+}
+
+.screen-fade-out {
+  animation: screenFadeOut 0.5s ease forwards;
+}
+
+@keyframes screenFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes screenFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ============================================
+   SCREEN 1: ENTRY / LOGIN
+============================================ */
+#entry-screen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-dark);
+}
+
+.entry-votive {
+  width: 8px;
+  height: 8px;
+  background: var(--votive-red);
+  border-radius: 50%;
+  box-shadow: 0 0 20px var(--votive-glow), 0 0 40px var(--votive-glow);
+  margin: 0 auto 2rem;
+  animation: votiveFlicker 3s ease-in-out infinite alternate;
+}
+
+@keyframes votiveFlicker {
+  0%, 100% { opacity: 0.8; box-shadow: 0 0 20px var(--votive-glow), 0 0 40px var(--votive-glow); }
+  33% { opacity: 1; box-shadow: 0 0 25px var(--votive-glow), 0 0 50px var(--votive-glow); }
+  66% { opacity: 0.7; box-shadow: 0 0 15px var(--votive-glow), 0 0 30px var(--votive-glow); }
+}
+
+.entry-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 2.2rem;
+  color: var(--gold);
+  line-height: 1.2;
+  margin-bottom: 0.3rem;
+}
+
+.entry-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.entry-flavour {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-muted);
+  max-width: 380px;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.entry-login {
+  width: 100%;
+  max-width: 300px;
+}
+
+.entry-input {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  background: var(--bg-panel);
+  border: 1px solid rgba(200, 162, 78, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--text-cream);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transition);
+  margin-bottom: 1rem;
+}
+
+.entry-input::placeholder {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.entry-input:focus {
+  border-color: var(--gold);
+}
+
+.btn-enter {
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, var(--door-wood), var(--door-dark));
+  border: 1px solid rgba(200, 162, 78, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--gold-light);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.05em;
+}
+
+.btn-enter:hover {
+  background: linear-gradient(135deg, #6b4525, #4a2e15);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(200, 162, 78, 0.15);
+}
+
+.entry-error {
+  color: var(--votive-red);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  min-height: 1.2rem;
+}
+
+.entry-skip {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color var(--transition);
+}
+
+.entry-skip:hover {
+  color: var(--text-muted);
+}
+
+/* ============================================
+   SCREEN 2: THE DOOR / PROBLEM ENTRY
+============================================ */
+#door-screen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-dark);
+}
+
+/* CSS tenement door */
+.door-container {
+  position: relative;
+  width: 160px;
+  height: 240px;
+  margin: 0 auto 1.5rem;
+  perspective: 800px;
+}
+
+.door {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, var(--door-wood) 0%, var(--door-dark) 100%);
+  border-radius: 4px 4px 0 0;
+  border: 3px solid #4a2e15;
+  position: relative;
+  box-shadow:
+    inset 0 0 30px rgba(0,0,0,0.3),
+    4px 4px 20px rgba(0,0,0,0.5);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+}
+
+.door.knocked {
+  animation: doorKnock 0.6s ease;
+}
+
+@keyframes doorKnock {
+  0%, 100% { transform: rotateY(0deg); }
+  15% { transform: rotateY(-2deg); }
+  30% { transform: rotateY(0deg); }
+  45% { transform: rotateY(-1.5deg); }
+  60% { transform: rotateY(0deg); }
+}
+
+/* Door panels */
+.door::before {
+  content: "";
+  position: absolute;
+  top: 15%;
+  left: 12%;
+  right: 12%;
+  height: 30%;
+  border: 2px solid rgba(200, 162, 78, 0.15);
+  border-radius: 2px;
+}
+
+.door::after {
+  content: "";
+  position: absolute;
+  top: 55%;
+  left: 12%;
+  right: 12%;
+  height: 30%;
+  border: 2px solid rgba(200, 162, 78, 0.15);
+  border-radius: 2px;
+}
+
+/* Door knocker */
+.door-knocker {
+  position: absolute;
+  top: 45%;
+  right: 20%;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.door-knocker::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+/* Door number */
+.door-number {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.door-prompt {
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+.door-problem-wrap {
+  width: 100%;
+  max-width: 400px;
+}
+
+.door-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 1rem 1.2rem;
+  background: var(--bg-panel);
+  border: 1px solid rgba(200, 162, 78, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--text-cream);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition);
+  margin-bottom: 1rem;
+}
+
+.door-textarea::placeholder {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.door-textarea:focus {
+  border-color: var(--gold);
+}
+
+.btn-knock {
+  width: 100%;
+  max-width: 400px;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--door-wood), var(--door-dark));
+  border: 1px solid rgba(200, 162, 78, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--gold-light);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.08em;
+}
+
+.btn-knock:hover {
+  background: linear-gradient(135deg, #6b4525, #4a2e15);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.btn-knock:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+
+/* Door screen for return knocks (acts 2 & 3) */
+.door-return-text {
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+/* ============================================
+   SCREEN 3: CHAT
+============================================ */
+#chat-screen {
+  background: var(--bg-dark);
+  position: relative;
+}
+
+/* Per-act set photo backgrounds */
+#chat-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  z-index: 0;
+}
+
+#chat-screen.act-1::before {
+  background-image: url('set_1.jpg');
+  opacity: 0.12;
+}
+
+#chat-screen.act-2::before {
+  background-image: url('set_2.jpg');
+  opacity: 0.15;
+}
+
+#chat-screen.act-3::before {
+  background-image: url('set_3.jpg');
+  opacity: 0.10;
+}
+
+/* Dark vignette overlay to keep text readable */
+#chat-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(17, 14, 10, 0.7) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure all chat content sits above the background */
+#chat-screen > * {
+  position: relative;
+  z-index: 1;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: var(--bg-panel);
+  border-bottom: 1px solid rgba(200, 162, 78, 0.15);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.chat-header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.chat-header-scene {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar */
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(200, 162, 78, 0.2); border-radius: 2px; }
+
+/* Chat message bubble */
+.chat-msg {
+  max-width: 85%;
+  animation: msgAppear 0.3s ease;
+}
+
+@keyframes msgAppear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-msg-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+  padding-left: 0.75rem;
+}
+
+.chat-msg-bubble {
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px 12px 12px 4px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  position: relative;
+}
+
+/* Character-specific colors */
+.chat-msg[data-char="boyle"] .chat-msg-name { color: var(--boyle); }
+.chat-msg[data-char="boyle"] .chat-msg-bubble {
+  background: rgba(168, 64, 64, 0.12);
+  border-left: 3px solid var(--boyle);
+}
+
+.chat-msg[data-char="joxer"] .chat-msg-name { color: var(--joxer); }
+.chat-msg[data-char="joxer"] .chat-msg-bubble {
+  background: rgba(138, 138, 64, 0.12);
+  border-left: 3px solid var(--joxer);
+}
+
+.chat-msg[data-char="juno"] .chat-msg-name { color: var(--juno); }
+.chat-msg[data-char="juno"] .chat-msg-bubble {
+  background: rgba(74, 90, 138, 0.12);
+  border-left: 3px solid var(--juno);
+}
+
+.chat-msg[data-char="johnny"] .chat-msg-name { color: var(--johnny); }
+.chat-msg[data-char="johnny"] .chat-msg-bubble {
+  background: rgba(122, 122, 122, 0.12);
+  border-left: 3px solid var(--johnny);
+}
+
+.chat-msg[data-char="mary"] .chat-msg-name { color: var(--mary); }
+.chat-msg[data-char="mary"] .chat-msg-bubble {
+  background: rgba(74, 122, 90, 0.12);
+  border-left: 3px solid var(--mary);
+}
+
+.chat-msg[data-char="madigan"] .chat-msg-name { color: var(--madigan); }
+.chat-msg[data-char="madigan"] .chat-msg-bubble {
+  background: rgba(122, 74, 138, 0.12);
+  border-left: 3px solid var(--madigan);
+}
+
+.chat-msg[data-char="member"] .chat-msg-name { color: var(--member); }
+.chat-msg[data-char="member"] .chat-msg-bubble {
+  background: rgba(200, 162, 78, 0.1);
+  border-left: 3px solid var(--member);
+  align-self: flex-end;
+}
+
+.chat-msg[data-char="member"] {
+  align-self: flex-end;
+}
+.chat-msg[data-char="member"] .chat-msg-name {
+  text-align: right;
+  padding-right: 0.75rem;
+  padding-left: 0;
+}
+.chat-msg[data-char="member"] .chat-msg-bubble {
+  border-radius: 12px 12px 4px 12px;
+  border-left: none;
+  border-right: 3px solid var(--member);
+}
+
+/* Stage directions */
+.chat-stage {
+  text-align: center;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--stage);
+  padding: 0.5rem 1rem;
+  max-width: 90%;
+  align-self: center;
+  animation: msgAppear 0.3s ease;
+}
+
+/* Typing indicator */
+.chat-typing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  animation: msgAppear 0.3s ease;
+}
+
+.chat-typing-name {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.typing-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Member prompt buttons */
+.chat-prompt {
+  align-self: stretch;
+  padding: 0.75rem 0;
+  animation: msgAppear 0.4s ease;
+}
+
+.chat-prompt-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.chat-prompt-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chat-prompt-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-prompt-input {
+  flex: 1;
+  padding: 0.7rem 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(200, 162, 78, 0.25);
+  border-radius: var(--radius-sm);
+  color: var(--text-cream);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition);
+  line-height: 1.4;
+}
+
+.chat-prompt-input::placeholder {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.chat-prompt-input:focus {
+  border-color: var(--gold);
+}
+
+.chat-prompt-send {
+  padding: 0.7rem 1.2rem;
+  background: linear-gradient(135deg, var(--door-wood), var(--door-dark));
+  border: 1px solid rgba(200, 162, 78, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--gold-light);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.chat-prompt-send:hover {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #6b4525, #4a2e15);
+}
+
+.chat-prompt-send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ============================================
+   SCREEN 4: SCENE TRANSITION
+============================================ */
+#transition-screen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-dark);
+}
+
+.transition-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  color: var(--text-muted);
+  max-width: 400px;
+  line-height: 1.8;
+  animation: transitionFade 1s ease;
+}
+
+@keyframes transitionFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.transition-setting {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  max-width: 380px;
+  line-height: 1.7;
+  margin-top: 1.5rem;
+  font-style: italic;
+  animation: transitionFade 1s ease 0.5s both;
+}
+
+/* ============================================
+   SCREEN 5: END
+============================================ */
+#end-screen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-dark);
+  overflow-y: auto;
+}
+
+.end-silence {
+  height: 60px;
+}
+
+.end-juno-line {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  color: var(--juno);
+  max-width: 500px;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  animation: endFade 2s ease;
+}
+
+@keyframes endFade {
+  from { opacity: 0; }
+  50% { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.end-credit {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-bottom: 0.3rem;
+}
+
+.end-innola {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 2.5rem;
+}
+
+.end-donation {
+  max-width: 400px;
+  background: var(--bg-panel);
+  border: 1px solid rgba(200, 162, 78, 0.15);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: endFade 3s ease;
+}
+
+.end-donation-quote {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-cream);
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.end-donation-attr {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.2rem;
+}
+
+.btn-donate {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: var(--gold);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+
+.btn-donate:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(200, 162, 78, 0.3);
+}
+
+.end-return {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.end-return a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.end-return a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 480px) {
+  .entry-title { font-size: 1.8rem; }
+  .entry-flavour { font-size: 0.85rem; }
+
+  .door-container { width: 130px; height: 200px; }
+
+  .chat-msg-bubble { font-size: 0.9rem; }
+  .chat-msg { max-width: 90%; }
+
+  .end-juno-line { font-size: 1.2rem; }
+}
+
+@media (min-width: 768px) {
+  .chat-messages { padding: 1.5rem 2rem; }
+  .chat-msg { max-width: 70%; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ==========================================
+     SCREEN 1: ENTRY / LOGIN
+========================================== -->
+<div class="screen active" id="entry-screen">
+  <div class="entry-votive"></div>
+  <h1 class="entry-title">The Tenement</h1>
+  <p class="entry-subtitle">Juno and the Paycock &mdash; An Interactive Experience</p>
+
+  <p class="entry-flavour">
+    You're a neighbour in a Dublin tenement, 1922. The Boyle family lives on your landing.
+    You've got a problem and you need advice. Knock on the door.
+  </p>
+
+  <div class="entry-login">
+    <input type="text" class="entry-input" id="memberCode" placeholder="Member code or name" autocomplete="off">
+    <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Enter</button>
+    <div class="entry-error" id="entryError"></div>
+  </div>
+
+  <div class="entry-skip" onclick="handleSkipLogin()">Continue as guest</div>
+</div>
+
+<!-- ==========================================
+     SCREEN 2: THE DOOR / PROBLEM ENTRY
+========================================== -->
+<div class="screen" id="door-screen">
+  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem;">
+
+    <div class="door-container">
+      <div class="door" id="theDoor">
+        <span class="door-number">7</span>
+        <div class="door-knocker"></div>
+      </div>
+    </div>
+
+    <!-- First visit: problem entry -->
+    <div id="door-first-visit">
+      <p class="door-prompt">
+        You stand outside the Boyle family flat on the landing.<br>
+        What's happened? What do you need help with?
+      </p>
+      <div class="door-problem-wrap">
+        <textarea class="door-textarea" id="problemInput" placeholder="I said something terrible at dinner and now my sister won't talk to me..."></textarea>
+        <button class="btn-knock" id="btnKnock" onclick="handleKnock()">Knock</button>
+      </div>
+    </div>
+
+    <!-- Return visits: just knock -->
+    <div id="door-return-visit" style="display:none;">
+      <p class="door-return-text" id="doorReturnText"></p>
+      <button class="btn-knock" id="btnReturnKnock" onclick="handleReturnKnock()">Knock</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==========================================
+     SCREEN 3: CHAT
+========================================== -->
+<div class="screen" id="chat-screen">
+  <div class="chat-header">
+    <span class="chat-header-title">The Boyle Flat</span>
+    <span class="chat-header-scene" id="chatSceneLabel">Act I</span>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+</div>
+
+<!-- ==========================================
+     SCREEN 4: SCENE TRANSITION
+========================================== -->
+<div class="screen" id="transition-screen">
+  <p class="transition-text" id="transitionText"></p>
+  <p class="transition-setting" id="transitionSetting"></p>
+</div>
+
+<!-- ==========================================
+     SCREEN 5: END
+========================================== -->
+<div class="screen" id="end-screen">
+  <div class="end-silence"></div>
+  <p class="end-juno-line" id="endJunoLine"></p>
+
+  <p class="end-credit">Juno and the Paycock was first performed at the Abbey Theatre, Dublin, 1924.</p>
+  <p class="end-innola">This experience was brought to you by Irish Network New Orleans.</p>
+
+  <div class="end-donation" id="endDonation">
+    <p class="end-donation-quote" id="donationQuote"></p>
+    <p class="end-donation-attr" id="donationAttr"></p>
+    <a class="btn-donate" href="https://paypal.me/innola" target="_blank" rel="noopener">Leave a Cup of Coffee &mdash; $0.99</a>
+  </div>
+
+  <p class="end-return">
+    <a href="../index.html">&larr; Return to the Village</a>
+  </p>
+</div>
+
+<!-- ==========================================
+     JAVASCRIPT
+========================================== -->
+<script>
+// ============================================
+//   STATE
+// ============================================
+const state = {
+  memberCode: '',
+  memberName: 'Neighbour',
+  problem: '',
+  scene: 0,        // 0 = not started, 1, 2, 3
+  choices: [],     // member choices from each scene
+  isPlaying: false,
+  junoFinalLine: '',
+  sessionId: null,
+};
+
+// API base — empty string for same-origin (Cloudflare Pages), or set for dev
+const API_BASE = '';
+
+// ============================================
+//   SCREEN MANAGEMENT
+// ============================================
+function showScreen(id, fadeIn = true) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active', 'screen-fade-in');
+  });
+  const screen = document.getElementById(id);
+  screen.classList.add('active');
+  if (fadeIn) screen.classList.add('screen-fade-in');
+}
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// ============================================
+//   SCREEN 1: LOGIN
+// ============================================
+async function handleLogin() {
+  const code = document.getElementById('memberCode').value.trim();
+  if (!code) {
+    document.getElementById('entryError').textContent = 'Please enter your member code.';
+    return;
+  }
+  state.memberCode = code;
+  state.memberName = code; // Will be replaced by API response
+
+  // Try to auth against the API
+  try {
+    const res = await fetch(`${API_BASE}/api/tenement`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'start', memberCode: code })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      state.memberName = data.memberName || code;
+      state.sessionId = data.sessionId || null;
+    }
+  } catch (e) {
+    // API not available — continue in offline/demo mode
+    console.log('API not available, continuing in demo mode');
+  }
+
+  showScreen('door-screen');
+}
+
+function handleSkipLogin() {
+  state.memberCode = 'guest';
+  state.memberName = 'Neighbour';
+  showScreen('door-screen');
+}
+
+// ============================================
+//   SCREEN 2: DOOR / KNOCK
+// ============================================
+async function handleKnock() {
+  const problem = document.getElementById('problemInput').value.trim();
+  if (!problem) return;
+
+  state.problem = problem;
+  state.scene = 1;
+
+  // Animate the door knock
+  const door = document.getElementById('theDoor');
+  door.classList.add('knocked');
+  document.getElementById('btnKnock').disabled = true;
+
+  await sleep(800);
+  door.classList.remove('knocked');
+
+  // Start scene 1
+  await startScene(1);
+}
+
+async function handleReturnKnock() {
+  const door = document.getElementById('theDoor');
+  door.classList.add('knocked');
+  document.getElementById('btnReturnKnock').disabled = true;
+
+  await sleep(800);
+  door.classList.remove('knocked');
+
+  await startScene(state.scene);
+}
+
+function showDoorForReturn(sceneNum) {
+  document.getElementById('door-first-visit').style.display = 'none';
+  document.getElementById('door-return-visit').style.display = 'block';
+
+  const texts = {
+    2: "A few days have passed. You're back on the landing. Something's different — you can hear music and laughter inside. You raise your hand to knock.",
+    3: "Two months later. November. The landing is quiet. Too quiet. The door is ajar. You knock anyway."
+  };
+  document.getElementById('doorReturnText').textContent = texts[sceneNum] || '';
+  document.getElementById('btnReturnKnock').disabled = false;
+
+  showScreen('door-screen');
+}
+
+// ============================================
+//   SCENE MANAGEMENT
+// ============================================
+async function startScene(sceneNum) {
+  state.scene = sceneNum;
+
+  const sceneLabels = { 1: 'Act I — A State o\' Chassis', 2: 'Act II — The Party', 3: 'Act III — The Blinds is Down' };
+  document.getElementById('chatSceneLabel').textContent = sceneLabels[sceneNum] || '';
+
+  // Set act-specific background
+  const chatScreen = document.getElementById('chat-screen');
+  chatScreen.classList.remove('act-1', 'act-2', 'act-3');
+  chatScreen.classList.add('act-' + sceneNum);
+
+  // Clear chat
+  document.getElementById('chatMessages').innerHTML = '';
+  showScreen('chat-screen');
+
+  // Get dialogue from API or use demo
+  let dialogue;
+  try {
+    const res = await fetch(`${API_BASE}/api/tenement`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'scene',
+        sceneNum,
+        memberName: state.memberName,
+        memberProblem: state.problem,
+        previousChoices: state.choices,
+        sessionId: state.sessionId
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      dialogue = data.dialogue;
+    }
+  } catch (e) {
+    console.log('API not available, using demo dialogue');
+  }
+
+  // Fallback to demo
+  if (!dialogue) {
+    dialogue = getDemoDialogue(sceneNum);
+  }
+
+  // Parse and play
+  const messages = parseDialogue(dialogue);
+  await playScene(messages, sceneNum);
+}
+
+async function endScene(sceneNum) {
+  if (sceneNum < 3) {
+    // Show transition, then door knock for next act
+    await showTransition(sceneNum);
+    state.scene = sceneNum + 1;
+    showDoorForReturn(sceneNum + 1);
+  } else {
+    // Final scene — show end screen
+    await showEndScreen();
+  }
+}
+
+async function showTransition(fromScene) {
+  const transitions = {
+    1: {
+      text: 'A few days pass...',
+      setting: 'The same tenement flat, but transformed. New furniture, a gramophone, whisky on the dresser. Everything looks prosperous. Nothing is paid for.'
+    },
+    2: {
+      text: 'Two months later. November.',
+      setting: 'The flat is growing bare. Furniture is being taken away. A lamp turned low. The votive light under the Blessed Virgin gleams more redly than ever.'
+    }
+  };
+
+  const t = transitions[fromScene];
+  document.getElementById('transitionText').textContent = t.text;
+  document.getElementById('transitionSetting').textContent = t.setting;
+
+  showScreen('transition-screen');
+  await sleep(5000);
+}
+
+// ============================================
+//   DIALOGUE PARSER
+// ============================================
+function parseDialogue(text) {
+  const messages = [];
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+  for (const line of lines) {
+    // MEMBER_PROMPT
+    const promptMatch = line.match(/^MEMBER_PROMPT:\s*\[(.+)\]$/);
+    if (promptMatch) {
+      try {
+        const options = JSON.parse('[' + promptMatch[1] + ']');
+        messages.push({ type: 'prompt', options });
+      } catch (e) {
+        // Try splitting by commas between quoted strings
+        const opts = promptMatch[1].match(/"([^"]+)"/g);
+        if (opts) {
+          messages.push({ type: 'prompt', options: opts.map(o => o.replace(/"/g, '')) });
+        }
+      }
+      continue;
+    }
+
+    // Stage direction
+    if (line.startsWith('(') && line.endsWith(')')) {
+      messages.push({ type: 'stage', text: line });
+      continue;
+    }
+
+    // Character dialogue
+    const charMatch = line.match(/^([A-Z][A-Za-z\s."']+?):\s*"(.+)"$/);
+    if (charMatch) {
+      const rawName = charMatch[1].trim();
+      const text = charMatch[2];
+      const charKey = getCharKey(rawName);
+      messages.push({ type: 'dialogue', character: rawName, charKey, text });
+      continue;
+    }
+
+    // Fallback — might be continuation or malformed line
+    if (line.length > 5) {
+      messages.push({ type: 'stage', text: line });
+    }
+  }
+
+  return messages;
+}
+
+function getCharKey(name) {
+  const n = name.toUpperCase();
+  if (n.includes('BOYLE') && (n.includes('MRS') || n.includes('JUNO'))) return 'juno';
+  if (n.includes('BOYLE') && n.includes('JOHNNY')) return 'johnny';
+  if (n.includes('BOYLE') && n.includes('MARY')) return 'mary';
+  if (n.includes('BOYLE') || n.includes('CAPTAIN')) return 'boyle';
+  if (n.includes('JOXER') || n.includes('DALY')) return 'joxer';
+  if (n.includes('JUNO')) return 'juno';
+  if (n.includes('JOHNNY')) return 'johnny';
+  if (n.includes('MARY')) return 'mary';
+  if (n.includes('MADIGAN') || n.includes('MAISIE')) return 'madigan';
+  if (n.includes('MEMBER') || n.includes('NEIGHBOUR') || n.includes('YOU')) return 'member';
+  if (n.includes('MRS. TANCRED') || n.includes('TANCRED')) return 'johnny'; // use grey
+  if (n.includes('NUGENT')) return 'joxer'; // reuse olive
+  if (n.includes('MOBILIZER') || n.includes('IRREGULAR')) return 'johnny';
+  return 'boyle'; // default
+}
+
+function getDisplayName(rawName) {
+  const n = rawName.toUpperCase();
+  if (n.includes('MEMBER') || n.includes('NEIGHBOUR') || n.includes('YOU')) return 'You';
+  return rawName;
+}
+
+// ============================================
+//   CHAT PLAYBACK ENGINE
+// ============================================
+async function playScene(messages, sceneNum) {
+  state.isPlaying = true;
+  const container = document.getElementById('chatMessages');
+
+  // "You knock on the door" — the opening for every act
+  const knockTexts = {
+    1: '(You raise your hand and knock on the door of Flat 7.)',
+    2: '(You knock on the door again. Music and laughter inside.)',
+    3: '(You knock softly. The door is already ajar.)'
+  };
+
+  addStageDirection(container, knockTexts[sceneNum] || '(You knock on the door.)');
+  await sleep(2000);
+
+  // Scene 1: the member explains their problem on entry
+  if (sceneNum === 1 && state.problem) {
+    addStageDirection(container, '(The door opens. You step inside and explain what\'s troubling you.)');
+    await sleep(1500);
+    addMessage(container, 'You', 'member', state.problem);
+    scrollToBottom(container);
+    await sleep(2500);
+  }
+
+  for (let i = 0; i < messages.length; i++) {
+    if (!state.isPlaying) break;
+
+    const msg = messages[i];
+
+    if (msg.type === 'stage') {
+      addStageDirection(container, msg.text);
+      scrollToBottom(container);
+      // Longer pause for emotionally heavy stage directions
+      const isHeavy = msg.text.includes('silence') || msg.text.includes('taken') || msg.text.includes('dragged') || msg.text.includes('dead') || msg.text.includes('funeral');
+      await sleep(isHeavy ? randomBetween(3000, 5000) : randomBetween(2000, 3500));
+
+    } else if (msg.type === 'dialogue') {
+      // Capture Juno's lines for the end screen (last one wins)
+      if (msg.charKey === 'juno') {
+        state.junoFinalLine = msg.text;
+      }
+
+      // Occasionally show dual typing (2-3 times per scene) for immersion
+      const nextMsg = messages[i + 1];
+      const doDualType = nextMsg && nextMsg.type === 'dialogue' && Math.random() < 0.08;
+
+      if (doDualType) {
+        // Two characters typing at once
+        const typingEl1 = addTypingIndicator(container, msg.character, msg.charKey);
+        await sleep(randomBetween(600, 1200));
+        const typingEl2 = addTypingIndicator(container, nextMsg.character, nextMsg.charKey);
+        scrollToBottom(container);
+
+        await sleep(randomBetween(2000, 4000));
+
+        // First one sends, second "reconsiders"
+        typingEl1.remove();
+        addMessage(container, msg.character, msg.charKey, msg.text);
+        scrollToBottom(container);
+
+        await sleep(randomBetween(800, 1500));
+        typingEl2.remove(); // second stops typing briefly
+
+        await sleep(randomBetween(1500, 3000));
+        // second starts typing again and sends
+        const typingEl2b = addTypingIndicator(container, nextMsg.character, nextMsg.charKey);
+        scrollToBottom(container);
+
+        const words2 = nextMsg.text.split(' ').length;
+        await sleep(words2 < 30 ? randomBetween(2000, 3500) : randomBetween(3500, 6000));
+
+        typingEl2b.remove();
+        if (nextMsg.charKey === 'juno') state.junoFinalLine = nextMsg.text;
+        addMessage(container, nextMsg.character, nextMsg.charKey, nextMsg.text);
+        scrollToBottom(container);
+
+        i++; // skip next message since we already played it
+        await sleep(randomBetween(2500, 4500));
+        continue;
+      }
+
+      // Show typing indicator
+      const typingEl = addTypingIndicator(container, msg.character, msg.charKey);
+      scrollToBottom(container);
+
+      // Typing duration based on message length — slower pacing for immersion
+      const words = msg.text.split(' ').length;
+      let typingMs;
+      if (words < 20) typingMs = randomBetween(2000, 3500);
+      else if (words < 50) typingMs = randomBetween(3500, 6000);
+      else if (words < 100) typingMs = randomBetween(5500, 9000);
+      else typingMs = randomBetween(8000, 12000);
+
+      await sleep(typingMs);
+
+      // Remove typing, add message
+      typingEl.remove();
+      addMessage(container, msg.character, msg.charKey, msg.text);
+      scrollToBottom(container);
+
+      // Reading delay — let the message breathe
+      await sleep(randomBetween(2500, 5000));
+
+    } else if (msg.type === 'prompt') {
+      // Member prompt — wait for user choice
+      const choice = await showMemberPrompt(container, msg.options);
+      state.choices.push(choice);
+
+      // Show member's response as a chat message
+      addMessage(container, 'You', 'member', choice);
+      scrollToBottom(container);
+      await sleep(2000);
+    }
+  }
+
+  // Scene complete
+  state.isPlaying = false;
+  await sleep(2000);
+  await endScene(sceneNum);
+}
+
+function addMessage(container, name, charKey, text) {
+  const div = document.createElement('div');
+  div.className = 'chat-msg';
+  div.dataset.char = charKey;
+  div.innerHTML = `
+    <div class="chat-msg-name">${getDisplayName(name)}</div>
+    <div class="chat-msg-bubble">${escapeHtml(text)}</div>
+  `;
+  container.appendChild(div);
+}
+
+function addStageDirection(container, text) {
+  const div = document.createElement('div');
+  div.className = 'chat-stage';
+  div.textContent = text;
+  container.appendChild(div);
+}
+
+function addTypingIndicator(container, name, charKey) {
+  const div = document.createElement('div');
+  div.className = 'chat-typing';
+  div.innerHTML = `
+    <span class="chat-typing-name" style="color: var(--${charKey})">${getDisplayName(name)} is typing</span>
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  `;
+  container.appendChild(div);
+  return div;
+}
+
+function showMemberPrompt(container, options) {
+  return new Promise((resolve) => {
+    const div = document.createElement('div');
+    div.className = 'chat-prompt';
+
+    // Use a placeholder from the AI-suggested options as hint text
+    const placeholder = options && options.length > 0
+      ? options[0]
+      : 'Say something...';
+
+    div.innerHTML = `
+      <div class="chat-prompt-label">How do you respond?</div>
+      <div class="chat-prompt-input-wrap">
+        <input type="text" class="chat-prompt-input" placeholder="${escapeHtml(placeholder)}" maxlength="300" autocomplete="off">
+        <button class="chat-prompt-send">Send</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+    scrollToBottom(container);
+
+    const input = div.querySelector('.chat-prompt-input');
+    const sendBtn = div.querySelector('.chat-prompt-send');
+
+    function submit() {
+      const text = input.value.trim();
+      // If they typed nothing, use the placeholder suggestion
+      const choice = text || placeholder;
+      clearTimeout(timer);
+      div.remove();
+      resolve(choice);
+    }
+
+    sendBtn.addEventListener('click', submit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submit();
+      }
+    });
+
+    // Focus the input
+    setTimeout(() => input.focus(), 100);
+
+    // 60-second timeout — use placeholder if they don't respond
+    const timer = setTimeout(() => {
+      div.remove();
+      resolve(placeholder);
+    }, 60000);
+  });
+}
+
+// ============================================
+//   END SCREEN
+// ============================================
+async function showEndScreen() {
+  // Try to get session summary from API
+  try {
+    await fetch(`${API_BASE}/api/tenement`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'summary',
+        memberName: state.memberName,
+        memberProblem: state.problem,
+        choices: state.choices,
+        junoFinalLine: state.junoFinalLine,
+        sessionId: state.sessionId
+      })
+    });
+  } catch (e) {
+    // OK to fail
+  }
+
+  // Juno's final line (captured from dialogue or fallback)
+  const junoLine = state.junoFinalLine ||
+    "Sacred Heart o' Jesus, take away our hearts o' stone, and give us hearts o' flesh! Take away this murdherin' hate, an' give us Thine own eternal love!";
+  document.getElementById('endJunoLine').textContent = `"${junoLine}"`;
+
+  // Rotating donation quotes
+  const donationQuotes = [
+    {
+      quote: "If you've enjoyed the hospitality of this house — an' I use the word loosely — you might leave a small contribution. I'd do it meself, but I've a terrible pain in me legs.",
+      attr: "— Captain Boyle"
+    },
+    {
+      quote: "Ah, that's a darlin' experience, a daarlin' experience. If you've a coin to spare, it'd be a darlin' thing entirely.",
+      attr: "— Joxer Daly"
+    },
+    {
+      quote: "If you got somethin' out of this, leave what you can. God knows we could all use a little more kindness.",
+      attr: "— Juno Boyle"
+    }
+  ];
+  const dq = donationQuotes[Math.floor(Math.random() * donationQuotes.length)];
+  document.getElementById('donationQuote').textContent = `"${dq.quote}"`;
+  document.getElementById('donationAttr').textContent = dq.attr;
+
+  showScreen('end-screen');
+}
+
+// ============================================
+//   DEMO DIALOGUE (offline testing)
+// ============================================
+function getDemoDialogue(sceneNum) {
+  const name = state.memberName || 'Neighbour';
+  const problem = state.problem || 'a terrible row';
+
+  if (sceneNum === 1) {
+    return `(The door opens slowly. Boyle is sitting by the fire in his shirt-sleeves, reading the paper upside down. A labourer's shovel leans untouched against the dresser. Joxer hovers near the door, half-in, half-out, ready to bolt if Juno appears.)
+BOYLE: "Well, who's this now? Come in, come in — don't be standin' in the draught. Juno'll have me head if I let the cold in. She has me heart scalded as it is."
+JOXER: "Ah, a neighbour! A darlin' neighbour! Come in, sit down — isn't that right, Captain? The more the merrier, as the fella says."
+BOYLE: "That's what I said, didn't I? Sit down there an' tell us what's the matther. You look like you've the weight of the world on your shoulders — an' believe me, I know the feelin'."
+(${name} enters and explains their problem.)
+JUNO: "God help us, is that what's troublin' you? Sit down there an' have a cup o' tay — you look perished. Boyle, move your paper an' give the poor soul room."
+BOYLE: "I'm readin' the paper, Juno! There's important things happenin' in the world — the whole counthry's in a state o' chassis, an' here you are worryin' about chairs!"
+JOXER: "That's a fact, that's a fact. The counthry's in a terrible state. But sure, God never shut wan door but he opened another — isn't that right?"
+(Juno sets a cup of tea on the table with a sharp clink.)
+JUNO: "Never mind the state of the counthry. Now then — tell me exactly what happened. Don't mind these two."
+MEMBER_PROMPT: ["Thank you, Mrs. Boyle. I didn't know who else to turn to.", "It's worse than I'm making it sound, to be honest.", "I'm sorry to bother you — I can see you have your own troubles."]
+JUNO: "Ah, don't be apologizin'. Sure we all have our crosses. What you need to do is—"
+BOYLE: "I'll tell you what they need to do, Juno! They need to take a step back an' look at the bigger picture. Now, I was thinkin' about this only last night — what is the stars, Joxer? What is the stars?"
+JOXER: "That's a darlin' question, Captain, a daarlin' question!"
+BOYLE: "You see, when you look up at the sky at night — an' I've done it many a time, at sea, standin' on the deck of the Doreen — you realize that all our little problems, all our little squabbles, they're nothin' compared to the vastness of the universe. Nothin'! The stars are up there, millions of them, an' they don't care about any of it."
+JUNO: "He was never on any ship called the Doreen or any other ship. The only vessel he's ever commanded is a pint glass."
+JOXER: "Ah now, Juno, that's not fair. The Captain was a great sailor — a daarlin' sailor! I remember him tellin' me about the time off the coast of—"
+BOYLE: "Mozambique, Joxer. Off the coast of Mozambique. The waves were forty feet high an' the whole crew was prayin' — but not me. I stood on that deck an' I said to meself, 'Jack Boyle, you've a little spirit left in you still!'"
+(Johnny's voice comes sharp from the back room.)
+JOHNNY: "For God's sake, will yous keep it down! I'm thryin' to rest in here! Every voice in this flat goes through me head like a nail!"
+MARY: "Don't mind Johnny. He hasn't been well."
+(Mary looks up from her book — Ibsen's A Doll's House.)
+MARY: "Tell me more about your situation. Was it a matter of principle? Because I think sometimes you have to stand by what you believe, even when it's hard. A principle's a principle."
+JUNO: "Principle! That's all anyone talks about in this house — principles an' stars an' the state o' the counthry. None of it puts bread on the table."
+BOYLE: "Bread! Is that all you think about, Juno? Bread? There are higher things in life than bread!"
+JUNO: "Not when there's none in the press, there isn't."
+(Joxer edges closer to the dresser, eyeing a bottle of stout.)
+JOXER: "She's right, you know. She's right. But then again, Captain, you're right too. It's a delicate situation. Like the fella says, 'It's betther to have loved an' lost than—' than— what is it again?"
+BOYLE: "Than never to have loved at all, Joxer."
+JOXER: "That's it! A darlin' sayin', a daarlin' sayin'!"
+MEMBER_PROMPT: ["Boyle, what would you do in my situation?", "Mrs. Boyle, you were about to give me advice before—", "Does anyone in this flat ever agree on anything?"]
+BOYLE: "What would I do? I'll tell you what I'd do. I'd do exactly what I did when I was in a similar situation meself. I was comin' round Cape Horn — or was it the Cape of Good Hope — anyway, I was standin' on the deck an' the first mate says to me, he says—"
+JUNO: "You were never round Cape Horn an' you know it! An' there was no first mate an' no deck an' no ship!"
+BOYLE: "U-u-u-ugh! Can a man not tell a story in his own house without bein' contradicted at every turn?"
+(There is a sudden knock at the door. Everyone freezes. Johnny's voice comes from the back room, high and thin.)
+JOHNNY: "Who's that? Who's at the door? Mother, is the light lightin' before the picture o' the Virgin?"
+JUNO: "It is, son, it is. Don't be frettin'."
+(Juno opens the door. It's a boy with a message.)
+JUNO: "It's only Father Farrell's boy with a message about a job. Boyle — a job! There's a job goin' down at Doyle's. Are you listenin' to me?"
+BOYLE: "A job? Ah now, Juno, you know me legs is at me again — I can hardly walk to the door, let alone carry hods o' bricks up a ladder. The pains is terrible today."
+JUNO: "Your legs! You'd walk quick enough to the pub if Joxer held the door open for you!"
+JOXER: "Ah now, that's a bit harsh, Juno. A bit harsh. The Captain's legs is a well-known affliction. Sure didn't he tell me only yesterday that the doctor said—"
+JUNO: "What doctor? He hasn't seen a doctor since the day he was born, an' that doctor slapped him for cryin'!"
+(Boyle shifts uncomfortably in his chair and rattles the paper.)
+BOYLE: "Anyway, as I was sayin' to our neighbour here — the important thing is not to let these little things get on top of you. Keep your head up. That's what I always say. The whole counthry's in a state o' chassis, but we have to carry on."
+MARY: "Father's right about one thing — you shouldn't let other people's expectations define your choices. You have to think about what you want."
+JUNO: "What I want is for someone in this family to do a day's work! But nobody's askin' me, are they?"
+MEMBER_PROMPT: ["You're all very kind. I feel a bit better already.", "I think I should go — I'm taking up your time.", "Juno, what would you do if you were me?"]
+JUNO: "What would I do? I'd stop thinkin' about it an' start doin' somethin' about it. That's the trouble with everyone in this house — all talk an' no action. You go back, you look them in the eye, an' you say what needs to be said. Not tomorrow. Today. Before pride eats you alive the way it's eatin' everyone in this—"
+JOHNNY: "Mother! MOTHER! I thought I saw somethin' at the window! There's someone out there!"
+JUNO: "There's nobody out there, Johnny. It's the curtain movin' in the wind."
+(Juno turns back, but the moment has passed. She sighs and picks up the teapot.)
+BOYLE: "Well, neighbour, I hope that's been some help to you. You're always welcome here. Aren't they, Joxer?"
+JOXER: "Always welcome! A darlin' neighbour! Sure isn't that what neighbours are for? As the fella says, 'God never shut wan door but he opened another!'"
+(Joxer has somehow acquired a bottle of stout during the conversation.)
+JUNO: "Is that my stout you're drinkin', Joxer Daly?"
+JOXER: "Me? No! No, this was — this was here already. I found it on the — I was just mindin' it for you, Juno."`;
+  }
+
+  if (sceneNum === 2) {
+    return `(The flat is unrecognizable. New upholstered sofa, polished chest of drawers, a gramophone playing a waltz. Bottles of stout and a bottle of whisky crowd the dresser. Christmas paper chains hang from the ceiling. Boyle is stretched on the sofa in a new suit, fountain pen in hand.)
+BOYLE: "Come in, come in! Don't be standin' on ceremony — pull up a chair, there's stout on the table an' whisky for them that wants it. We're celebratin'! Aren't we, Joxer?"
+JOXER: "We are that, Captain! How d'ye feel now, as a man o' money? It's a darlin' thing, a daarlin' thing, to see you in your rightful position!"
+(Mrs. Madigan sweeps in from the back room with a plate of sandwiches.)
+MRS. MADIGAN: "Ah, God bless us, I remember this flat when there wasn't a stick o' furniture in it — I remember as well as I remember yestherday, the fourteenth of March, nineteen-hundred an' nine, when your poor mother, God rest her soul, was tryin' to boil a kettle on a candle because the gas was cut off. An' now look at it! Gawn with you!"
+BOYLE: "Them days is over, Mrs. Madigan. The Boyles are on the up. It's a responsibility, Joxer, a great responsibility — but I'm the man for it."
+JOXER: "You are that, Captain! A natural born leader, as I always said!"
+MEMBER_PROMPT: ["Congratulations on the inheritance, Boyle!", "I was hoping to talk about my problem from before...", "The flat looks incredible — what happened?"]
+BOYLE: "Ah, sit down, sit down! Have a drink! Now, I was just explainin' to Joxer about the financial situation. I seen be the paper this mornin' that Consols was down half per cent. That's serious, min' you, an' shows the whole counthry's in a state o' chassis."
+JOXER: "Terrible serious. Half per cent! That could bring down the government, Captain."
+BOYLE: "It could, Joxer, it could. An' that's why a man of means has to keep his eye on things. Consols, bonds, securities — I've been studyin' them all. There's also the Prawna — have I told you about the Prawna?"
+JOXER: "The Prawna? No, Captain, I don't think you have."
+BOYLE: "Prawna — yis, the Prawna."
+(Boyle blows gently through his lips, as if this explains everything.)
+BOYLE: "That's the Prawna! It's about the life force, Joxer — the universal spirit that connects all livin' things. Bentham was explainin' it to me the other night. He's a very educated man, Bentham. Theosophy, they call it."
+MRS. MADIGAN: "Theo-what? Sure I knew a Theo once — Theo Hennessy from Gardiner Street. Married a girl from Mountjoy Square, a lovely girl, lovely — but she had a terrible squint. I remember the weddin' as well as I remember yestherday—"
+MARY: "I don't know what you wanted a gramophone for — I know Charlie hates them. He says they're mechanical and soulless."
+JUNO: "Never mind what Charlie says or doesn't say. I'm afraid we're runnin' into too much debt, Boyle. All this furniture an' the gramophone an' the suit — an' not a penny of the money come through yet."
+BOYLE: "The money'll come through, Juno. These things take time. Legal matters, probate, solicitors — you wouldn't understand."
+JUNO: "I understand well enough that every stick of furniture in this room is on credit."
+(Joxer, sensing the mood shifting, reaches for the gramophone.)
+JOXER: "Here, will I put on another record? A bit of music to lighten the mood? 'She is far from the lan' where her young hero sleeps, an' lovers around her are sighin'... sighin'...' How does the rest of it go?"
+MRS. MADIGAN: "Ah, that's a lovely song, that. I remember hearin' it at a concert in the Antient Concert Rooms — it must have been nineteen-twelve or thirteen — and the woman that sang it, she had a voice like an angel, a Mrs. — what was her name now — Mrs. O'Somethin'—"
+MEMBER_PROMPT: ["Mrs. Madigan, you were telling a story?", "Boyle, has the money actually come through?", "This is quite a party!"]
+BOYLE: "Now, neighbour, I hope you're enjoyin' yourself. If there's anythin' you need — anythin' at all — you just say the word. A man in my position has a duty to help his neighbours."
+JOHNNY: "Are yous goin' to put on th' gramophone to-night, or are yous not? If yous are, I'm goin' to bed — I can't stand the noise of it!"
+BOYLE: "There he goes again. Johnny, will you come out here an' be sociable for once in your life?"
+JOHNNY: "For God's sake, let us have no more o' this talk. I want to be left alone."
+(A distant sound — a hymn, carried on the evening air. Then the slow, measured tread of many feet.)
+MRS. MADIGAN: "Whisht! What's that? Is that a funeral passin'?"
+(The hymn grows louder. Everyone stops. The gramophone plays on, obscenely cheerful against the approaching cortège.)
+JOHNNY: "Turn that off! TURN IT OFF! Can yous not hear? There's a funeral passin'! For God's sake!"
+(Joxer lifts the needle. Silence, except for the hymn and the shuffling of feet on the street below.)
+MRS. MADIGAN: "God rest the poor soul. That's Mrs. Tancred's boy they're buryin' — young Robbie Tancred, shot on the road out by Finglas. Not twenty years old."
+JUNO: "May God have mercy on him. An' on his poor mother."
+(Juno goes to the window and looks out. Her face changes.)
+BOYLE: "We've nothin' to do with these things, I'm tellin' you. Shut the window an' let's get on with the party."
+JUNO: "Nothin' to do with it? That woman down there — Mrs. Tancred — she's walkin' behind her dead son's coffin, an' she hasn't a friend in the world to walk with her. Someone should go down to her."
+BOYLE: "Let the Republicans look afther their own."
+JUNO: "It's nearly time we had a little less respect for the dead, an' a little more regard for the livin'."
+(Juno puts on her shawl.)
+JUNO: "I'm goin' down to walk with Mrs. Tancred. You can all do what you like."
+MEMBER_PROMPT: ["Should I come with you, Mrs. Boyle?", "That poor woman...", "Is everyone all right?"]
+(Juno leaves. A heavy silence settles over the room.)
+JOHNNY: "I can rest nowhere, nowhere, nowhere!"
+(Johnny rushes from the room into the back. A door slams.)
+MRS. MADIGAN: "The poor boy. He's not been right since the Risin'. Losin' his arm like that — an' now with all this shootin' an' killin'—"
+BOYLE: "Don't be talkin' about shootin' an' killin' in this house, Mrs. Madigan. We want no part of it."
+JOXER: "Ah, that's a darlin' funeral, a daarlin' funeral. Though it's a sad thing, a sad thing entirely. Still — God never shut wan door—"
+(Nobody finishes the sentence. The hymn fades into the distance.)
+BOYLE: "Well. Is anyone goin' to have another drink or are yous all just goin' to sit there with faces on yous like wet Tuesdays?"`;
+  }
+
+  if (sceneNum === 3) {
+    return `(The flat is nearly bare. Marks on the walls where pictures hung. The new furniture is gone — repossessed. A single lamp burns low on the table. The votive light under the Blessed Virgin gleams more redly than ever. Mary sits by the dying fire, hands under her chin, staring at nothing. Juno is in the back room.)
+(${name} enters. The door was ajar.)
+MARY: "Oh. It's you."
+(Mary doesn't move. Her voice is flat, exhausted.)
+MARY: "You might as well come in. There's nowhere to sit, mind. They took the sofa yesterday. And the chairs the day before that."
+JUNO: "Who's there? Come in. You might as well see how it all ends."
+(Juno emerges. She looks ten years older than the last time.)
+BOYLE: "I can't get blood out of a turnip, can I? The will's a washout — that Bentham an' his first an' second cousins instead of namin' the people properly — an' now the whole thing is gone! Every penny of it!"
+JUNO: "It was never your money, Boyle. You just spent it like it was."
+BOYLE: "An' who was it spent on the gramophone? An' the furniture? An' the suit? I was only tryin' to give this family a bit of dignity!"
+JUNO: "Dignity! You can't buy dignity on credit, Boyle."
+MEMBER_PROMPT: ["What happened to the inheritance?", "Mrs. Boyle, is there anything I can do?", "I'm so sorry — I shouldn't have come."]
+BOYLE: "An' now — on top of everything — on top of the will bein' a washout, on top of Nugent takin' me suit back, on top of Mrs. Madigan marchin' in here an' takin' the gramophone right off the table — on top of all that—"
+JUNO: "Boyle. Stop."
+BOYLE: "No, I won't stop! I'll say it! Mary is — Mary is—"
+MARY: "Oh, this is unbearable!"
+JUNO: "Mary is goin' to have a child, Boyle. An' Bentham is gone. He left. He's gone to England an' he won't be comin' back."
+(A long, terrible silence.)
+BOYLE: "A child? She's — she's goin' to have a—"
+(Boyle stands up. His face darkens.)
+BOYLE: "She should be dhriven out o' th' house she's brought disgrace on! She should be dhriven out, I tell you! No Boyle ever—"
+JUNO: "Don't you DARE talk about Mary that way! Don't you dare! Where were you when she needed a father? Down at the pub with Joxer Daly, that's where! You've been no father to any of your children, an' you've no right — no RIGHT — to judge her now!"
+MARY: "Your humanity is just as narrow as the humanity of the others."
+BOYLE: "What did you say to me?"
+MARY: "I said your humanity is narrow. Jerry Devine came back — said he loved me — an' then he found out about the baby an' he couldn't get away fast enough. An' now you. My own father."
+(Boyle sinks back into his chair. He says nothing for a long moment.)
+JOXER: "Did you ever hear the like! Him that goes a borrowin' goes a sorrowin'! That's a good wan, that is."
+BOYLE: "Shut up, Joxer."
+JOXER: "I'm only sayin'—"
+BOYLE: "I said shut up!"
+MEMBER_PROMPT: ["This is between your family. I should leave.", "Mary, I'm sorry.", "Is there anything anyone can do?"]
+(A sound from the back room — Johnny's voice, thin and frightened.)
+JOHNNY: "Mother! The light — the votive light — it's gone out! Mother of God, the light's gone out!"
+(Juno hurries to the back room. Everyone is still.)
+JOHNNY: "I feel a terrible pain in me breast, Mother. Somethin's wrong. Somethin' terrible is goin' to happen."
+JUNO: "Nothin's goin' to happen, Johnny. The light just blew out in the draught. I'll light it again."
+(A sudden, violent banging at the front door. Two men in trench coats enter. They are calm and purposeful.)
+IRREGULAR: "Boyle. Johnny Boyle. You're wanted. Come on."
+JOHNNY: "I haven't done nothin'! Haven't I done enough for Ireland! I lost me arm in the GPO — isn't that enough?"
+IRREGULAR: "Boyle, no man can do enough for Ireland. Come on."
+(Johnny is pulled from the back room. He is white as paper, shaking.)
+JOHNNY: "Mother! Mother! Sacred Heart of Jesus, have mercy on me! Mother o' God, pray for me — be with me now in the agonies o' death! Oh, Jesus, Jesus, Jesus!"
+(They drag him to the door. He is praying, weeping. The door slams shut behind them.)
+(Silence. A long, long silence. Nobody moves. The votive light flickers and dies.)
+(Juno stands in the middle of the bare room. She is perfectly still.)
+(After a long time, she speaks.)
+JUNO: "What you an' I'll have to go through'll be nothin' to what poor Mary'll have to go through. But she won't be alone. The baby'll have what's far betther than a father — it'll have two mothers."
+(Juno turns to Mary.)
+JUNO: "Come on, Mary. Get your things. We're leavin'. We're leavin' this flat an' we're not comin' back. Whatever happens to us, we'll face it together — the three of us."
+MARY: "Where will we go?"
+JUNO: "Anywhere. It doesn't matter. As long as it's away from here."
+(Juno looks around the bare room one last time.)
+JUNO: "What can God do agen the stupidity o' men! Sacred Heart o' Jesus, take away our hearts o' stone, and give us hearts o' flesh! Take away this murdherin' hate, an' give us Thine own eternal love!"
+MEMBER_PROMPT: ["Mrs. Boyle... thank you.", "I'll never forget this.", "God bless you, Juno."]
+(Juno takes Mary by the hand. They walk out together. The door closes quietly behind them.)
+(The flat is empty. The lamp gutters. The votive light is out.)
+(A very long silence.)
+(Then — sounds on the stairs. Stumbling. Cursing. A key scraping at the lock.)
+(Boyle and Joxer lurch through the door, holding each other up. They are catastrophically drunk.)
+BOYLE: "The blinds is down, Joxer... the blinds is down!"
+JOXER: "The anchor's weighed, farewell... ree... mem... ber... me! Jacky Boyle, Esquire, infernal rogue an' damned liar!"
+(Boyle trips over something in the dark and crashes to the floor.)
+BOYLE: "Where's all the... where's the furni... where's the chairs gone?"
+JOXER: "They're all gone, Captain. Everything's gone. Put all... your throubles... in your oul' kit bag... an' smile... smile... smile!"
+(Joxer collapses onto the bare bed frame.)
+BOYLE: "I'm tellin' you... Joxer... th' whole worl's... in a terr... ible state o'... chassis!"
+JOXER: "Chassis... that's the word... chassis..."
+(They lie in the dark, in the bare room, mumbling. The blinds are down.)`;
+  }
+
+  return '';
+}
+
+// ============================================
+//   UTILITIES
+// ============================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function randomBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function scrollToBottom(el) {
+  requestAnimationFrame(() => {
+    el.scrollTop = el.scrollHeight;
+  });
+}
+
+// Enter key on inputs
+document.getElementById('memberCode').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+document.getElementById('problemInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleKnock();
+  }
+});
+</script>
+
+</body>
+</html>

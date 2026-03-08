@@ -21,3 +21,7 @@ id = "dc52dbe3b66e4b47b58f9da4fd0a1888"
 [[kv_namespaces]]
 binding = "MEMBERS_KV"
 id = "936fda0c56ad41359ad331c365c276c4"
+
+[[kv_namespaces]]
+binding = "TENEMENT_KV"
+id = "1b6af5e274614d1cbcfde82b3413d664"

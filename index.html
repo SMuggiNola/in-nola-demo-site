@@ -157,6 +157,20 @@
     <span class="featured-teaser-arrow">→</span>
   </div>
 
+  <!-- The Tenement Teaser -->
+  <div class="featured-teaser" id="tenement-teaser" onclick="document.getElementById('tenement-modal').classList.add('active')" style="animation-delay: 1.5s;">
+    <div class="featured-teaser-glow"></div>
+    <div class="featured-teaser-image" style="background: #1a1510; display:flex; align-items:center; justify-content:center;">
+      <span style="font-size:1.6rem; filter:none;">&#x1F6AA;</span>
+    </div>
+    <div class="featured-teaser-content">
+      <span class="featured-teaser-badge">Members Only</span>
+      <span class="featured-teaser-title">The Tenement &mdash; An Interactive Experience</span>
+      <span class="featured-teaser-author">Juno and the Paycock &middot; by Se&aacute;n O'Casey</span>
+    </div>
+    <span class="featured-teaser-arrow">&rarr;</span>
+  </div>
+
   <!-- Next Event Banner -->
   <div id="next-event-wrapper" class="next-event-wrapper" style="display:none;">
     <span class="next-event-label">Our Next Event</span>
@@ -297,6 +311,47 @@
         </a>
 
         <span class="article-modal-pub">Published in <em>64 Parishes</em> · March 2026</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tenement Modal Overlay -->
+<div class="article-modal-backdrop" id="tenement-modal" onclick="if(event.target===this)closeTenementModal()">
+  <div class="article-modal">
+    <div class="article-modal-celtic-top"></div>
+
+    <button class="article-modal-close" onclick="closeTenementModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+
+    <div class="article-modal-inner" style="background: #1a1510;">
+      <!-- Poster-style visual -->
+      <div style="width:100%; padding: 2.5rem 2rem 1rem; text-align:center; position:relative; min-height: 360px; display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(ellipse at center, rgba(200,162,78,0.08) 0%, transparent 70%);">
+        <div style="font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(200,162,78,0.7); margin-bottom:1.5rem;">Irish Network New Orleans presents&hellip;</div>
+        <div style="font-family:'Cinzel Decorative',serif; font-size:2.8rem; color:#c8a24e; line-height:1.1; font-weight:700;">Juno</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:1rem; font-style:italic; color:rgba(232,220,200,0.6); margin:0.2rem 0;">and the</div>
+        <div style="font-family:'Cinzel Decorative',serif; font-size:2.8rem; color:#c8a24e; line-height:1.1; font-weight:700;">Paycock</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:0.85rem; color:rgba(232,220,200,0.5); margin-top:0.75rem;">by Se&aacute;n O'Casey</div>
+        <div style="width:40px; height:2px; background:rgba(200,162,78,0.4); margin:1.2rem auto;"></div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:#c8a24e; letter-spacing:0.05em;">An Interactive Literary Experience</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:rgba(232,220,200,0.9); margin-top:0.75rem;">Starring&hellip; <span style="font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:#c8a24e; font-weight:700;">YOU!</span></div>
+      </div>
+
+      <div class="article-modal-overlay" style="background: linear-gradient(to bottom, transparent 30%, rgba(26,21,16,0.6) 60%, rgba(26,21,16,0.9) 80%, #1a1510 95%);"></div>
+
+      <div class="article-modal-content" style="position:absolute; bottom:0; left:0; right:0; padding:0 32px 30px; z-index:5; text-align:center;">
+        <span class="article-modal-tag" style="color:#c8a24e;">Irish Network New Orleans</span>
+
+        <p class="article-modal-body" style="color:rgba(232,220,200,0.85); font-size:14px;">
+          Step inside a Dublin tenement, 1922. Bring your problems to the Boyle family flat. They have enough of their own. An <strong style="color:#e8dcc8;">interactive AI-powered experience</strong> where the characters of O'Casey's masterpiece respond to <em>you</em>.
+        </p>
+
+        <a class="article-modal-cta" href="./Our-Village/The_Tenement/index.html" style="background:#c8a24e; color:#1a1510;">
+          Enter the Tenement
+        </a>
+
+        <span class="article-modal-pub" style="color:rgba(232,220,200,0.5);">Members Only &middot; Opening March 2026</span>
       </div>
     </div>
   </div>
@@ -844,9 +899,16 @@ function closeArticleModal() {
   document.getElementById('article-modal').classList.remove('active');
 }
 
+function closeTenementModal() {
+  document.getElementById('tenement-modal').classList.remove('active');
+}
+
 // Close on Escape key
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeArticleModal();
+  if (e.key === 'Escape') {
+    closeArticleModal();
+    closeTenementModal();
+  }
 });
 </script>
 

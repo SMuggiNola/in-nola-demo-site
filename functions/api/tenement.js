@@ -29,11 +29,9 @@ const SCENE_1_SYSTEM_PROMPT = `# SCENE 1 — "A State o' Chassis"
 Early forenoon in a two-room tenement flat in Dublin, 1922. A labourer's shovel leans against the dresser. Breakfast things on the table. A votive light burns before a picture of the Blessed Virgin. A neighbour has just knocked on the door with a problem.
 
 ## Your Role
-You generate dialogue for a group chat set inside this tenement flat. The MEMBER is a neighbour who has just arrived with a personal dilemma. The Boyle family and their associates will respond — but they are already tangled in their own lives and will increasingly lose focus on the member's problem.
+You generate SHORT CHUNKS of dialogue for a group chat set inside this tenement flat. Each response should be exactly 3-5 lines of dialogue/stage directions — like a text conversation. The MEMBER is a neighbour who has arrived with a personal dilemma. After your 3-5 lines, STOP. The member will respond, then you generate the next 3-5 lines.
 
-Generate 35-45 exchanges of dialogue — this scene should feel like a full, immersive visit lasting about 10 minutes of reading. Let conversations breathe. Let characters go on tangents, tell stories, argue with each other, circle back. Boyle should launch into at least one extended monologue. Joxer should attempt a song. Include frequent stage directions between dialogue lines to set atmosphere and pace.
-
-Use the format:
+Use PLAIN TEXT only — no markdown, no bold, no italic markers. Use this format:
 CHARACTER_NAME: "Dialogue here."
 
 Stage directions go in parentheses on their own line:
@@ -91,29 +89,24 @@ Age 22, well-made, good-looking. Two forces at work — her tenement life pullin
 
 ## Dialogue Rules
 
-1. The member's problem is stated at the start. Characters initially respond to it with genuine interest.
-2. Within 5-6 exchanges, the characters start drifting into their own concerns — Boyle's legs, Joxer's flattery, Johnny's fear, Mary's strike. But they drift back occasionally, giving the member false hope.
-3. Characters react to EACH OTHER as much as to the member. Juno scolds Boyle. Boyle dismisses Johnny. Joxer agrees with whoever spoke last. Let arguments develop and breathe — don't rush past them.
-4. Boyle should deliver at least one extended philosophical monologue (about the stars, or the state of the country, or his time "at sea") that has nothing to do with the member's problem.
-5. Joxer should attempt to sing a song and forget the words halfway through.
-6. Johnny should have at least two paranoid outbursts that derail the conversation.
-7. By the end of this scene, the member's problem is half-forgotten amid the daily chaos of the flat.
-8. The member gets 3 dialogue prompts (marked as MEMBER_PROMPT) where the UI will pause for the member to type a response. Place these at natural moments where a character has directly asked them a question or where there's a lull. Space them roughly evenly through the scene.
-9. Maintain O'Casey's Dublin dialect throughout. Every character must sound distinct. Write long, naturalistic dialogue — not summaries.
-10. Juno should deliver one piece of genuinely useful — if interrupted — advice.
-11. Include 8-12 stage directions throughout to set atmosphere, describe character actions, and pace the scene.`;
+1. Generate EXACTLY 3-5 lines per response. Each line is either a CHARACTER_NAME: "dialogue" or a (stage direction). Then STOP and wait for the member's reply.
+2. Characters initially respond to the member's problem with genuine interest, then drift into their own concerns.
+3. Characters react to EACH OTHER as much as to the member. Juno scolds Boyle. Boyle dismisses Johnny. Joxer agrees with whoever spoke last.
+4. Let Boyle go on tangents about the stars, his legs, the state of the country. Joxer flatters and agrees. Johnny has paranoid outbursts.
+5. Maintain O'Casey's Dublin dialect throughout. Every character must sound distinct.
+6. End each chunk at a natural pause — a question to the member, a lull, or a moment where they could chime in.
+7. The member's input should subtly influence the conversation but NOT command full attention. Characters drift, interrupt, talk over each other. Only JUNO directly addresses and listens to the neighbour — everyone else is too wrapped up in themselves. Boyle ignores them, Joxer agrees then changes the subject, Johnny doesn't care.
+8. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.`;
 
 const SCENE_2_SYSTEM_PROMPT = `# SCENE 2 — "The Party"
 
 ## Setting
-A few days later. The same tenement flat but transformed — new upholstered sofa, polished chest of drawers, gramophone, artificial flowers, Christmas paper chains, whisky and stout on the dresser. Boyle is stretched on the sofa in his shirt-sleeves. Everything looks prosperous. Nothing is paid for. The neighbour (MEMBER) has returned.
+A few days later. The same tenement flat but transformed — new upholstered sofa, polished chest of drawers, gramophone, artificial flowers, Christmas paper chains, whisky and stout on the dresser. Boyle is stretched on the sofa in his shirt-sleeves. Everything looks prosperous. Nothing is paid for. The neighbour has returned.
 
 ## Your Role
-You generate dialogue for a group chat set inside this tenement flat during a party. The MEMBER has returned — their problem from Scene 1 still unresolved. The characters are in celebratory mode and give the member's problem even less attention than before. A funeral procession passes outside halfway through, darkening the mood.
+You generate SHORT CHUNKS of dialogue (3-5 lines each) for a group chat during a party. The neighbour has returned — their problem from the previous visit still unresolved. Characters are celebrating and give the problem even less attention. A funeral procession should pass outside partway through the conversation, darkening the mood.
 
-Generate 35-45 exchanges of dialogue — this scene should feel like a full, immersive party lasting about 10 minutes of reading. The celebration should feel raucous and alive before the funeral darkens everything. Let Mrs. Madigan tell a long rambling story. Let Boyle pontificate about Consols. Let songs be attempted. Include frequent stage directions for atmosphere and physical comedy.
-
-Use the format:
+Use PLAIN TEXT only — no markdown, no bold, no italic markers. Use this format:
 CHARACTER_NAME: "Dialogue here."
 
 Stage directions go in parentheses on their own line.
@@ -178,33 +171,29 @@ Will relate the member's problem to something that happened to someone she knew,
 
 ## Dialogue Rules
 
-1. The member's problem is re-introduced briefly. Characters wave it off — they're celebrating.
-2. The party dominates the first half: songs, drinks, Boyle pontificating about Consols and the Prawna, Joxer flattering and attempting songs, Mrs. Madigan telling long-winded stories with specific dates and street names. Let each character have extended moments.
-3. Mrs. Madigan should tell at least one rambling story about something that happened to someone she knew years ago, with very specific and irrelevant details.
-4. Boyle should attempt to recite poetry or explain Theosophy (the Prawna) at length, getting everything wrong.
-5. MIDPOINT SHIFT: A funeral procession is heard passing outside. The mood darkens slowly — describe the sound growing louder, the hymn, the shuffling feet. Johnny panics. Juno goes quiet. Boyle dismisses it. The shift should take several exchanges.
-6. After the shift, the member's problem feels trivial — even to the member. The characters are dealing with death and guilt and things much larger than what the member walked in with.
-7. The member gets 3 dialogue prompts (marked as MEMBER_PROMPT). Space them through the scene — one during the party, one around the funeral, one after. The tone of the prompts should shift as the mood darkens.
-8. Maintain O'Casey's Dublin dialect throughout. Write long, naturalistic dialogue — not summaries.
-9. No character gives the member useful advice in this scene. Juno comes closest but is pulled away by the funeral.
-10. Include 10-15 stage directions throughout for atmosphere, sounds, character movements, and the funeral procession.`;
+1. Generate EXACTLY 3-5 lines per response. Then STOP and wait for the member's reply.
+2. The member's problem is waved off — they're celebrating. Party dominates early rounds.
+3. Mrs. Madigan tells rambling stories. Boyle pontificates about Consols and the Prawna. Joxer attempts songs.
+4. Later in the conversation, a funeral procession passes outside — darken the mood.
+5. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
+6. End each chunk at a natural pause for the member to respond.
+7. The member's input subtly influences the conversation but does NOT get full attention. Characters talk over each other. Only JUNO directly addresses the neighbour — everyone else is too caught up in the celebration.
+8. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.`;
 
 const SCENE_3_SYSTEM_PROMPT = `# SCENE 3 — "The Blinds is Down"
 
 ## Setting
-Two months later. November evening, half-past six. The same flat, growing bare — furniture is being repossessed. A lamp turned low. The votive light under the Blessed Virgin gleams more redly than ever. The neighbour (MEMBER) has returned one last time.
+Two months later. November evening, half-past six. The same flat, growing bare — furniture is being repossessed. A lamp turned low. The votive light under the Blessed Virgin gleams more redly than ever. The neighbour has returned one last time.
 
 ## Your Role
-You generate dialogue for a group chat set inside this tenement flat as the Boyle family collapses. The MEMBER returns to find everything changed. Their original problem is almost irrelevant now — they are witnessing a family's destruction. The characters are consumed by catastrophe.
+You generate SHORT CHUNKS of dialogue (3-5 lines each) for a group chat as the Boyle family collapses. The neighbour returns to find everything changed. Their problem is almost irrelevant — they are witnessing a family's destruction.
 
-This is the final scene. It must build to Juno's departure — and in that departure, she must say one thing that accidentally, perfectly applies to the member's original problem. Not because she's trying to help them. Because her own pain has stripped her down to nothing but truth.
+This is the final scene. Build toward Juno's departure. Near the end, Juno must say one thing from her own grief that accidentally, perfectly applies to the neighbour's original problem.
 
-Generate 40-50 exchanges of dialogue — this is the emotional climax and should last about 10 minutes of reading. Do not rush. Let silences sit. Let arguments build and crumble. The pacing should slow as the catastrophes accumulate. After Johnny is taken, let there be a long, painful quiet before Juno speaks. The coda with drunk Boyle and Joxer should be extended — pathetic and darkly funny.
-
-Use the format:
+Use PLAIN TEXT only — no markdown, no bold, no italic markers. Use this format:
 CHARACTER_NAME: "Dialogue here."
 
-Stage directions go in parentheses on their own line. Use many stage directions in this scene — every silence, every glance, every sound matters.
+Stage directions go in parentheses on their own line.
 
 ## Characters Present
 
@@ -264,17 +253,15 @@ Cannot help the member. If she speaks, it's to say that nobody's compassion exte
 
 ## Dialogue Rules
 
-1. The member arrives to find the flat being stripped. Furniture removal men are carrying things out. Describe the bare walls, the marks where pictures hung, the cold. The mood is immediately wrong.
-2. The member's original problem surfaces briefly but is immediately overwhelmed by the cascade of catastrophes: the will is a washout, Mary is pregnant, creditors are arriving, Nugent takes the suit, Mrs. Madigan takes the gramophone. Let each catastrophe land with its own weight — don't list them, dramatize them.
-3. Characters are consumed by their own crises. Boyle blames everyone at length — Bentham, Mary, Juno, the clergy, the government, the state of the country. Joxer turns traitor with relish. Johnny is terrified. Mary is silent but when she speaks it cuts deep.
-4. Let Boyle and Juno have a real, extended argument about Mary's pregnancy. This should be ugly and raw.
-5. CLIMAX: Johnny is taken by the Irregulars. This happens suddenly — armed men enter, ask for him, drag him out praying. Everything stops. Write this moment with full stage directions. Then write the silence that follows.
-6. RESOLUTION: After Johnny is taken, let the silence build. Then Juno makes her decision. She will leave Boyle. She will take Mary. She will carry on. In the midst of this, she says the line — the one that applies to the member's problem. She doesn't address the member directly. She's speaking to Mary, or to God, or to no one. But it lands. This should be Juno's longest speech in the experience.
-7. CODA: Boyle and Joxer stumble in drunk after everyone has left. They don't know Johnny is dead. Extend this — let Boyle try to find his way to a chair, let Joxer ramble. Boyle mumbles about chassis. Joxer anchors on the bed. The blinds are down. Make this darkly comic and pathetic.
-8. The member gets 3 dialogue prompts (marked as MEMBER_PROMPT). One early when they try to bring up their problem. One during the catastrophes. One after Johnny is taken — this one should feel different, as if the member's problem has been recontextualized by what they've just witnessed.
-9. Maintain O'Casey's Dublin dialect throughout. Write long, naturalistic dialogue — not summaries.
-10. This scene is the emotional payoff. The comedy of Act I and the party of Act II have led here. Don't rush the ending.
-11. Include 15-20 stage directions throughout. Every silence, every sound, every physical detail matters in this scene.`;
+1. Generate EXACTLY 3-5 lines per response. Then STOP and wait for the member's reply.
+2. The flat is being stripped. Catastrophes cascade: the will is a washout, Mary is pregnant, creditors arrive.
+3. Characters are consumed by crisis. Boyle blames everyone. Joxer turns traitor. Johnny is terrified.
+4. Later in the conversation: Johnny is taken by the Irregulars. Then Juno decides to leave Boyle. Near the very end, Juno says something from her grief that accidentally addresses the neighbour's problem.
+5. Final rounds: Boyle and Joxer stumble in drunk. "The whole worl's in a terr...ible state o'...chassis."
+6. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
+7. End each chunk at a natural pause for the member to respond.
+8. The member's input subtly influences things but does NOT command attention. Only JUNO truly listens and responds to the neighbour. Everyone else is consumed by catastrophe. Boyle rages, Joxer betrays, Johnny is terrified.
+9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.`;
 
 const SUMMARY_SYSTEM_PROMPT = `You are a concise summarizer. Write a 2-3 sentence summary of this neighbour's visit to the Boyle flat, written from the perspective of someone who lives in the tenement. Use Dublin dialect.`;
 
@@ -540,8 +527,8 @@ async function handleStart(body, env) {
   });
 }
 
-async function handleScene(body, env) {
-  const { sceneNum, characterName, characterBio, memberProblem, previousChoices, sessionId } = body;
+async function handleChunk(body, env) {
+  const { sceneNum, characterName, characterBio, memberProblem, history, round, totalRounds, sessionId } = body;
 
   if (!env.MISTRAL_API_KEY) {
     return errorResponse('Mistral API not configured', 500);
@@ -555,84 +542,103 @@ async function handleScene(body, env) {
     return errorResponse('characterName and memberProblem are required');
   }
 
+  const currentRound = round || 1;
+  const maxRounds = totalRounds || 10;
+
   // Select system prompt
   let systemPrompt;
   switch (sceneNum) {
-    case 1:
-      systemPrompt = SCENE_1_SYSTEM_PROMPT;
-      break;
-    case 2:
-      systemPrompt = SCENE_2_SYSTEM_PROMPT;
-      break;
-    case 3:
-      systemPrompt = SCENE_3_SYSTEM_PROMPT;
-      break;
+    case 1: systemPrompt = SCENE_1_SYSTEM_PROMPT; break;
+    case 2: systemPrompt = SCENE_2_SYSTEM_PROMPT; break;
+    case 3: systemPrompt = SCENE_3_SYSTEM_PROMPT; break;
   }
 
-  // Inject the member's character into the system prompt
+  // Inject the member's character
   const bioSection = characterBio
-    ? `\n\n## The Neighbour — ${characterName}\n${characterBio}\nUse this background to shape how the Boyles interact with them. Juno might recognise something in their story. Boyle might be dismissive. Joxer might try to bond over shared hardship. Let the bio colour the scene naturally — don't state it outright, let it emerge through dialogue.`
-    : `\n\n## The Neighbour — ${characterName}\nA neighbour from the tenement. Not much is known about them yet.`;
+    ? `\n\nThe Neighbour: ${characterName} — ${characterBio}`
+    : `\n\nThe Neighbour: ${characterName}`;
   systemPrompt += bioSection;
 
-  // If returning visitor and scene 1, inject previous visit context
-  if (sceneNum === 1 && body.previousSummary) {
-    systemPrompt += `\n\n## Returning Visitor\nThis neighbour has visited before. Last time they came by about: "${body.previousSummary}". Boyle vaguely remembers them. Joxer claims they're old friends. Juno recalls the detail. Johnny doesn't care.`;
+  // Build the Mistral messages array as a real conversation
+  const messages = [{ role: 'system', content: systemPrompt }];
+
+  if (currentRound === 1) {
+    // First round — set the scene
+    let opener;
+    if (sceneNum === 1) {
+      opener = `${characterName} knocks on the door and says: "${memberProblem}"\n\nThis is round 1 of ${maxRounds}. Generate 3-5 lines of dialogue. Use ${characterName} as the neighbour's name. PLAIN TEXT ONLY.`;
+    } else if (sceneNum === 2) {
+      opener = `${characterName} has returned. Their problem was: "${memberProblem}"\n\nThis is round 1 of ${maxRounds}. The party is underway. Generate 3-5 lines. Use ${characterName} as the neighbour's name. PLAIN TEXT ONLY.`;
+    } else {
+      opener = `${characterName} has returned one last time. Their problem was: "${memberProblem}"\n\nThis is round 1 of ${maxRounds}. The flat is being stripped bare. Generate 3-5 lines. Use ${characterName} as the neighbour's name. PLAIN TEXT ONLY.`;
+    }
+    messages.push({ role: 'user', content: opener });
+  } else {
+    // Subsequent rounds — replay the conversation history
+    // history is an array of { role: 'assistant'|'user', content: string }
+    if (history && history.length > 0) {
+      // Add the first user message (opener)
+      let opener;
+      if (sceneNum === 1) {
+        opener = `${characterName} knocks on the door and says: "${memberProblem}"\n\nGenerate 3-5 lines. Use ${characterName} as the neighbour's name. PLAIN TEXT ONLY.`;
+      } else if (sceneNum === 2) {
+        opener = `${characterName} has returned. Their problem was: "${memberProblem}"\n\nGenerate 3-5 lines. Use ${characterName} as the neighbour's name. PLAIN TEXT ONLY.`;
+      } else {
+        opener = `${characterName} has returned. Their problem was: "${memberProblem}"\n\nGenerate 3-5 lines. Use ${characterName} as the neighbour's name. PLAIN TEXT ONLY.`;
+      }
+      messages.push({ role: 'user', content: opener });
+
+      for (const entry of history) {
+        messages.push({ role: entry.role, content: entry.content });
+      }
+    }
+
+    // The current prompt
+    let roundPrompt = `Round ${currentRound} of ${maxRounds}. Generate the next 3-5 lines of dialogue continuing the scene. PLAIN TEXT ONLY.`;
+    if (currentRound >= maxRounds - 1) {
+      roundPrompt += ' This is near the end — begin wrapping up the scene.';
+    }
+    if (currentRound >= maxRounds) {
+      roundPrompt += ' This is the FINAL round. End the scene with a closing stage direction.';
+    }
+    messages.push({ role: 'user', content: roundPrompt });
   }
 
-  // Build user message
-  let userMessage;
-  const choices = previousChoices || [];
-
-  switch (sceneNum) {
-    case 1:
-      userMessage = `The neighbour ${characterName} knocks on the door and says: "${memberProblem}"
-
-Generate the full scene dialogue — aim for 35-45 exchanges for a rich, immersive experience. Include exactly 3 MEMBER_PROMPT points spaced evenly through the scene where the neighbour can type a free response. Format each as: MEMBER_PROMPT: ["suggested response 1", "suggested response 2", "suggested response 3"]
-The suggested responses are only shown as placeholder hints — the member types their own words. Make the suggestions feel natural and conversational. Use ${characterName} (not "MEMBER" or "NEIGHBOUR") as the character name in dialogue lines for the visiting neighbour.`;
-      break;
-
-    case 2:
-      userMessage = `The neighbour ${characterName} has returned. Their original problem was: "${memberProblem}"
-In the previous visit, when asked, they said: "${choices[0] || '(no response)'}"\n${choices[1] ? `They also said: "${choices[1]}"` : ''}${choices[2] ? `\nAnd: "${choices[2]}"` : ''}
-
-Generate the full scene dialogue — aim for 35-45 exchanges. Include exactly 3 MEMBER_PROMPT points spaced through the scene. Format: MEMBER_PROMPT: ["suggestion 1", "suggestion 2", "suggestion 3"]
-Use ${characterName} (not "MEMBER") as the character name in dialogue lines for the visiting neighbour.`;
-      break;
-
-    case 3:
-      userMessage = `The neighbour ${characterName} has returned one last time. Their original problem was: "${memberProblem}"
-In previous visits they said: ${choices.map((c, i) => `"${c}"`).join(', ')}
-
-Generate the full final scene — aim for 40-50 exchanges. This is the emotional climax. Juno must say one thing from her own grief that accidentally addresses ${characterName}'s original problem with devastating clarity. Include exactly 3 MEMBER_PROMPT points. Format: MEMBER_PROMPT: ["suggestion 1", "suggestion 2", "suggestion 3"]
-Use ${characterName} (not "MEMBER") as the character name in dialogue lines for the visiting neighbour.`;
-      break;
-  }
-
-  // Call Mistral
+  // Call Mistral with the full conversation
   let dialogue;
   try {
-    dialogue = await callMistral(env.MISTRAL_API_KEY, systemPrompt, userMessage);
+    const response = await fetch(MISTRAL_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.MISTRAL_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: MISTRAL_MODEL,
+        messages,
+        temperature: MISTRAL_TEMPERATURE,
+        max_tokens: 500 // Small chunks only
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Mistral API error (${response.status}): ${errText}`);
+    }
+
+    const data = await response.json();
+    dialogue = data.choices[0].message.content;
   } catch (err) {
-    return errorResponse(`Failed to generate scene: ${err.message}`, 502);
+    return errorResponse(`Failed to generate dialogue: ${err.message}`, 502);
   }
 
-  // Update session if sessionId provided
+  // Save to session
   if (sessionId && env.TENEMENT_KV) {
     const session = await getSession(sessionId, env);
     if (session) {
-      // Store the problem on first scene
-      if (sceneNum === 1) {
+      if (currentRound === 1 && sceneNum === 1) {
         session.problem = memberProblem;
       }
-
-      session.scenes.push({
-        sceneNum,
-        dialogue,
-        choice: null, // Will be updated when member makes choices
-        generatedAt: new Date().toISOString()
-      });
-
       await saveSession(sessionId, session, env);
     }
   }
@@ -640,6 +646,7 @@ Use ${characterName} (not "MEMBER") as the character name in dialogue lines for 
   return jsonResponse({
     success: true,
     sceneNum,
+    round: currentRound,
     dialogue
   });
 }
@@ -779,13 +786,14 @@ export async function onRequest(context) {
         return handleStart(body, env);
 
       case 'scene':
-        return handleScene(body, env);
+      case 'chunk':
+        return handleChunk(body, env);
 
       case 'summary':
         return handleSummary(body, env);
 
       default:
-        return errorResponse('Invalid action. Supported: start, scene, summary');
+        return errorResponse('Invalid action. Supported: start, chunk, summary');
     }
   }
 

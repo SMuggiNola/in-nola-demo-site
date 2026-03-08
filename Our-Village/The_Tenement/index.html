@@ -1189,10 +1189,13 @@ function showDoorForReturn(sceneNum) {
 }
 
 // ============================================
-//   SCENE MANAGEMENT
+//   SCENE MANAGEMENT — CONVERSATIONAL CHUNKS
 // ============================================
+const ROUNDS_PER_ACT = 10;
+
 async function startScene(sceneNum) {
   state.scene = sceneNum;
+  state.isPlaying = true;
 
   const sceneLabels = { 1: 'Act I — A State o\' Chassis', 2: 'Act II — The Party', 3: 'Act III — The Blinds is Down' };
   document.getElementById('chatSceneLabel').textContent = sceneLabels[sceneNum] || '';
@@ -1203,57 +1206,128 @@ async function startScene(sceneNum) {
   chatScreen.classList.add('act-' + sceneNum);
 
   // Clear chat
-  document.getElementById('chatMessages').innerHTML = '';
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
   showScreen('chat-screen');
 
-  // Show loading state
-  const container0 = document.getElementById('chatMessages');
-  addStageDirection(container0, '(The sounds of Dublin drift up from the street below...)');
+  // Opening knock
+  const knockTexts = {
+    1: '(You raise your hand and knock on the door of Flat 7.)',
+    2: '(You knock on the door again. Music and laughter inside.)',
+    3: '(You knock softly. The door is already ajar.)'
+  };
+  addStageDirection(container, knockTexts[sceneNum] || '(You knock on the door.)');
+  scrollToBottom(container);
+  await sleep(2000);
 
-  // Get dialogue from API or use demo
-  let dialogue;
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+  // Scene 1: show the member's problem as their first message
+  if (sceneNum === 1 && state.problem) {
+    const charLabel = state.characterName || 'You';
+    addStageDirection(container, `(The door opens. ${charLabel} steps inside.)`);
+    await sleep(1500);
+    addMessage(container, charLabel, 'member', state.problem);
+    scrollToBottom(container);
+    await sleep(2000);
+  }
 
-    const res = await fetch(`${API_BASE}/api/tenement`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'scene',
-        sceneNum,
-        characterName: state.characterName,
-        characterBio: state.characterBio,
-        memberProblem: state.problem,
-        previousChoices: state.choices,
-        sessionId: state.sessionId
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
+  // Conversation history for Mistral context
+  const history = [];
 
-    if (res.ok) {
-      const data = await res.json();
-      dialogue = data.dialogue;
-    } else {
-      const err = await res.json().catch(() => ({}));
-      console.log('Scene API error:', res.status, err.error || '');
+  // Main conversation loop — ~10 rounds of back-and-forth
+  for (let round = 1; round <= ROUNDS_PER_ACT; round++) {
+    if (!state.isPlaying) break;
+
+    // Show typing indicator while fetching
+    const loadingEl = addTypingIndicator(container, 'Boyle', 'boyle');
+    scrollToBottom(container);
+
+    // Fetch a chunk from the API
+    let dialogue = null;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
+
+      const res = await fetch(`${API_BASE}/api/tenement`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'chunk',
+          sceneNum,
+          characterName: state.characterName,
+          characterBio: state.characterBio,
+          memberProblem: state.problem,
+          history,
+          round,
+          totalRounds: ROUNDS_PER_ACT,
+          sessionId: state.sessionId
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const data = await res.json();
+        dialogue = data.dialogue;
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.log('Chunk API error:', res.status, err.error || '');
+      }
+    } catch (e) {
+      console.log('Chunk fetch failed:', e.message);
     }
-  } catch (e) {
-    console.log('API not available or timed out, using demo dialogue:', e.message);
+
+    loadingEl.remove();
+
+    if (!dialogue) {
+      // Fallback — use a demo line
+      dialogue = getDemoChunk(sceneNum, round);
+    }
+
+    // Add AI response to history
+    history.push({ role: 'assistant', content: dialogue });
+
+    // Parse and play the chunk one message at a time
+    const messages = parseDialogue(dialogue);
+    for (const msg of messages) {
+      if (!state.isPlaying) break;
+
+      if (msg.type === 'stage') {
+        addStageDirection(container, msg.text);
+        scrollToBottom(container);
+        await sleep(randomBetween(1500, 2500));
+      } else if (msg.type === 'dialogue') {
+        if (msg.charKey === 'juno') state.junoFinalLine = msg.text;
+        // Show typing then message
+        const typingEl = addTypingIndicator(container, msg.character, msg.charKey);
+        scrollToBottom(container);
+        await sleep(randomBetween(3000, 5000));
+        typingEl.remove();
+        addMessage(container, msg.character, msg.charKey, msg.text);
+        scrollToBottom(container);
+        await sleep(randomBetween(2000, 3500));
+      }
+    }
+
+    // Last round — no member input needed
+    if (round >= ROUNDS_PER_ACT) break;
+
+    // Member's turn to respond
+    const memberResponse = await showMemberInput(container);
+    state.choices.push(memberResponse);
+
+    // Show the member's message
+    addMessage(container, state.characterName || 'You', 'member', memberResponse);
+    scrollToBottom(container);
+    await sleep(1500);
+
+    // Add member response to history
+    history.push({ role: 'user', content: `${state.characterName} says: "${memberResponse}"` });
   }
 
-  // Fallback to demo
-  if (!dialogue) {
-    dialogue = getDemoDialogue(sceneNum);
-  }
-
-  // Clear loading message before playing
-  document.getElementById('chatMessages').innerHTML = '';
-
-  // Parse and play
-  const messages = parseDialogue(dialogue);
-  await playScene(messages, sceneNum);
+  // Scene complete
+  state.isPlaying = false;
+  await sleep(2000);
+  await endScene(sceneNum);
 }
 
 async function endScene(sceneNum) {
@@ -1376,128 +1450,8 @@ function getDisplayName(rawName) {
 }
 
 // ============================================
-//   CHAT PLAYBACK ENGINE
+//   MEMBER INPUT
 // ============================================
-async function playScene(messages, sceneNum) {
-  state.isPlaying = true;
-  const container = document.getElementById('chatMessages');
-
-  // "You knock on the door" — the opening for every act
-  const knockTexts = {
-    1: '(You raise your hand and knock on the door of Flat 7.)',
-    2: '(You knock on the door again. Music and laughter inside.)',
-    3: '(You knock softly. The door is already ajar.)'
-  };
-
-  addStageDirection(container, knockTexts[sceneNum] || '(You knock on the door.)');
-  await sleep(2000);
-
-  // Scene 1: the member explains their problem on entry
-  if (sceneNum === 1 && state.problem) {
-    const charLabel = state.characterName || 'You';
-    addStageDirection(container, `(The door opens. ${charLabel} steps inside and explains what's troubling them.)`);
-    await sleep(1500);
-    addMessage(container, charLabel, 'member', state.problem);
-    scrollToBottom(container);
-    await sleep(2500);
-  }
-
-  for (let i = 0; i < messages.length; i++) {
-    if (!state.isPlaying) break;
-
-    const msg = messages[i];
-
-    if (msg.type === 'stage') {
-      addStageDirection(container, msg.text);
-      scrollToBottom(container);
-      // Longer pause for emotionally heavy stage directions
-      const isHeavy = msg.text.includes('silence') || msg.text.includes('taken') || msg.text.includes('dragged') || msg.text.includes('dead') || msg.text.includes('funeral');
-      await sleep(isHeavy ? randomBetween(3000, 5000) : randomBetween(2000, 3500));
-
-    } else if (msg.type === 'dialogue') {
-      // Capture Juno's lines for the end screen (last one wins)
-      if (msg.charKey === 'juno') {
-        state.junoFinalLine = msg.text;
-      }
-
-      // Occasionally show dual typing (2-3 times per scene) for immersion
-      const nextMsg = messages[i + 1];
-      const doDualType = nextMsg && nextMsg.type === 'dialogue' && Math.random() < 0.08;
-
-      if (doDualType) {
-        // Two characters typing at once
-        const typingEl1 = addTypingIndicator(container, msg.character, msg.charKey);
-        await sleep(randomBetween(600, 1200));
-        const typingEl2 = addTypingIndicator(container, nextMsg.character, nextMsg.charKey);
-        scrollToBottom(container);
-
-        await sleep(randomBetween(2000, 4000));
-
-        // First one sends, second "reconsiders"
-        typingEl1.remove();
-        addMessage(container, msg.character, msg.charKey, msg.text);
-        scrollToBottom(container);
-
-        await sleep(randomBetween(800, 1500));
-        typingEl2.remove(); // second stops typing briefly
-
-        await sleep(randomBetween(1500, 3000));
-        // second starts typing again and sends
-        const typingEl2b = addTypingIndicator(container, nextMsg.character, nextMsg.charKey);
-        scrollToBottom(container);
-
-        const words2 = nextMsg.text.split(' ').length;
-        await sleep(words2 < 30 ? randomBetween(2000, 3500) : randomBetween(3500, 6000));
-
-        typingEl2b.remove();
-        if (nextMsg.charKey === 'juno') state.junoFinalLine = nextMsg.text;
-        addMessage(container, nextMsg.character, nextMsg.charKey, nextMsg.text);
-        scrollToBottom(container);
-
-        i++; // skip next message since we already played it
-        await sleep(randomBetween(2500, 4500));
-        continue;
-      }
-
-      // Show typing indicator
-      const typingEl = addTypingIndicator(container, msg.character, msg.charKey);
-      scrollToBottom(container);
-
-      // Typing duration based on message length — slower pacing for immersion
-      const words = msg.text.split(' ').length;
-      let typingMs;
-      if (words < 20) typingMs = randomBetween(2000, 3500);
-      else if (words < 50) typingMs = randomBetween(3500, 6000);
-      else if (words < 100) typingMs = randomBetween(5500, 9000);
-      else typingMs = randomBetween(8000, 12000);
-
-      await sleep(typingMs);
-
-      // Remove typing, add message
-      typingEl.remove();
-      addMessage(container, msg.character, msg.charKey, msg.text);
-      scrollToBottom(container);
-
-      // Reading delay — let the message breathe
-      await sleep(randomBetween(2500, 5000));
-
-    } else if (msg.type === 'prompt') {
-      // Member prompt — wait for user choice
-      const choice = await showMemberPrompt(container, msg.options);
-      state.choices.push(choice);
-
-      // Show member's response as a chat message
-      addMessage(container, state.characterName || 'You', 'member', choice);
-      scrollToBottom(container);
-      await sleep(2000);
-    }
-  }
-
-  // Scene complete
-  state.isPlaying = false;
-  await sleep(2000);
-  await endScene(sceneNum);
-}
 
 function addMessage(container, name, charKey, text) {
   const div = document.createElement('div');
@@ -1528,20 +1482,14 @@ function addTypingIndicator(container, name, charKey) {
   return div;
 }
 
-function showMemberPrompt(container, options) {
+function showMemberInput(container) {
   return new Promise((resolve) => {
     const div = document.createElement('div');
     div.className = 'chat-prompt';
 
-    // Use a placeholder from the AI-suggested options as hint text
-    const placeholder = options && options.length > 0
-      ? options[0]
-      : 'Say something...';
-
     div.innerHTML = `
-      <div class="chat-prompt-label">How do you respond?</div>
       <div class="chat-prompt-input-wrap">
-        <input type="text" class="chat-prompt-input" placeholder="${escapeHtml(placeholder)}" maxlength="300" autocomplete="off">
+        <input type="text" class="chat-prompt-input" placeholder="Say something..." maxlength="300" autocomplete="off">
         <button class="chat-prompt-send">Send</button>
       </div>
     `;
@@ -1554,11 +1502,10 @@ function showMemberPrompt(container, options) {
 
     function submit() {
       const text = input.value.trim();
-      // If they typed nothing, use the placeholder suggestion
-      const choice = text || placeholder;
+      if (!text) return;
       clearTimeout(timer);
       div.remove();
-      resolve(choice);
+      resolve(text);
     }
 
     sendBtn.addEventListener('click', submit);
@@ -1569,14 +1516,13 @@ function showMemberPrompt(container, options) {
       }
     });
 
-    // Focus the input
     setTimeout(() => input.focus(), 100);
 
-    // 60-second timeout — use placeholder if they don't respond
+    // 90-second timeout
     const timer = setTimeout(() => {
       div.remove();
-      resolve(placeholder);
-    }, 60000);
+      resolve('...');
+    }, 90000);
   });
 }
 
@@ -1630,7 +1576,44 @@ async function showEndScreen() {
 }
 
 // ============================================
-//   DEMO DIALOGUE (offline testing)
+//   DEMO CHUNKS (offline fallback)
+// ============================================
+function getDemoChunk(sceneNum, round) {
+  const name = state.characterName || 'Neighbour';
+  const chunks1 = [
+    `(The door opens slowly. Boyle is sitting by the fire.)\nBOYLE: "Well, who's this now? Come in, come in — don't be standin' in the draught."\nJOXER: "Ah, a neighbour! A darlin' neighbour!"`,
+    `JUNO: "Sit down an' have a cup o' tay. Now tell me — what's troublin' you?"\nBOYLE: "The whole counthry's in a state o' chassis, an' here you are worryin' about chairs!"`,
+    `BOYLE: "Did I ever tell ye about the time I was in Buenos Aires? The stars — what is the stars, Joxer?"\nJOXER: "That's a darlin' question, Captain, a daarlin' question!"`,
+    `JUNO: "He was never on any ship! The only vessel he's ever commanded is a pint glass."\n(Johnny jumps at a sound from the landing.)\nJOHNNY: "Is the light lightin' before the picture o' the Virgin?"`,
+    `MARY: "A principle's a principle. You should stand your ground."\nBOYLE: "Principles! What good are principles when the landlord's got the law on his side?"`,
+    `JOXER: "God never shut wan door but he opened another!"\nJUNO: "Never mind him. Now what you need to do is—"\nBOYLE: "I'll tell you what they need to do!"`,
+    `(Boyle rubs his legs and groans.)\nBOYLE: "U-u-u-ugh! The pain in me legs! I can barely move."\nJUNO: "Your legs hurt only when there's work to be done!"`,
+    `JOHNNY: "Let me alone! For God's sake, let me alone!"\n(A silence falls over the room. The fire crackles.)\nJUNO: "Don't mind him. He's not been right since... since the trouble."`,
+    `BOYLE: "I've a little spirit left in me still! An' when that inheritance comes through—"\nJOXER: "Ah, an inheritance! That's grand, Captain, that's grand!"`,
+    `JUNO: "Look, come back if you need us. We're not much — but we're here."\nBOYLE: "Aye! The door's always open! Unless Juno's locked it."\n(Juno shakes her head. The votive light flickers.)`
+  ];
+  const chunks2 = [
+    `(The flat is transformed — gramophone, whisky, new furniture.)\nBOYLE: "Ah, welcome back! Come in, come in! We're celebratin'!"`,
+    `JOXER: "How d'ye feel now, as a man o' money?"\nBOYLE: "I seen be the paper this mornin' that Consols was down half per cent. That's serious."`,
+    `MADIGAN: "I remember as well as I remember yestherday — Mrs. O'Brien's weddin' on Parnell Street..."\nJOXER: "Ah, a darlin' story!"`,
+    `(The sound of a hymn drifts up from the street. A funeral procession.)\nJOHNNY: "What's that? Who's that outside?"\nJUNO: "It's Mrs. Tancred's son. They found him on a country road."`,
+    `JUNO: "It's nearly time we had a little less respect for the dead, an' a little more regard for the livin'."\n(She goes quietly to the door.)`,
+  ];
+  const chunks3 = [
+    `(The flat is nearly bare. Marks on the walls where furniture stood.)\nJUNO: "They've taken everything. The sofa, the dresser, the lot."`,
+    `BOYLE: "I can't get blood out of a turnip, can I? It's that Bentham — the snake!"\nJOXER: "Did you ever do anythin' else! Sure, you can't believe a word out o' your mouth."`,
+    `(Two armed men appear at the door.)\nIRREGULAR: "Boyle. Johnny Boyle. You're wanted."\nJOHNNY: "Haven't I done enough for Ireland!"`,
+    `(A terrible silence after Johnny is taken.)\nJUNO: "What can God do agen the stupidity o' men!"\nMARY: "Oh, this is unbearable!"`,
+    `JUNO: "Sacred Heart o' Jesus, take away our hearts o' stone, and give us hearts o' flesh!"\n(She takes Mary's hand. They leave together.)`,
+  ];
+
+  const chunks = sceneNum === 1 ? chunks1 : sceneNum === 2 ? chunks2 : chunks3;
+  const idx = Math.min(round - 1, chunks.length - 1);
+  return chunks[idx];
+}
+
+// ============================================
+//   DEMO DIALOGUE (legacy, unused)
 // ============================================
 function getDemoDialogue(sceneNum) {
   const name = state.characterName || 'Neighbour';

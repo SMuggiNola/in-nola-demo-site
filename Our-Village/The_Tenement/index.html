@@ -399,6 +399,108 @@ body::after {
   color: var(--text-muted);
 }
 
+.guest-picker {
+  display: none;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 1rem;
+}
+
+.guest-picker.revealed {
+  display: block;
+  animation: screenFadeIn 0.5s ease forwards;
+}
+
+.guest-picker-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+
+.guest-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.guest-card {
+  background: var(--bg-panel);
+  border: 1px solid rgba(200, 162, 78, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition);
+}
+
+.guest-card:hover {
+  border-color: var(--gold);
+  background: var(--bg-card);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(200, 162, 78, 0.1);
+}
+
+.guest-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 0.2rem;
+}
+
+.guest-card-bio {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 0.3rem;
+}
+
+.guest-card-problem {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.guest-card-problem strong {
+  color: var(--text-muted);
+}
+
+.entry-link {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.entry-link:hover {
+  color: var(--gold);
+}
+
+.entry-link-support {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border: 1px solid rgba(42, 104, 48, 0.4);
+  border-radius: 3px;
+  color: #2a6830;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all var(--transition);
+}
+
+.entry-link-support:hover {
+  background: rgba(42, 104, 48, 0.15);
+  border-color: #2a6830;
+  color: #3a8a42;
+}
+
 /* ============================================
    SCREEN 2: CHARACTER CREATION
 ============================================ */
@@ -1140,10 +1242,23 @@ body::after {
     </div>
   </div>
 
+  <div class="entry-skip" onclick="revealGuestPicker()">Continue as Guest</div>
+
+  <div class="guest-picker" id="guestPicker">
+    <p class="guest-picker-title">Choose Your Character</p>
+    <div class="guest-cards" id="guestCards"></div>
+  </div>
+
+  <div class="entry-divider" style="margin-top:1rem;"></div>
+
   <div class="entry-venue">
     <div>The Tenement &mdash; IN-NOLA Village</div>
-    <div>Members Only Experience</div>
-    <div style="color:#2a6830; margin-top:4px;">www.irishnetworkneworleans.com</div>
+    <div style="margin-top:6px;">
+      <a href="https://muggsoflearning.net" target="_blank" rel="noopener" class="entry-link">A MuggsOfLearning.net Production</a>
+    </div>
+    <div style="margin-top:6px;">
+      <a href="https://muggsoflearning.net/MuggsOfLearningSite/support" target="_blank" rel="noopener" class="entry-link entry-link-support">Support Our Work</a>
+    </div>
   </div>
 
 </div>
@@ -1284,6 +1399,75 @@ function sleep(ms) {
 // ============================================
 //   SCREEN 1: MEMBER LOGIN
 // ============================================
+// ============================================
+//   GUEST CHARACTER PRESETS
+// ============================================
+const GUEST_CHARACTERS = [
+  {
+    name: 'Paddy Dunne',
+    bio: "A schoolteacher living alone up the hallway. Came to Dublin from Galway after the Troubles. Keeps a tidy room and goes to Mass on Sundays, though lately he's been distracted.",
+    problem: "I've fallen in love with the headmaster's wife and she's been leaving notes under me door. Her husband drinks at Foley's every night and I'm terrified he'll find out."
+  },
+  {
+    name: 'Bridie Costello',
+    bio: "A charwoman on the third floor. Widow these past two years — her husband died at the docks. Has three small children and takes in washing to make ends meet.",
+    problem: "Me youngest has the cough somethin' terrible and I can't afford the doctor. Mrs. Boyle once mentioned a fella who'd see children for nothin' — I need to ask her before it gets worse."
+  },
+  {
+    name: 'Tommy Kearns',
+    bio: "A docker who shares a room on the landing below. Fought in the Great War and came back to nothing. Drinks more than he should but keeps his head down and his mouth shut.",
+    problem: "I saw somethin' I shouldn't have seen last Tuesday night on the quays. Two fellas in long coats and a body. Now one of them lives in this building and he knows I was there."
+  },
+  {
+    name: 'Nora Flaherty',
+    bio: "A seamstress from the top floor. Young, sharp-tongued, keeps a canary in a cage by the window. Her mother died last winter and left her with nothing but a sewing machine and a temper.",
+    problem: "The landlord says I owe three months' back rent that me mother never paid. He's given me till Friday or I'm out on the street. I haven't got a penny."
+  },
+  {
+    name: 'Seamus Molloy',
+    bio: "An old pensioner on the ground floor. Used to work the trams. Knows everyone's business and everyone knows his. Sits by the hall door smoking his pipe and watching who comes and goes.",
+    problem: "Me pension's been stopped and the post office says there's no record of me at all. Forty years I worked and now they say I don't exist. I need someone to write a letter for me."
+  }
+];
+
+function revealGuestPicker() {
+  const picker = document.getElementById('guestPicker');
+  const container = document.getElementById('guestCards');
+  picker.classList.add('revealed');
+
+  // Hide the Join button and login section
+  document.getElementById('btnJoin').style.display = 'none';
+  const loginSection = document.getElementById('loginSection');
+  if (loginSection.classList.contains('revealed')) {
+    loginSection.classList.remove('revealed');
+  }
+
+  // Build cards
+  container.innerHTML = '';
+  GUEST_CHARACTERS.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'guest-card';
+    card.innerHTML = `
+      <div class="guest-card-name">${ch.name}</div>
+      <div class="guest-card-bio">${ch.bio}</div>
+      <div class="guest-card-problem"><strong>Problem:</strong> ${ch.problem}</div>
+    `;
+    card.onclick = () => selectGuestCharacter(ch);
+    container.appendChild(card);
+  });
+
+  setTimeout(() => picker.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function selectGuestCharacter(ch) {
+  state.memberCode = 'guest';
+  state.memberName = 'Guest';
+  state.characterName = ch.name;
+  state.characterBio = ch.bio;
+  state.problem = ch.problem;
+  showScreen('door-screen');
+}
+
 function revealLogin() {
   const section = document.getElementById('loginSection');
   section.classList.add('revealed');

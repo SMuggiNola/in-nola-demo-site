@@ -899,7 +899,8 @@ body::after {
   </p>
 
   <div class="entry-login">
-    <input type="text" class="entry-input" id="memberCode" placeholder="Member code or name" autocomplete="off">
+    <input type="text" class="entry-input" id="loginUsername" placeholder="Username" autocomplete="off">
+    <input type="password" class="entry-input" id="loginPin" placeholder="PIN or password" autocomplete="off">
     <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Enter</button>
     <div class="entry-error" id="entryError"></div>
   </div>
@@ -1022,32 +1023,39 @@ function sleep(ms) {
 //   SCREEN 1: LOGIN
 // ============================================
 async function handleLogin() {
-  const code = document.getElementById('memberCode').value.trim();
-  if (!code) {
-    document.getElementById('entryError').textContent = 'Please enter your member code.';
+  const username = document.getElementById('loginUsername').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const errorEl = document.getElementById('entryError');
+
+  if (!username || !pin) {
+    errorEl.textContent = 'Please enter your username and PIN.';
     return;
   }
-  state.memberCode = code;
-  state.memberName = code; // Will be replaced by API response
 
-  // Try to auth against the API
+  state.memberCode = username;
+  state.memberName = username;
+  errorEl.textContent = '';
+
+  // Auth against the API
   try {
     const res = await fetch(`${API_BASE}/api/tenement`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'start', memberCode: code })
+      body: JSON.stringify({ action: 'start', username, pin })
     });
-    if (res.ok) {
-      const data = await res.json();
-      state.memberName = data.memberName || code;
+    const data = await res.json();
+    if (res.ok && data.success) {
+      state.memberName = data.memberName || username;
       state.sessionId = data.sessionId || null;
+      showScreen('door-screen');
+    } else {
+      errorEl.textContent = data.error || 'Invalid credentials.';
     }
   } catch (e) {
     // API not available — continue in offline/demo mode
     console.log('API not available, continuing in demo mode');
+    showScreen('door-screen');
   }
-
-  showScreen('door-screen');
 }
 
 function handleSkipLogin() {
@@ -1727,7 +1735,10 @@ function scrollToBottom(el) {
 }
 
 // Enter key on inputs
-document.getElementById('memberCode').addEventListener('keydown', e => {
+document.getElementById('loginUsername').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loginPin').focus();
+});
+document.getElementById('loginPin').addEventListener('keydown', e => {
   if (e.key === 'Enter') handleLogin();
 });
 

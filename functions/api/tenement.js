@@ -331,31 +331,65 @@ async function callMistral(apiKey, systemPrompt, userMessage) {
 
 // ─── Member validation ────────────────────────────────────────
 
-async function validateMember(memberCode, env) {
+// ─── Password hashing (matches /api/auth) ────────────────────────────
+
+async function hashPassword(password, salt) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(salt + password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+// ─── Member validation (same auth as /api/auth) ─────────────────────
+
+async function validateMember(username, pin, env) {
   if (!env.BOARD_KV) {
     return { valid: false, reason: 'Member store not configured' };
   }
 
   const raw = await env.BOARD_KV.get('admin_users');
   if (!raw) {
-    return { valid: false, reason: 'No members found' };
+    return { valid: false, reason: 'No members registered yet. Please log in via the Admin Portal first to seed accounts.' };
   }
 
   const users = JSON.parse(raw);
 
-  // Look up by memberId or username
-  const member = users.find(
-    u => (u.memberId && u.memberId === memberCode) ||
-         (u.username && u.username === memberCode)
-  );
+  // Find user (case-insensitive)
+  const user = users.find(u => u.username === username.toLowerCase().trim());
+  if (!user) {
+    return { valid: false, reason: 'Invalid credentials' };
+  }
 
-  if (!member) {
-    return { valid: false, reason: 'Member not found' };
+  // Authenticate: try PIN first, then password
+  let authenticated = false;
+
+  if (pin) {
+    if (user.pin && user.pin === pin.trim()) {
+      // Check PIN expiration if set
+      if (user.pinExpiresAt && new Date(user.pinExpiresAt) < new Date()) {
+        return { valid: false, reason: 'PIN has expired. Please request a new one.' };
+      }
+      authenticated = true;
+    }
+
+    // Also try as password hash (for password-based users like mug.sea)
+    if (!authenticated && user.passwordHash) {
+      const submittedHash = await hashPassword(pin.trim(), user.salt);
+      if (submittedHash === user.passwordHash) {
+        authenticated = true;
+      }
+    }
+  }
+
+  if (!authenticated) {
+    return { valid: false, reason: 'Invalid credentials' };
   }
 
   // Check membership expiration
-  if (member.expirationDate) {
-    const expDate = new Date(member.expirationDate);
+  if (user.expirationDate) {
+    const expDate = new Date(user.expirationDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (expDate < today) {
@@ -365,8 +399,8 @@ async function validateMember(memberCode, env) {
 
   return {
     valid: true,
-    memberName: member.displayName || member.username,
-    memberId: member.memberId || member.username
+    memberName: user.displayName || user.username,
+    memberId: user.memberId || user.username
   };
 }
 
@@ -455,14 +489,14 @@ async function saveMemberHistory(memberId, session, env) {
 // ─── Action handlers ──────────────────────────────────────────
 
 async function handleStart(body, env) {
-  const { memberCode } = body;
+  const { username, pin } = body;
 
-  if (!memberCode) {
-    return errorResponse('memberCode is required');
+  if (!username || !pin) {
+    return errorResponse('Username and PIN are required');
   }
 
-  // Validate member
-  const validation = await validateMember(memberCode, env);
+  // Validate member using same auth as /api/auth
+  const validation = await validateMember(username, pin, env);
   if (!validation.valid) {
     return errorResponse(validation.reason, 401);
   }

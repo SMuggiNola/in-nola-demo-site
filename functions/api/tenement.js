@@ -94,7 +94,12 @@ Age 22, well-made, good-looking. Two forces at work — her tenement life pullin
 3. JUNO is the only character with genuine interest in the neighbour and their problem. She listens, she cares, she gives real advice — but she's constantly interrupted by Boyle's nonsense, Johnny's demands, or her own exhaustion. Her attention is pulled in every direction.
 4. Everyone else gives HALF-HEARTED, distracted responses to the member. They acknowledge the neighbour exists but don't really care. Boyle might nod along and then pivot to his legs or the stars. Joxer says "ah, that's terrible" and immediately changes the subject. Johnny snaps "leave me alone." Mary relates it vaguely to a principle then goes back to her ribbons. They are NOT invested — they give barely-paying-attention advice while absorbed in their own lives.
 5. Characters react to EACH OTHER, not to the member. Juno scolds Boyle. Boyle dismisses Johnny. Joxer agrees with whoever spoke last. The neighbour is in someone else's kitchen.
-6. Let the PLOT EVENTS of Act I unfold naturally: Boyle dodging work, Joxer arriving, Juno's exhaustion, news of the inheritance from Bentham, Johnny's paranoid outbursts about the votive light.
+6. PLOT PACING — follow this beat structure across the ~10 rounds:
+   - Rounds 1-2: Boyle dodging the job from Father Farrell, Juno scolding him, Joxer sneaking in. Boyle's legs hurt. "The whole counthry's in a state o' chassis."
+   - Round 3: Word arrives about the INHERITANCE from a solicitor named Bentham. This is the big news — a relative has died and left money. Boyle is cautiously excited. Joxer is thrilled. Juno is skeptical.
+   - Rounds 4-6: The inheritance dominates. Boyle starts making grand plans. Joxer flatters him. Juno warns they shouldn't count their chickens. Mary mentions Bentham is her new boyfriend. Johnny demands to know if the votive light is still lit.
+   - Rounds 7-8: Boyle grows expansive — talks of what he'll buy, philosophises about the stars, acts the lord. Juno tries to keep everyone grounded.
+   - Rounds 9-10: The mood shifts. Johnny has a paranoid outburst. Juno expresses quiet dread beneath the hope. Something feels wrong.
 7. Maintain O'Casey's Dublin dialect throughout. Every character must sound distinct.
 8. End each chunk at a natural pause — a lull, someone leaving the room, a question hanging in the air.
 9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
@@ -178,7 +183,12 @@ Will relate the member's problem to something that happened to someone she knew,
 3. JUNO is the only character with genuine interest in the neighbour. She tries to listen, tries to help — but is constantly pulled away by hosting duties, the funeral procession, or Boyle's antics. Her warmth is real but stretched impossibly thin.
 4. Everyone else gives HALF-HEARTED, distracted responses. Boyle grandly offers to "sort it out" and immediately forgets, pivoting to Consols or the Prawna. Joxer calls the problem "darlin'" and changes the subject. Mrs. Madigan relates it to someone she knew fifteen years ago and never comes back to the point. Johnny snaps that nobody's problems matter. They acknowledge the neighbour but they DO NOT CARE — they're celebrating.
 5. Characters interact with EACH OTHER, not the member. Mrs. Madigan tells rambling stories. Boyle recites bad poetry. Joxer steals bottles. Johnny demands the gramophone be turned off. Mary talks about Charlie Bentham.
-6. Let the PLOT EVENTS of Act II unfold: the party atmosphere, Boyle's spending, Mrs. Tancred's funeral procession passing outside (darkening the mood), the Mobilizer coming for Johnny.
+6. PLOT PACING — follow this beat structure across the ~10 rounds:
+   - Rounds 1-2: The party in full swing. New furniture, gramophone, whisky. Boyle in his shirt-sleeves, lord of the manor. Mrs. Madigan singing. Joxer flattering. Everything on credit.
+   - Rounds 3-4: Boyle pontificates about Consols and the Prawna (Theosophy). Recites his bad poetry. Joxer tries to sing but forgets the words. Mrs. Madigan tells a rambling story about a birth fifteen years ago.
+   - Rounds 5-6: Mary mentions Charlie Bentham. Boyle talks about the furniture he's ordered. Juno worries aloud about the debt — "we're runnin' into too much."
+   - Rounds 7-8: The FUNERAL PROCESSION of young Tancred passes outside. The mood darkens sharply. Mrs. Tancred's voice is heard keening. Juno goes out to comfort her. Johnny is terrified — he informed on Tancred.
+   - Rounds 9-10: The Mobilizer arrives for Johnny: "Boyle, no man can do enough for Ireland." Johnny refuses. The party is over. Dread settles in.
 7. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
 8. End each chunk at a natural pause — a lull in the party, a song trailing off, someone leaving the room.
 9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
@@ -261,7 +271,13 @@ Cannot help the member. If she speaks, it's to say that nobody's compassion exte
 2. THE PLAY COMES FIRST. The dialogue should primarily be the characters living through Act III's catastrophe. The will is a washout. Mary is pregnant. Furniture is repossessed. Johnny is taken. Juno leaves. These PLOT EVENTS are everything — the neighbour's problem is nothing compared to what's happening to this family.
 3. JUNO is the only one who still sees the neighbour as a person. In the midst of everything collapsing, she might turn to them once with raw honesty. Near the very end, she says ONE thing from her own grief that accidentally, perfectly applies to the neighbour's original problem — but she doesn't know she's helping them. She's just telling the truth about her own life.
 4. Everyone else has completely forgotten the neighbour exists. Boyle blames everyone and flees to the pub. Joxer turns traitor and mocks openly. Johnny is dragged away by Irregulars. Mary sits in devastated silence. If any of them notice the neighbour at all, it's to snap at them or tell them to get out.
-5. Let the PLOT EVENTS of Act III unfold: the will revealed as worthless, Nugent taking back the suit, Mary's pregnancy revealed, Boyle disowning her, Johnny taken by the IRA, Juno's decision to leave, Boyle and Joxer drunk on the floor.
+5. PLOT PACING — follow this beat structure across the ~10 rounds:
+   - Rounds 1-2: The flat is half-bare. Furniture being taken. Boyle in bed demanding stout and liniment. The INHERITANCE IS A WASHOUT — Bentham botched the will. Nugent takes back the suit. Boyle rages.
+   - Rounds 3-4: Juno tells Boyle that Mary is PREGNANT. Bentham has disappeared. Boyle disowns Mary: "She should be dhriven out!" Juno defends her daughter fiercely.
+   - Rounds 5-6: Joxer arrives. He's turned completely — mocking Boyle behind his back, stealing the last bottle. The friendship is revealed as hollow. Mrs. Madigan takes back the gramophone.
+   - Rounds 7-8: Two IRREGULARS come for Johnny. He is dragged away: "Haven't I done enough for Ireland!" Silence falls. Then word comes — Johnny's body found shot dead on a country road.
+   - Round 9: JUNO decides to leave Boyle. She echoes Mrs. Tancred's prayer. "Sacred Heart o' Jesus, take away our hearts o' stone." She says something from her grief that accidentally, devastatingly applies to the neighbour's problem. She doesn't know she's helping them.
+   - Round 10: Boyle and Joxer stumble in drunk. The flat is empty. "The blinds is down, Joxer." "Th' whole worl's in a terr...ible state o'...chassis."
 6. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
 7. End each chunk at a natural pause — a silence after someone leaves, a knock at the door, a moment of shock.
 9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
@@ -598,7 +614,7 @@ async function handleChunk(body, env) {
     }
 
     // The current prompt
-    let roundPrompt = `Round ${currentRound} of ${maxRounds}. Generate the next 3-5 lines of dialogue continuing the scene. PLAIN TEXT ONLY.`;
+    let roundPrompt = `Round ${currentRound} of ${maxRounds}. Follow the PLOT PACING beats in your instructions for this round number. Generate the next 3-5 lines of dialogue continuing the scene. PLAIN TEXT ONLY.`;
     if (currentRound >= maxRounds - 1) {
       roundPrompt += ' This is near the end — begin wrapping up the scene.';
     }

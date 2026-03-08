@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Sean O'Casey Experience | Irish Network NOLA</title>
 <link rel="icon" type="image/png" href="../../assets/in_logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Libre+Franklin:wght@300;400;500&display=swap" rel="stylesheet">
@@ -89,7 +89,9 @@ body::after {
   display: none;
   flex-direction: column;
   z-index: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .screen.active {
@@ -122,10 +124,11 @@ body::after {
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-  padding: 2rem;
+  padding: 1.2rem 1rem;
   background: var(--bg-dark);
   position: relative;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Period photo watermark */
@@ -158,18 +161,18 @@ body::after {
 .entry-presents {
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   letter-spacing: 0.05em;
-  margin-top: 2rem;
-  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .entry-title-line {
   font-family: 'Playfair Display', serif;
   font-weight: 900;
   font-style: italic;
-  font-size: clamp(2.8rem, 8vw, 3.8rem);
+  font-size: clamp(2rem, 7vw, 3.8rem);
   color: #2a6830;
   line-height: 0.95;
   text-shadow: 1px 2px 4px rgba(0,0,0,0.3);
@@ -178,40 +181,40 @@ body::after {
 .entry-title-and {
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--gold);
-  margin: 3px 0;
+  margin: 1px 0;
 }
 
 .entry-byline {
   font-family: 'IM Fell English', serif;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  margin-top: 0.8rem;
+  margin-top: 0.4rem;
 }
 
 .entry-author {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: #2a6830;
   letter-spacing: 0.08em;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .entry-directed {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: var(--gold);
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.4rem;
 }
 
 .entry-divider {
-  width: 140px;
+  width: 120px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 0.6rem auto;
+  margin: 0.3rem auto;
 }
 
 .entry-interactive {
@@ -235,11 +238,11 @@ body::after {
 .entry-starring-you {
   font-family: 'Cinzel Decorative', serif;
   font-weight: 700;
-  font-size: clamp(2rem, 5vw, 2.6rem);
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
   color: #2a6830;
   letter-spacing: 0.05em;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .entry-opening {
@@ -253,34 +256,34 @@ body::after {
 .entry-date {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  font-size: clamp(1.2rem, 4vw, 1.9rem);
   color: #2a6830;
   letter-spacing: 0.05em;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .entry-flavour {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-style: italic;
   color: var(--text-muted);
   max-width: 380px;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
+  line-height: 1.4;
+  margin-bottom: 0.8rem;
 }
 
 .btn-join {
-  padding: 0.9rem 2.5rem;
+  padding: 0.75rem 2rem;
   background: linear-gradient(135deg, #2a6830, #1e4d24);
   border: 1px solid rgba(42, 104, 48, 0.6);
   border-radius: var(--radius-sm);
   color: var(--text-cream);
   font-family: 'Cinzel Decorative', serif;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all var(--transition);
   letter-spacing: 0.05em;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
@@ -304,13 +307,13 @@ body::after {
 
 .entry-venue {
   font-family: 'Cinzel', serif;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   color: var(--text-dim);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  line-height: 1.8;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .entry-login {
@@ -320,17 +323,17 @@ body::after {
 
 .entry-input {
   width: 100%;
-  padding: 0.85rem 1.2rem;
+  padding: 0.7rem 1rem;
   background: var(--bg-panel);
   border: 1px solid rgba(200, 162, 78, 0.2);
   border-radius: var(--radius-sm);
   color: var(--text-cream);
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.05rem;
+  font-size: 16px; /* prevents iOS zoom on focus */
   text-align: center;
   outline: none;
   transition: border-color var(--transition);
-  margin-bottom: 1rem;
+  margin-bottom: 0.7rem;
 }
 
 .entry-input::placeholder {
@@ -344,16 +347,17 @@ body::after {
 
 .btn-enter {
   width: 100%;
-  padding: 0.85rem;
+  padding: 0.75rem;
   background: linear-gradient(135deg, var(--door-wood), var(--door-dark));
   border: 1px solid rgba(200, 162, 78, 0.3);
   border-radius: var(--radius-sm);
   color: var(--gold-light);
   font-family: 'Cinzel Decorative', serif;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all var(--transition);
   letter-spacing: 0.05em;
+  min-height: 44px; /* touch target */
 }
 
 .btn-enter:hover {
@@ -371,7 +375,7 @@ body::after {
 }
 
 .entry-skip {
-  margin-top: 1.5rem;
+  margin-top: 0.8rem;
   font-size: 0.8rem;
   color: var(--text-dim);
   cursor: pointer;
@@ -458,8 +462,8 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 2rem;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
 }
 
 .entry-btn-muggs {
@@ -682,19 +686,19 @@ body::after {
 
 .door-textarea {
   width: 100%;
-  min-height: 100px;
-  padding: 1rem 1.2rem;
+  min-height: 90px;
+  padding: 0.8rem 1rem;
   background: var(--bg-panel);
   border: 1px solid rgba(200, 162, 78, 0.2);
   border-radius: var(--radius-sm);
   color: var(--text-cream);
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 16px; /* prevents iOS zoom on focus */
+  line-height: 1.5;
   resize: vertical;
   outline: none;
   transition: border-color var(--transition);
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .door-textarea::placeholder {
@@ -1029,13 +1033,14 @@ body::after {
 
 .chat-prompt-input {
   flex: 1;
+  min-width: 0;
   padding: 0.7rem 0.9rem;
   background: var(--bg-card);
   border: 1px solid rgba(200, 162, 78, 0.25);
   border-radius: var(--radius-sm);
   color: var(--text-cream);
   font-family: 'Cormorant Garamond', serif;
-  font-size: 0.95rem;
+  font-size: 16px; /* prevents iOS zoom on focus */
   outline: none;
   transition: border-color var(--transition);
   line-height: 1.4;
@@ -1303,15 +1308,42 @@ body::after {
    RESPONSIVE
 ============================================ */
 @media (max-width: 480px) {
-  .entry-title { font-size: 1.8rem; }
-  .entry-flavour { font-size: 0.85rem; }
+  #entry-screen { padding: 0.8rem 0.8rem 3.5rem; }
 
-  .door-container { width: 130px; height: 200px; }
+  .entry-presents { font-size: 0.7rem; margin-top: 0.3rem; margin-bottom: 0.3rem; }
+  .entry-title-line { font-size: clamp(1.8rem, 10vw, 2.4rem); }
+  .entry-title-and { font-size: 0.85rem; }
+  .entry-byline { font-size: 0.75rem; margin-top: 0.2rem; }
+  .entry-author { font-size: 0.95rem; margin-bottom: 0.2rem; }
+  .entry-directed { font-size: 0.75rem; margin-bottom: 0.2rem; }
+  .entry-divider { margin: 0.2rem auto; }
+  .entry-interactive { font-size: 0.7rem; }
+  .entry-starring { font-size: clamp(1.1rem, 4vw, 1.4rem); }
+  .entry-starring-you { font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 0.2rem; }
+  .entry-opening { font-size: 0.85rem; }
+  .entry-date { font-size: clamp(1rem, 4vw, 1.3rem); margin-bottom: 0.3rem; }
+  .entry-flavour { font-size: 0.78rem; line-height: 1.3; margin-bottom: 0.5rem; }
+  .btn-join { padding: 0.6rem 1.5rem; font-size: 0.85rem; margin-bottom: 0.4rem; }
+  .entry-input { padding: 0.6rem 0.8rem; font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .entry-skip { margin-top: 0.5rem; }
+  .entry-venue { font-size: 0.5rem; margin-top: 0.3rem; margin-bottom: 0.3rem; }
+  .entry-links { gap: 0.3rem; margin-bottom: 0.5rem; }
+  .entry-btn-muggs, .entry-btn-support { font-size: 0.6rem; padding: 0.35rem 1rem; }
 
-  .chat-msg-bubble { font-size: 0.9rem; }
-  .chat-msg { max-width: 90%; }
+  .door-container { width: 120px; height: 190px; }
+  .door-prompt { font-size: 0.85rem; margin-bottom: 1rem; }
+  .btn-knock { font-size: 0.9rem; padding: 0.75rem; }
 
-  .end-juno-line { font-size: 1.2rem; }
+  .char-create-title { font-size: 1.3rem; }
+  .char-create-sub { font-size: 0.8rem; margin-bottom: 1rem; }
+  .char-hint { font-size: 0.7rem; }
+  .char-create-form .door-textarea { min-height: 80px; }
+
+  .chat-msg-bubble { font-size: 0.88rem; }
+  .chat-msg { max-width: 92%; }
+
+  .end-juno-line { font-size: 1.1rem; }
+  .end-silence { height: 30px; }
 }
 
 @media (min-width: 768px) {
@@ -1512,7 +1544,7 @@ body::after {
      SCREEN 2: CHARACTER CREATION
 ========================================== -->
 <div class="screen" id="character-screen">
-  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; overflow-y:auto;">
+  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:1.5rem 1rem; overflow-y:auto; -webkit-overflow-scrolling:touch;">
 
     <h2 class="char-create-title">Create Your Character</h2>
     <p class="char-create-sub">
@@ -1555,7 +1587,7 @@ body::after {
      SCREEN 3: THE DOOR
 ========================================== -->
 <div class="screen" id="door-screen">
-  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem;">
+  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem 1rem;">
 
     <div class="door-container" id="theDoor">
       <img src="door.webp" alt="The door to the Boyle flat" class="door-photo">

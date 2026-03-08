@@ -935,6 +935,36 @@ body::after {
   backdrop-filter: blur(6px);
 }
 
+/* Inner thought — member aside not heard by characters */
+.chat-thought {
+  max-width: 75%;
+  align-self: flex-end;
+  animation: msgAppear 0.3s ease;
+}
+
+.chat-thought-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(200, 162, 78, 0.45);
+  text-align: right;
+  padding-right: 0.75rem;
+  margin-bottom: 2px;
+}
+
+.chat-thought-bubble {
+  padding: 0.5rem 0.9rem;
+  border-radius: 12px 12px 4px 12px;
+  font-size: 0.88rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: rgba(232, 220, 200, 0.6);
+  background: rgba(38, 30, 14, 0.45);
+  border-right: 2px dashed rgba(200, 162, 78, 0.25);
+  backdrop-filter: blur(4px);
+}
+
 /* Typing indicator */
 .chat-typing {
   display: flex;
@@ -2024,13 +2054,23 @@ async function startScene(sceneNum) {
     const memberResponse = await showMemberInput(container);
     state.choices.push(memberResponse);
 
-    // Show the member's message
-    addMessage(container, state.characterName || 'You', 'member', memberResponse);
-    scrollToBottom(container);
-    await sleep(1500);
+    // Check if the entire message is an inner thought (wrapped in parentheses)
+    const isThought = /^\(.*\)$/.test(memberResponse.trim());
 
-    // Add member response to history
-    history.push({ role: 'user', content: `${state.characterName} says: "${memberResponse}"` });
+    if (isThought) {
+      // Inner thought — show as aside, send as director note
+      const thoughtText = memberResponse.trim().slice(1, -1).trim();
+      addInnerThought(container, state.characterName || 'You', thoughtText);
+      scrollToBottom(container);
+      await sleep(1000);
+      history.push({ role: 'user', content: `[INNER THOUGHT — not spoken aloud, this is a direction from the player: ${thoughtText}]` });
+    } else {
+      // Normal spoken dialogue
+      addMessage(container, state.characterName || 'You', 'member', memberResponse);
+      scrollToBottom(container);
+      await sleep(1500);
+      history.push({ role: 'user', content: `${state.characterName} says: "${memberResponse}"` });
+    }
   }
 
   // Scene complete
@@ -2180,6 +2220,16 @@ function addStageDirection(container, text) {
   container.appendChild(div);
 }
 
+function addInnerThought(container, name, text) {
+  const div = document.createElement('div');
+  div.className = 'chat-thought';
+  div.innerHTML = `
+    <div class="chat-thought-label">${escapeHtml(name)} thinks&hellip;</div>
+    <div class="chat-thought-bubble">${escapeHtml(text)}</div>
+  `;
+  container.appendChild(div);
+}
+
 function addTypingIndicator(container, name, charKey) {
   const div = document.createElement('div');
   div.className = 'chat-typing';
@@ -2198,7 +2248,7 @@ function showMemberInput(container) {
 
     div.innerHTML = `
       <div class="chat-prompt-input-wrap">
-        <input type="text" class="chat-prompt-input" placeholder="Say something..." maxlength="300" autocomplete="off">
+        <input type="text" class="chat-prompt-input" placeholder="Say something... (parentheses = inner thought)" maxlength="300" autocomplete="off">
         <button class="chat-prompt-send">Send</button>
       </div>
     `;

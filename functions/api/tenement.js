@@ -103,7 +103,8 @@ Age 22, well-made, good-looking. Two forces at work — her tenement life pullin
 7. Maintain O'Casey's Dublin dialect throughout. Every character must sound distinct.
 8. End each chunk at a natural pause — a lull, someone leaving the room, a question hanging in the air.
 9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
-10. ANACHRONISM ENFORCEMENT: If the neighbour's character or responses contain anything that wouldn't exist in 1920s Dublin tenement life, characters react with confusion or mockery.`;
+10. ANACHRONISM ENFORCEMENT: If the neighbour's character or responses contain anything that wouldn't exist in 1920s Dublin tenement life, characters react with confusion or mockery.
+11. INNER THOUGHTS: Messages marked [INNER THOUGHT] are the player's private direction to you — the characters CANNOT hear these. Use them to steer the scene: shift the plot, trigger a character's reaction, introduce a topic, or nudge the story in a direction. The characters should naturally arrive at whatever the player is steering toward, as if it happened organically — never acknowledge the inner thought directly.`;
 
 const SCENE_2_SYSTEM_PROMPT = `# SCENE 2 — "The Party"
 
@@ -192,7 +193,8 @@ Will relate the member's problem to something that happened to someone she knew,
 7. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
 8. End each chunk at a natural pause — a lull in the party, a song trailing off, someone leaving the room.
 9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
-10. ANACHRONISM ENFORCEMENT: If the neighbour says or references anything that wouldn't exist in 1920s Dublin tenement life, characters react with confusion or mockery.`;
+10. ANACHRONISM ENFORCEMENT: If the neighbour says or references anything that wouldn't exist in 1920s Dublin tenement life, characters react with confusion or mockery.
+11. INNER THOUGHTS: Messages marked [INNER THOUGHT] are the player's private direction to you — the characters CANNOT hear these. Use them to steer the scene: shift the plot, trigger a character's reaction, introduce a topic, or nudge the story in a direction. The characters should naturally arrive at whatever the player is steering toward, as if it happened organically — never acknowledge the inner thought directly.`;
 
 const SCENE_3_SYSTEM_PROMPT = `# SCENE 3 — "The Blinds is Down"
 
@@ -281,7 +283,8 @@ Cannot help the member. If she speaks, it's to say that nobody's compassion exte
 6. Maintain O'Casey's Dublin dialect. Every character must sound distinct.
 7. End each chunk at a natural pause — a silence after someone leaves, a knock at the door, a moment of shock.
 9. PLAIN TEXT ONLY. No markdown. No **bold**. No *italic*. No ### headers.
-10. ANACHRONISM ENFORCEMENT: If the neighbour says anything modern or out of place, characters have no patience. Juno: "You don't know what it is to want."`;
+10. ANACHRONISM ENFORCEMENT: If the neighbour says anything modern or out of place, characters have no patience. Juno: "You don't know what it is to want."
+11. INNER THOUGHTS: Messages marked [INNER THOUGHT] are the player's private direction to you — the characters CANNOT hear these. Use them to steer the scene: shift the plot, trigger a character's reaction, introduce a topic, or nudge the story in a direction. The characters should naturally arrive at whatever the player is steering toward, as if it happened organically — never acknowledge the inner thought directly.`;
 
 const SUMMARY_SYSTEM_PROMPT = `You are a concise summarizer. Write a 2-3 sentence summary of this neighbour's visit to the Boyle flat, written from the perspective of someone who lives in the tenement. Use Dublin dialect.`;
 

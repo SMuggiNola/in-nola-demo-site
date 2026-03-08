@@ -489,17 +489,20 @@ async function saveMemberHistory(memberId, session, env) {
 // ─── Action handlers ──────────────────────────────────────────
 
 async function handleStart(body, env) {
-  const { visitorName } = body;
+  const { username, pin } = body;
 
-  if (!visitorName) {
-    return errorResponse('visitorName is required');
+  if (!username || !pin) {
+    return errorResponse('Username and PIN are required');
   }
 
-  const memberId = visitorName.toLowerCase().replace(/\s+/g, '_');
-  const memberName = visitorName;
+  // Validate member using same auth as /api/auth
+  const validation = await validateMember(username, pin, env);
+  if (!validation.valid) {
+    return errorResponse(validation.reason, 401);
+  }
 
   // Check rate limit
-  const rateCheck = await checkRateLimit(memberId, env);
+  const rateCheck = await checkRateLimit(validation.memberId, env);
   if (!rateCheck.allowed) {
     return errorResponse(
       `You can start a new session in ${rateCheck.minutesLeft} minute${rateCheck.minutesLeft === 1 ? '' : 's'}. The Boyles need time to recover between visitors.`,
@@ -508,16 +511,16 @@ async function handleStart(body, env) {
   }
 
   // Set rate limit
-  await setRateLimit(memberId, env);
+  await setRateLimit(validation.memberId, env);
 
   // Check for previous visit summary
-  const previousSummary = await getPreviousSummary(memberId, env);
+  const previousSummary = await getPreviousSummary(validation.memberId, env);
 
   // Create session
   const sessionId = generateSessionId();
   const session = {
-    memberCode: memberId,
-    memberName: memberName,
+    memberCode: validation.memberId,
+    memberName: validation.memberName,
     problem: null,
     scenes: [],
     summary: null,
@@ -532,13 +535,13 @@ async function handleStart(body, env) {
   return jsonResponse({
     success: true,
     sessionId,
-    memberName: memberName,
+    memberName: validation.memberName,
     previousSummary: previousSummary || null
   });
 }
 
 async function handleScene(body, env) {
-  const { sceneNum, memberName, memberProblem, previousChoices, sessionId } = body;
+  const { sceneNum, characterName, characterBio, memberProblem, previousChoices, sessionId } = body;
 
   if (!env.MISTRAL_API_KEY) {
     return errorResponse('Mistral API not configured', 500);
@@ -548,8 +551,8 @@ async function handleScene(body, env) {
     return errorResponse('sceneNum must be 1, 2, or 3');
   }
 
-  if (!memberName || !memberProblem) {
-    return errorResponse('memberName and memberProblem are required');
+  if (!characterName || !memberProblem) {
+    return errorResponse('characterName and memberProblem are required');
   }
 
   // Select system prompt
@@ -566,6 +569,12 @@ async function handleScene(body, env) {
       break;
   }
 
+  // Inject the member's character into the system prompt
+  const bioSection = characterBio
+    ? `\n\n## The Neighbour — ${characterName}\n${characterBio}\nUse this background to shape how the Boyles interact with them. Juno might recognise something in their story. Boyle might be dismissive. Joxer might try to bond over shared hardship. Let the bio colour the scene naturally — don't state it outright, let it emerge through dialogue.`
+    : `\n\n## The Neighbour — ${characterName}\nA neighbour from the tenement. Not much is known about them yet.`;
+  systemPrompt += bioSection;
+
   // If returning visitor and scene 1, inject previous visit context
   if (sceneNum === 1 && body.previousSummary) {
     systemPrompt += `\n\n## Returning Visitor\nThis neighbour has visited before. Last time they came by about: "${body.previousSummary}". Boyle vaguely remembers them. Joxer claims they're old friends. Juno recalls the detail. Johnny doesn't care.`;
@@ -577,24 +586,26 @@ async function handleScene(body, env) {
 
   switch (sceneNum) {
     case 1:
-      userMessage = `The neighbour's name is ${memberName}. They knock on the door and say: "${memberProblem}"
+      userMessage = `The neighbour ${characterName} knocks on the door and says: "${memberProblem}"
 
 Generate the full scene dialogue — aim for 35-45 exchanges for a rich, immersive experience. Include exactly 3 MEMBER_PROMPT points spaced evenly through the scene where the neighbour can type a free response. Format each as: MEMBER_PROMPT: ["suggested response 1", "suggested response 2", "suggested response 3"]
-The suggested responses are only shown as placeholder hints — the member types their own words. Make the suggestions feel natural and conversational.`;
+The suggested responses are only shown as placeholder hints — the member types their own words. Make the suggestions feel natural and conversational. Use ${characterName} (not "MEMBER" or "NEIGHBOUR") as the character name in dialogue lines for the visiting neighbour.`;
       break;
 
     case 2:
-      userMessage = `The neighbour ${memberName} has returned. Their original problem was: "${memberProblem}"
+      userMessage = `The neighbour ${characterName} has returned. Their original problem was: "${memberProblem}"
 In the previous visit, when asked, they said: "${choices[0] || '(no response)'}"\n${choices[1] ? `They also said: "${choices[1]}"` : ''}${choices[2] ? `\nAnd: "${choices[2]}"` : ''}
 
-Generate the full scene dialogue — aim for 35-45 exchanges. Include exactly 3 MEMBER_PROMPT points spaced through the scene. Format: MEMBER_PROMPT: ["suggestion 1", "suggestion 2", "suggestion 3"]`;
+Generate the full scene dialogue — aim for 35-45 exchanges. Include exactly 3 MEMBER_PROMPT points spaced through the scene. Format: MEMBER_PROMPT: ["suggestion 1", "suggestion 2", "suggestion 3"]
+Use ${characterName} (not "MEMBER") as the character name in dialogue lines for the visiting neighbour.`;
       break;
 
     case 3:
-      userMessage = `The neighbour ${memberName} has returned one last time. Their original problem was: "${memberProblem}"
+      userMessage = `The neighbour ${characterName} has returned one last time. Their original problem was: "${memberProblem}"
 In previous visits they said: ${choices.map((c, i) => `"${c}"`).join(', ')}
 
-Generate the full final scene — aim for 40-50 exchanges. This is the emotional climax. Juno must say one thing from her own grief that accidentally addresses the neighbour's original problem with devastating clarity. Include exactly 3 MEMBER_PROMPT points. Format: MEMBER_PROMPT: ["suggestion 1", "suggestion 2", "suggestion 3"]`;
+Generate the full final scene — aim for 40-50 exchanges. This is the emotional climax. Juno must say one thing from her own grief that accidentally addresses ${characterName}'s original problem with devastating clarity. Include exactly 3 MEMBER_PROMPT points. Format: MEMBER_PROMPT: ["suggestion 1", "suggestion 2", "suggestion 3"]
+Use ${characterName} (not "MEMBER") as the character name in dialogue lines for the visiting neighbour.`;
       break;
   }
 
@@ -634,20 +645,20 @@ Generate the full final scene — aim for 40-50 exchanges. This is the emotional
 }
 
 async function handleSummary(body, env) {
-  const { memberName, memberProblem, choices, junoFinalLine, sessionId } = body;
+  const { characterName, memberProblem, choices, junoFinalLine, sessionId } = body;
 
   if (!env.MISTRAL_API_KEY) {
     return errorResponse('Mistral API not configured', 500);
   }
 
-  if (!memberName || !memberProblem) {
-    return errorResponse('memberName and memberProblem are required');
+  if (!characterName || !memberProblem) {
+    return errorResponse('characterName and memberProblem are required');
   }
 
   const choiceList = choices || [];
   const choiceText = choiceList.map((c, i) => `"${c}"`).join(' and ');
 
-  const userMessage = `The neighbour ${memberName} came about this problem: "${memberProblem}". They said: ${choiceText || '"(nothing)"'}. Juno's final words to them were: "${junoFinalLine || '(unrecorded)'}".`;
+  const userMessage = `The neighbour ${characterName} came about this problem: "${memberProblem}". They said: ${choiceText || '"(nothing)"'}. Juno's final words to them were: "${junoFinalLine || '(unrecorded)'}".`;
 
   let summary;
   try {

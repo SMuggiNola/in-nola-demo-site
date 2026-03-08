@@ -237,7 +237,55 @@ body::after {
 }
 
 /* ============================================
-   SCREEN 2: THE DOOR / PROBLEM ENTRY
+   SCREEN 2: CHARACTER CREATION
+============================================ */
+#character-screen {
+  background: var(--bg-dark);
+}
+
+.char-create-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--gold);
+  margin-bottom: 0.3rem;
+}
+
+.char-create-sub {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-muted);
+  max-width: 420px;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.char-create-form {
+  width: 100%;
+  max-width: 420px;
+}
+
+.char-label {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+.char-create-form .entry-input {
+  margin-bottom: 1rem;
+}
+
+.char-create-form .door-textarea {
+  min-height: 80px;
+  margin-bottom: 1rem;
+}
+
+/* ============================================
+   SCREEN 3: THE DOOR
 ============================================ */
 #door-screen {
   align-items: center;
@@ -887,7 +935,7 @@ body::after {
 <body>
 
 <!-- ==========================================
-     SCREEN 1: ENTRY / LOGIN
+     SCREEN 1: MEMBER LOGIN
 ========================================== -->
 <div class="screen active" id="entry-screen">
   <div class="entry-votive"></div>
@@ -895,19 +943,47 @@ body::after {
   <p class="entry-subtitle">Juno and the Paycock &mdash; An Interactive Experience</p>
 
   <p class="entry-flavour">
-    You're a neighbour in a Dublin tenement, 1922. The Boyle family lives on your landing.
-    You've got a problem and you need advice. Knock on the door.
+    Dublin, 1922. You live in a tenement on Hilljoy Square.
+    The Boyle family is on your landing. You've got a problem.
+    Log in to create your character and knock on their door.
   </p>
 
   <div class="entry-login">
-    <input type="text" class="entry-input" id="visitorName" placeholder="Your first name" autocomplete="off">
-    <button class="btn-enter" id="btnEnter" onclick="handleEnter()">Enter the Tenement</button>
+    <input type="text" class="entry-input" id="loginUsername" placeholder="Username" autocomplete="off">
+    <input type="password" class="entry-input" id="loginPin" placeholder="PIN or password" autocomplete="off">
+    <button class="btn-enter" id="btnEnter" onclick="handleLogin()">Sign In</button>
     <div class="entry-error" id="entryError"></div>
   </div>
 </div>
 
 <!-- ==========================================
-     SCREEN 2: THE DOOR / PROBLEM ENTRY
+     SCREEN 2: CHARACTER CREATION
+========================================== -->
+<div class="screen" id="character-screen">
+  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; overflow-y:auto;">
+
+    <h2 class="char-create-title">Create Your Character</h2>
+    <p class="char-create-sub">Who are you in the tenement? Give yourself a name, a story, and a problem to bring to the Boyles.</p>
+
+    <div class="char-create-form">
+      <label class="char-label" for="charName">Character Name</label>
+      <input type="text" class="entry-input" id="charName" placeholder="e.g. Paddy Dunne, Mary Costello" autocomplete="off">
+
+      <label class="char-label" for="charBio">Short Bio</label>
+      <textarea class="door-textarea" id="charBio" placeholder="A docker's widow on the second floor. Keeps to herself mostly. Has a son in the National Army and prays for him every night under the votive light on the landing."></textarea>
+
+      <label class="char-label" for="charProblem">Your Problem</label>
+      <textarea class="door-textarea" id="charProblem" placeholder="I lent money to a neighbour three months ago and they won't pay it back. Now I can't make the rent and the landlord is threatening eviction..."></textarea>
+
+      <button class="btn-knock" onclick="handleCharacterDone()">Step onto the Landing</button>
+      <div class="entry-error" id="charError"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==========================================
+     SCREEN 3: THE DOOR
 ========================================== -->
 <div class="screen" id="door-screen">
   <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem;">
@@ -919,19 +995,16 @@ body::after {
       </div>
     </div>
 
-    <!-- First visit: problem entry -->
+    <!-- First visit -->
     <div id="door-first-visit">
-      <p class="door-prompt">
+      <p class="door-prompt" id="doorFirstPrompt">
         You stand outside the Boyle family flat on the landing.<br>
-        What's happened? What do you need help with?
+        You take a breath and raise your hand.
       </p>
-      <div class="door-problem-wrap">
-        <textarea class="door-textarea" id="problemInput" placeholder="I said something terrible at dinner and now my sister won't talk to me..."></textarea>
-        <button class="btn-knock" id="btnKnock" onclick="handleKnock()">Knock</button>
-      </div>
+      <button class="btn-knock" id="btnKnock" onclick="handleKnock()">Knock on the Door</button>
     </div>
 
-    <!-- Return visits: just knock -->
+    <!-- Return visits: acts 2 & 3 -->
     <div id="door-return-visit" style="display:none;">
       <p class="door-return-text" id="doorReturnText"></p>
       <button class="btn-knock" id="btnReturnKnock" onclick="handleReturnKnock()">Knock</button>
@@ -990,6 +1063,8 @@ body::after {
 const state = {
   memberCode: '',
   memberName: 'Neighbour',
+  characterName: '',
+  characterBio: '',
   problem: '',
   scene: 0,        // 0 = not started, 1, 2, 3
   choices: [],     // member choices from each scene
@@ -1018,38 +1093,76 @@ function sleep(ms) {
 }
 
 // ============================================
-//   SCREEN 1: LOGIN
+//   SCREEN 1: MEMBER LOGIN
 // ============================================
-function handleEnter() {
-  const name = document.getElementById('visitorName').value.trim();
-  if (!name) {
-    document.getElementById('entryError').textContent = 'Tell us your name, neighbour.';
+async function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const errorEl = document.getElementById('entryError');
+
+  if (!username || !pin) {
+    errorEl.textContent = 'Please enter your username and PIN.';
+    return;
+  }
+  errorEl.textContent = '';
+
+  // Auth against the API
+  try {
+    const res = await fetch(`${API_BASE}/api/tenement`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'start', username, pin })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      state.memberCode = username;
+      state.memberName = data.memberName || username;
+      state.sessionId = data.sessionId || null;
+      showScreen('character-screen');
+    } else {
+      errorEl.textContent = data.error || 'Invalid credentials.';
+    }
+  } catch (e) {
+    // API not available — allow through in demo mode
+    state.memberCode = username;
+    state.memberName = username;
+    showScreen('character-screen');
+  }
+}
+
+// ============================================
+//   SCREEN 2: CHARACTER CREATION
+// ============================================
+function handleCharacterDone() {
+  const charName = document.getElementById('charName').value.trim();
+  const charBio = document.getElementById('charBio').value.trim();
+  const charProblem = document.getElementById('charProblem').value.trim();
+  const errorEl = document.getElementById('charError');
+
+  if (!charName) {
+    errorEl.textContent = 'Give your character a name.';
+    return;
+  }
+  if (!charBio) {
+    errorEl.textContent = 'Write a short bio — who are you in the tenement?';
+    return;
+  }
+  if (!charProblem) {
+    errorEl.textContent = 'What problem are you bringing to the Boyles?';
     return;
   }
 
-  state.memberCode = name.toLowerCase();
-  state.memberName = name;
-
-  // Try to start a session on the backend (no auth required)
-  fetch(`${API_BASE}/api/tenement`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'start', visitorName: name })
-  }).then(r => r.json()).then(data => {
-    if (data.sessionId) state.sessionId = data.sessionId;
-  }).catch(() => {});
+  state.characterName = charName;
+  state.characterBio = charBio;
+  state.problem = charProblem;
 
   showScreen('door-screen');
 }
 
 // ============================================
-//   SCREEN 2: DOOR / KNOCK
+//   SCREEN 3: DOOR / KNOCK
 // ============================================
 async function handleKnock() {
-  const problem = document.getElementById('problemInput').value.trim();
-  if (!problem) return;
-
-  state.problem = problem;
   state.scene = 1;
 
   // Animate the door knock
@@ -1116,7 +1229,8 @@ async function startScene(sceneNum) {
       body: JSON.stringify({
         action: 'scene',
         sceneNum,
-        memberName: state.memberName,
+        characterName: state.characterName,
+        characterBio: state.characterBio,
         memberProblem: state.problem,
         previousChoices: state.choices,
         sessionId: state.sessionId
@@ -1233,6 +1347,7 @@ function getCharKey(name) {
   if (n.includes('MARY')) return 'mary';
   if (n.includes('MADIGAN') || n.includes('MAISIE')) return 'madigan';
   if (n.includes('MEMBER') || n.includes('NEIGHBOUR') || n.includes('YOU')) return 'member';
+  if (state.characterName && n.includes(state.characterName.toUpperCase())) return 'member';
   if (n.includes('MRS. TANCRED') || n.includes('TANCRED')) return 'johnny'; // use grey
   if (n.includes('NUGENT')) return 'joxer'; // reuse olive
   if (n.includes('MOBILIZER') || n.includes('IRREGULAR')) return 'johnny';
@@ -1241,7 +1356,7 @@ function getCharKey(name) {
 
 function getDisplayName(rawName) {
   const n = rawName.toUpperCase();
-  if (n.includes('MEMBER') || n.includes('NEIGHBOUR') || n.includes('YOU')) return 'You';
+  if (n.includes('MEMBER') || n.includes('NEIGHBOUR') || n.includes('YOU')) return state.characterName || 'You';
   return rawName;
 }
 
@@ -1264,9 +1379,10 @@ async function playScene(messages, sceneNum) {
 
   // Scene 1: the member explains their problem on entry
   if (sceneNum === 1 && state.problem) {
-    addStageDirection(container, '(The door opens. You step inside and explain what\'s troubling you.)');
+    const charLabel = state.characterName || 'You';
+    addStageDirection(container, `(The door opens. ${charLabel} steps inside and explains what's troubling them.)`);
     await sleep(1500);
-    addMessage(container, 'You', 'member', state.problem);
+    addMessage(container, charLabel, 'member', state.problem);
     scrollToBottom(container);
     await sleep(2500);
   }
@@ -1356,7 +1472,7 @@ async function playScene(messages, sceneNum) {
       state.choices.push(choice);
 
       // Show member's response as a chat message
-      addMessage(container, 'You', 'member', choice);
+      addMessage(container, state.characterName || 'You', 'member', choice);
       scrollToBottom(container);
       await sleep(2000);
     }
@@ -1460,7 +1576,7 @@ async function showEndScreen() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'summary',
-        memberName: state.memberName,
+        characterName: state.characterName,
         memberProblem: state.problem,
         choices: state.choices,
         junoFinalLine: state.junoFinalLine,
@@ -1502,7 +1618,7 @@ async function showEndScreen() {
 //   DEMO DIALOGUE (offline testing)
 // ============================================
 function getDemoDialogue(sceneNum) {
-  const name = state.memberName || 'Neighbour';
+  const name = state.characterName || 'Neighbour';
   const problem = state.problem || 'a terrible row';
 
   if (sceneNum === 1) {
@@ -1713,15 +1829,11 @@ function scrollToBottom(el) {
 }
 
 // Enter key on inputs
-document.getElementById('visitorName').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleEnter();
+document.getElementById('loginUsername').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loginPin').focus();
 });
-
-document.getElementById('problemInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    handleKnock();
-  }
+document.getElementById('loginPin').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
 });
 </script>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>The Tenement | Irish Network NOLA</title>
+<title>The Sean O'Casey Experience | Irish Network NOLA</title>
 <link rel="icon" type="image/png" href="../../assets/in_logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Libre+Franklin:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -1462,14 +1462,14 @@ body::after {
     <div class="entry-date">March 8th, 2026</div>
 
     <div class="entry-venue">
-      <div>The Tenement &mdash; IN-NOLA Village</div>
+      <div>The Se&aacute;n O'Casey Experience &mdash; IN-NOLA Village</div>
     </div>
   </div>
 
   <!-- RIGHT COLUMN: Actions -->
   <div class="entry-action-col">
     <p class="entry-flavour">
-      Dublin, 1922. You live in a tenement on Hilljoy Square.
+      Dublin, 1922. You live on Hilljoy Square.
       The Boyle family is on your landing. You've got a problem.
       Sign in to create your character and knock on their door.
     </p>
@@ -1516,7 +1516,7 @@ body::after {
 
     <h2 class="char-create-title">Create Your Character</h2>
     <p class="char-create-sub">
-      You're about to step into a Dublin tenement in 1922. The Civil War is raging.
+      You're about to step into Dublin, 1922. The Civil War is raging.
       The Boyles have their own troubles &mdash; but you've got yours.
       The richer your character, the more alive the scene becomes.
     </p>
@@ -1558,7 +1558,7 @@ body::after {
   <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem;">
 
     <div class="door-container" id="theDoor">
-      <img src="door.webp" alt="Tenement door" class="door-photo">
+      <img src="door.webp" alt="The door to the Boyle flat" class="door-photo">
     </div>
 
     <!-- First visit -->
@@ -1792,7 +1792,7 @@ function handleCharacterDone() {
     return;
   }
   if (!charBio) {
-    errorEl.textContent = 'Write a short bio — who are you in the tenement?';
+    errorEl.textContent = 'Write a short bio — who are you on this landing?';
     return;
   }
   if (!charProblem) {
@@ -2112,7 +2112,7 @@ async function showTransition(fromScene) {
   const transitions = {
     1: {
       text: 'A few days pass...',
-      setting: 'The same tenement flat, but transformed. New furniture, a gramophone, whisky on the dresser. Everything looks prosperous. Nothing is paid for.'
+      setting: 'The same flat, but transformed. New furniture, a gramophone, whisky on the dresser. Everything looks prosperous. Nothing is paid for.'
     },
     2: {
       text: 'Two months later. November.',

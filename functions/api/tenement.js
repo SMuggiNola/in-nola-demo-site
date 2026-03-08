@@ -1,5 +1,5 @@
-// Tenement API - Cloudflare Pages Function
-// Orchestrates "The Tenement" interactive literary experience
+// Sean O'Casey Experience API - Cloudflare Pages Function
+// Orchestrates "The Sean O'Casey Experience" interactive literary experience
 // based on Sean O'Casey's "Juno and the Paycock"
 // Requires KV bindings: TENEMENT_KV, BOARD_KV (members)
 // Requires secrets: MISTRAL_API_KEY, TENEMENT_ADMIN_KEY

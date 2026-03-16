@@ -188,6 +188,10 @@
         </div>
       </div>
 
+      <!-- Operations & Support -->
+      <h2 id="support-heading" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--gold-muted); color: var(--gold-light); font-size: 1.5rem;">Operations &amp; Support</h2>
+      <div id="support-grid" class="board-grid"></div>
+
       <!-- Edit Link for Board Members -->
       <a href="./board-edit.html" class="edit-link">Board Member? Edit Your Profile &rarr;</a>
 
@@ -211,7 +215,10 @@
       { id: 'andrew', name: 'Andrew Jones', role: 'Grant Manager', email: '', bio: 'Andrew Jones joined the board of Irish Network New Orleans in 2025...', photo: '', photoCrop: { zoom: 100, offsetX: 0, offsetY: 0 } },
       { id: 'joni', name: 'Joni Muggivan', role: 'Treasurer', email: '', bio: 'A lifelong resident of the Greater New Orleans area...', photo: '', photoCrop: { zoom: 100, offsetX: 0, offsetY: 0 } },
       { id: 'colm', name: 'Colm Kennedy', role: 'Event Coordinator', email: '', bio: 'Details about event planning experience...', photo: '', photoCrop: { zoom: 100, offsetX: 0, offsetY: 0 } },
-      { id: 'sean', name: 'Seán Muggivan, LCSW', role: 'Data Manager & AI Strategist', email: 'muggs@muggsofdatasci.net', bio: 'Seán Muggivan, LCSW, is a Licensed Clinical Social Worker...', photo: '', photoCrop: { zoom: 100, offsetX: 0, offsetY: 0 } }
+    ];
+
+    const fallbackSupport = [
+      { id: 'sean', name: 'Seán Muggivan, LCSW', role: 'Data Manager & AI Strategist', email: 'sean@muggivanlcsw.me', bio: 'Seán Muggivan, LCSW, supports the IN-NOLA board and network with data management, technology strategy, and AI-driven tools to help the organization grow and stay connected with its community.', photo: '', photoCrop: { zoom: 100, offsetX: 0, offsetY: 0 } }
     ];
 
     function getInitials(name) {
@@ -268,21 +275,30 @@
       }
     }
 
+    // IDs that belong in the support section, not the board
+    const supportIds = ['sean'];
+
     async function loadBoardMembers() {
       const grid = document.getElementById('board-grid');
+      const supportGrid = document.getElementById('support-grid');
 
       try {
         const response = await fetch('/api/board');
         if (!response.ok) throw new Error('API error');
 
         const data = await response.json();
-        const members = data.members || fallbackMembers;
+        const allMembers = data.members || fallbackMembers;
 
-        grid.innerHTML = members.map(renderMember).join('');
+        const boardMembers = allMembers.filter(m => !supportIds.includes(m.id));
+        const supportMembers = allMembers.filter(m => supportIds.includes(m.id));
+
+        grid.innerHTML = boardMembers.map(renderMember).join('');
+        supportGrid.innerHTML = (supportMembers.length ? supportMembers : fallbackSupport).map(renderMember).join('');
 
       } catch (error) {
         console.log('Could not load from API, using fallback:', error);
-        grid.innerHTML = fallbackMembers.map(renderMember).join('');
+        grid.innerHTML = fallbackMembers.filter(m => !supportIds.includes(m.id)).map(renderMember).join('');
+        supportGrid.innerHTML = fallbackSupport.map(renderMember).join('');
       }
     }
 

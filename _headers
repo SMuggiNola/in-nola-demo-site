@@ -1,4 +1,4 @@
-# Always revalidate JS so code updates reach members immediately
-# (small files; ETag makes this cheap — 304 when unchanged).
 /js/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-cache
+/global.css
+  Cache-Control: no-cache

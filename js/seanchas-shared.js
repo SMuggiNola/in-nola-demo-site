@@ -146,6 +146,10 @@
           <label for="sqStory">The story * <span class="opt">(keep it on the short side)</span></label>
           <textarea id="sqStory" required placeholder="Tell it in your own words — a summary is perfect."></textarea>
         </div>
+        <div class="form-group">
+          <label for="sqNextSteps">Next steps <span class="opt">(optional)</span></label>
+          <textarea id="sqNextSteps" style="min-height:80px;" placeholder="Where you'd like to take this next — records to check, questions to answer, leads to follow."></textarea>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label for="sqPlace">Place <span class="opt">(optional)</span></label>
@@ -278,6 +282,7 @@
     $('sqTitle').value = s.title || ''; $('sqContributor').value = s.contributor || ''; $('sqContributor').readOnly = false;
     $('sqPeople').value = s.people || ''; $('sqStory').value = s.story || '';
     $('sqPlace').value = s.place || ''; $('sqEra').value = s.era || '';
+    $('sqNextSteps').value = s.nextSteps || '';
     if (s.image) { $('sqImagePreviewImg').src = s.image; $('sqImagePreview').style.display = 'block'; $('sqImageRemoveWrap').style.display = 'flex'; }
     var vis = s.visibility || 'public';
     $('sqVisibility').value = vis;
@@ -320,6 +325,7 @@
         title: $('sqTitle').value.trim(), contributor: $('sqContributor').value.trim(),
         story: $('sqStory').value.trim(), people: $('sqPeople').value.trim(),
         place: $('sqPlace').value.trim(), era: $('sqEra').value.trim(),
+        nextSteps: $('sqNextSteps').value.trim(),
         visibility: vis, sharedWith: vis === 'shared' ? collectShared() : [],
         commentsOpen: $('sqCommentsOpen').checked
       };

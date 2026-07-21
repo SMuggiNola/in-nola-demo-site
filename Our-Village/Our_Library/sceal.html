@@ -17,6 +17,9 @@
     .sceal-meta { color: var(--gold-light); font-style: italic; font-size: 0.95rem; margin-bottom: 1.25rem; }
     .sceal img { width: 100%; max-height: 460px; object-fit: contain; border-radius: 1rem; margin-bottom: 1.25rem; }
     .sceal .story { font-size: 1.15rem; color: var(--gold-light); line-height: 1.8; white-space: pre-wrap; }
+    .next-steps { margin-top: 1.5rem; padding: 1rem 1.25rem; background: rgba(212,167,38,0.08); border: 1px solid rgba(212,167,38,0.3); border-left: 3px solid var(--gold); border-radius: 0.6rem; }
+    .next-steps h3 { color: var(--gold); font-size: 1rem; margin: 0 0 0.5rem; letter-spacing: 0.03em; text-transform: uppercase; }
+    .next-steps .ns-text { color: var(--gold-light); line-height: 1.7; white-space: pre-wrap; }
     .sceal .byline { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.95rem; }
     .sceal .byline a { color: var(--gold); text-decoration: none; }
     .sceal .byline a:hover { text-decoration: underline; }
@@ -93,6 +96,7 @@
         ${metaBits.length ? `<div class="sceal-meta">${metaBits.join(' · ')}</div>` : ''}
         ${s.image ? `<img src="${s.image}" alt="${esc(s.title)}">` : ''}
         <div class="story">${esc(s.story)}</div>
+        ${s.nextSteps ? `<div class="next-steps"><h3>Next Steps</h3><div class="ns-text">${esc(s.nextSteps)}</div></div>` : ''}
         <p class="byline">— told by ${author}${s.createdAt ? ' · ' + fmtDate(s.createdAt) : ''}</p>`;
       if (s._canEdit) {
         html += `<div class="owner-controls">

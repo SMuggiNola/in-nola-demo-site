@@ -12,6 +12,26 @@
  * After login, the user is sent back to the page they originally tried to visit.
  */
 (function () {
+  // Hydrate the legacy sessionStorage keys from the canonical localStorage
+  // session, so a login made through ANY door is recognised here too.
+  try {
+    if (sessionStorage.getItem('boardAuth') !== 'true') {
+      var raw = localStorage.getItem('innola_member_session');
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (!s.expiresAt || Date.now() <= s.expiresAt) {
+          sessionStorage.setItem('boardAuth', 'true');
+          sessionStorage.setItem('boardUser', s.username || '');
+          sessionStorage.setItem('userRole', s.role || '');
+          sessionStorage.setItem('adminPassword', s.apiToken || '');
+          sessionStorage.setItem('displayName', s.displayName || s.name || '');
+          sessionStorage.setItem('boardId', s.boardId || '');
+          sessionStorage.setItem('userEmail', s.email || '');
+        }
+      }
+    }
+  } catch (e) { /* ignore */ }
+
   if (sessionStorage.getItem('boardAuth') !== 'true') {
     var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
     window.location.href = '/admin-portal/index.html?return=' + returnUrl;
@@ -71,5 +91,6 @@ function adminLogout() {
   sessionStorage.removeItem('displayName');
   sessionStorage.removeItem('boardId');
   sessionStorage.removeItem('userEmail');
+  localStorage.removeItem('innola_member_session'); // clear the canonical session too
   window.location.href = '/admin-portal/index.html';
 }

@@ -127,6 +127,9 @@ function isMembershipValid() {
  */
 function logout() {
     localStorage.removeItem(AUTH_KEY);
+    // Also clear the legacy sessionStorage mirror used by admin pages.
+    ['boardAuth', 'boardUser', 'userRole', 'adminPassword', 'displayName', 'boardId', 'userEmail']
+        .forEach(function (k) { sessionStorage.removeItem(k); });
 }
 
 /**

@@ -1004,6 +1004,13 @@ p {
   font-size: 1rem;
 }
 
+button.floating-btn {
+  cursor: pointer;
+  font-family: 'Cormorant Garamond', serif;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* =========================================
    Responsive Design (Media Queries)
 ========================================= */

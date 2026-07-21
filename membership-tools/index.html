@@ -72,8 +72,13 @@
 
     <script src="js/auth.js"></script>
     <script>
-        // Redirect if already logged in
-        window.Auth.redirectIfAuthenticated();
+        // Where to send the user after login: back to ?return=… if present.
+        const returnUrl = new URLSearchParams(window.location.search).get('return');
+
+        // If already logged in, go straight there (or the member card).
+        if (window.Auth.getSession()) {
+            window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'certificate.html';
+        }
 
         const form = document.getElementById('loginForm');
         const messageEl = document.getElementById('message');
@@ -151,14 +156,13 @@
             if (result.success) {
                 showMessage('Login successful! Redirecting...', 'success');
 
-                // Role-based redirect
+                // Where to go next: a return URL wins; scanners always go to the scanner.
                 const role = result.user.role;
-                let redirect = 'certificate.html';
+                let redirect;
                 if (role === 'scanner') {
                     redirect = 'scanner.html';
-                } else if (role === 'board' || role === 'architect') {
-                    // Board/architect can access member cert but also admin portal
-                    redirect = 'certificate.html';
+                } else {
+                    redirect = returnUrl ? decodeURIComponent(returnUrl) : 'certificate.html';
                 }
 
                 setTimeout(function() {

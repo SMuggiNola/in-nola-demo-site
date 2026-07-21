@@ -451,22 +451,13 @@
                     window.location.hostname === 'localhost' ||
                     window.location.port === '5500';
 
-    // A logged-in user carries a session token + identity in sessionStorage.
-    function adminPassword() { return sessionStorage.getItem('adminPassword') || ''; }
-    function sessionUsername() { return sessionStorage.getItem('boardUser') || ''; }
-    function sessionRole() { return sessionStorage.getItem('userRole') || ''; }
-    function sessionName() { return sessionStorage.getItem('displayName') || ''; }
-    // Board members / architect can edit & delete.
-    function isAdmin() {
-      return sessionStorage.getItem('boardAuth') === 'true' &&
-             ['board', 'architect'].includes(sessionRole()) && !!adminPassword();
-    }
+    // Identity comes from the unified site session (window.Session, from main.js).
+    function adminPassword() { return window.Session ? window.Session.apiToken() : ''; }
+    function sessionUsername() { return window.Session ? window.Session.username() : ''; }
+    function sessionName() { return window.Session ? window.Session.displayName() : ''; }
     // Any logged-in member (or board/architect) may add a scéal. Active status is
     // enforced server-side; this only controls whether the button is shown.
-    function isMemberLoggedIn() {
-      return sessionStorage.getItem('boardAuth') === 'true' &&
-             ['member', 'board', 'architect'].includes(sessionRole());
-    }
+    function isMemberLoggedIn() { return !!(window.Session && window.Session.isMember()); }
 
     // Show the Add button only to logged-in members; otherwise show the login gate.
     function refreshAddGate() {

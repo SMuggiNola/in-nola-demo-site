@@ -190,6 +190,24 @@
           sessionStorage.setItem('boardId', data.user.boardId || '');
           sessionStorage.setItem('userEmail', data.user.email || '');
 
+          // Canonical site-wide session (localStorage) so every page recognises this login.
+          localStorage.setItem('innola_member_session', JSON.stringify({
+            username: data.user.username,
+            role: data.user.role,
+            displayName: data.user.displayName || '',
+            name: data.user.displayName || '',
+            boardId: data.user.boardId || null,
+            memberId: data.user.memberId || null,
+            email: data.user.email || '',
+            memberType: data.user.memberType || null,
+            joinDate: data.user.joinDate || null,
+            expirationDate: data.user.expirationDate || null,
+            qrSignature: data.user.qrSignature || null,
+            apiToken: data.apiToken,
+            loginTime: Date.now(),
+            expiresAt: Date.now() + 24 * 60 * 60 * 1000
+          }));
+
           // Role-based redirect
           const role = data.user.role;
 

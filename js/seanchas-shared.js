@@ -191,9 +191,10 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="sqSeanchasTitle">Your personal seanchas title <span class="opt">(optional)</span></label>
-          <input type="text" id="sqSeanchasTitle" placeholder="e.g., Scéalta Sheáin Uí Mhongabháin">
-          <p class="hint">Names your whole collection on the Seanchas page. Leave blank to use your name.</p>
+          <label for="sqSeanchasName">Seanchas <span class="opt">(which collection this belongs to)</span></label>
+          <input type="text" id="sqSeanchasName" list="sqSeanchasNames" autocomplete="off" placeholder="e.g., Scéalta Sheáin Uí Mhongabháin">
+          <datalist id="sqSeanchasNames"></datalist>
+          <p class="hint">Type an existing seanchas to add to it (a family collection can span members), or a new name to start your own.</p>
         </div>
         <div class="form-group">
           <label class="sq-check"><input type="checkbox" id="sqCommentsOpen"> Welcome IN-NOLA member input (open comments)</label>
@@ -268,6 +269,22 @@
     return Array.prototype.slice.call(document.querySelectorAll('#sqShareList .sq-share-cb')).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
   }
 
+  // Populate the seanchas-name autocomplete from existing collections the viewer can see.
+  // When setDefault, prefill the field with the member's most-recent seanchas (or their name).
+  async function loadSeanchasNames(setDefault) {
+    try {
+      var d = await API.feed();
+      var scealta = d.scealta || [];
+      var names = [], seen = {};
+      scealta.forEach(function (s) { if (s.seanchasName && !seen[s.seanchasName]) { seen[s.seanchasName] = 1; names.push(s.seanchasName); } });
+      $('sqSeanchasNames').innerHTML = names.map(function (n) { return '<option value="' + esc(n) + '">'; }).join('');
+      if (setDefault && S() && !formDirty) {
+        var mine = scealta.filter(function (s) { return s.authorId === S().memberId(); });
+        $('sqSeanchasName').value = mine.length ? mine[0].seanchasName : ('Scéalta ' + S().displayName());
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   function resetImage() {
     pendingImage = null; rawImageEl = null;
     $('sqImage').value = ''; $('sqImagePreview').style.display = 'none';
@@ -293,7 +310,8 @@
     var cf = $('sqContributor'); cf.value = nm; cf.readOnly = false; // editable so you can render your name in Irish
     $('sqVisibility').value = 'public'; $('sqSharePicker').style.display = 'none'; $('sqShareList').innerHTML = '';
     $('sqCommentsOpen').checked = false;
-    $('sqSeanchasTitle').value = '';
+    $('sqSeanchasName').value = S() ? ('Scéalta ' + S().displayName()) : '';
+    loadSeanchasNames(true);
     hideStatus(); formDirty = false; $('sqModal').classList.add('active');
   }
 
@@ -310,7 +328,8 @@
     if (vis === 'shared') { $('sqSharePicker').style.display = 'block'; renderShareList(s.sharedWith || []); }
     else $('sqSharePicker').style.display = 'none';
     $('sqCommentsOpen').checked = !!s.commentsOpen;
-    $('sqSeanchasTitle').value = s.authorTitle || '';
+    $('sqSeanchasName').value = s.seanchasName || '';
+    loadSeanchasNames(false);
     $('sqModalTitle').textContent = 'Edit Scéal';
     $('sqModalSub').textContent = 'Edit this scéal, who can read it, and whether comments are open.';
     $('sqSubmit').textContent = 'Save Changes';
@@ -363,9 +382,7 @@
         commentsOpen: $('sqCommentsOpen').checked
       };
       if (imageVal !== undefined) payload.image = imageVal;
-      // Only overwrite the stored collection title when editing (field prefilled) or when set on add.
-      var seanchasTitle = $('sqSeanchasTitle').value.trim();
-      if (editing || seanchasTitle) payload.seanchasTitle = seanchasTitle;
+      payload.seanchasName = $('sqSeanchasName').value.trim();
       btn.disabled = true; btn.textContent = editing ? 'Saving…' : 'Adding…';
       try {
         var result = editing ? await API.edit(Object.assign({ id: id }, payload)) : await API.create(payload);

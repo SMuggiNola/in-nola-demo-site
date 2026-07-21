@@ -32,8 +32,13 @@
     .add-gate { text-align: center; color: var(--text-secondary); font-size: 0.95rem; margin: 0; }
     .add-gate a { color: var(--gold); }
 
+    .browse-toggle { max-width: 700px; margin: 1.5rem auto 0; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .browse-toggle a { padding: 0.4rem 0.9rem; border-radius: 999px; border: 1px solid var(--glass-border); color: #fff; text-decoration: none; font-size: 0.85rem; }
+    .browse-toggle a.active { background: rgba(212,167,38,0.15); border-color: var(--gold); color: var(--gold); }
+    .browse-toggle a:hover { border-color: var(--gold); }
+
     .list-header {
-      max-width: 700px; margin: 2.5rem auto 1rem; display: flex; align-items: baseline;
+      max-width: 700px; margin: 1rem auto 1rem; display: flex; align-items: baseline;
       justify-content: space-between; border-bottom: 1px solid rgba(212,167,38,0.3); padding-bottom: 0.5rem;
     }
     .list-header h2 { font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; color: var(--gold); margin: 0; }
@@ -98,11 +103,11 @@
         <p class="add-gate" id="addScealGate" style="display:none;"><a href="/membership-tools/index.html">Log in as a member</a> to add your scéal.</p>
       </div>
 
+      <div class="browse-toggle" id="browseToggle"></div>
       <div class="list-header">
-        <h2 id="listTitle">Personal Seanchas</h2>
+        <h2 id="listTitle">Seanchas</h2>
         <span class="count" id="listCount"></span>
       </div>
-      <div id="authorNav" style="max-width:700px;margin:0 auto 0.75rem;display:none;"><a href="./seanchas.html" style="color:var(--gold);font-size:0.85rem;text-decoration:none;">← All scéalta</a></div>
 
       <div id="scealtaList"><p class="loading-message">Gathering the scéalta…</p></div>
 
@@ -111,12 +116,16 @@
     <div id="main-footer-placeholder"></div>
   </div>
 
-  <script src="../../js/main.js?v=4"></script>
-  <script src="../../js/seanchas-shared.js?v=4"></script>
+  <script src="../../js/main.js?v=5"></script>
+  <script src="../../js/seanchas-shared.js?v=5"></script>
   <script>
     const UI = window.SeanchasUI;
     const esc = UI.esc;
-    const authorFilter = new URLSearchParams(location.search).get('author');
+    const params = new URLSearchParams(location.search);
+    const authorFilter = params.get('author');
+    const seanchasFilter = params.get('seanchas');
+    const view = params.get('view') || 'seanchas'; // seanchas | member | all
+    const enc = encodeURIComponent;
 
     function refreshGate() {
       const inMember = UI.isLoggedIn();
@@ -124,8 +133,10 @@
       document.getElementById('addScealGate').style.display = inMember ? 'none' : 'block';
     }
 
-    // A single scéal, shown inside a member's personal seanchas (author view).
-    function scealRowHtml(s) {
+    function nameOf(s) { return s.seanchasName || ('Scéalta ' + s.contributor); }
+
+    // One scéal row; showAuthor adds a "by <author>" link (for collections that span members).
+    function scealRowHtml(s, showAuthor) {
       const metaBits = [];
       if (s.people) metaBits.push(esc(s.people));
       if (s.place) metaBits.push(esc(s.place));
@@ -133,70 +144,114 @@
       const meta = metaBits.length ? `<div class="sceal-row-meta">${metaBits.join(' · ')}</div>` : '';
       const badge = (s.visibility && s.visibility !== 'public')
         ? ` <span class="sq-badge ${s.visibility === 'private' ? 'private' : ''}">${UI.visLabel(s.visibility)}</span>` : '';
-      const bits = [];
-      if (s.commentCount) bits.push(`💬 ${s.commentCount}`);
-      else if (s.commentsOpen) bits.push('open for input');
+      const by = [];
+      if (showAuthor && s.authorId) by.push(`by <a href="./seanchas.html?author=${enc(s.authorId)}">${esc(s.contributor)}</a>`);
+      if (s.commentCount) by.push(`💬 ${s.commentCount}`);
+      else if (s.commentsOpen) by.push('open for input');
       return `<div class="sceal-row">
-        <a class="sceal-row-title" href="./sceal.html?id=${encodeURIComponent(s.id)}">${esc(s.title)}</a>${badge}
+        <a class="sceal-row-title" href="./sceal.html?id=${enc(s.id)}">${esc(s.title)}</a>${badge}
         ${meta}
-        ${bits.length ? `<div class="sceal-row-by">${bits.join(' · ')}</div>` : ''}
+        ${by.length ? `<div class="sceal-row-by">${by.join(' · ')}</div>` : ''}
       </div>`;
     }
 
-    // A member's personal seanchas — a link to all their scéalta.
-    function personalRowHtml(g) {
-      const heading = g.title || ('Scéalta ' + g.name);
+    function collectionRowHtml(g) {
+      const sub = `${g.count === 1 ? '1 scéal' : g.count + ' scéalta'}${g.authors > 1 ? ` · ${g.authors} contributors` : ''}`;
       return `<div class="sceal-row">
-        <a class="sceal-row-title" href="./seanchas.html?author=${encodeURIComponent(g.authorId)}">${esc(heading)}</a>
+        <a class="sceal-row-title" href="./seanchas.html?seanchas=${enc(g.name)}">${esc(g.name)}</a>
+        <div class="sceal-row-by">${sub}</div>
+      </div>`;
+    }
+
+    function memberRowHtml(g) {
+      return `<div class="sceal-row">
+        <a class="sceal-row-title" href="./seanchas.html?author=${enc(g.authorId)}">Scéalta ${esc(g.name)}</a>
         <div class="sceal-row-by">${g.count === 1 ? '1 scéal' : g.count + ' scéalta'}</div>
       </div>`;
     }
 
+    function renderToggle(activeView, drill) {
+      const el = document.getElementById('browseToggle');
+      if (drill) { el.innerHTML = `<a href="./seanchas.html">← All seanchas</a>`; return; }
+      const opts = [['seanchas', 'By seanchas'], ['member', 'By member'], ['all', 'All scéalta']];
+      el.innerHTML = opts.map(([v, l]) => `<a href="./seanchas.html?view=${v}" class="${v === activeView ? 'active' : ''}">${l}</a>`).join('');
+    }
+
+    function setEmpty(msg) {
+      document.getElementById('scealtaList').innerHTML = `<p class="no-scealta">${msg}</p>`;
+      document.getElementById('listCount').textContent = '';
+    }
+    function setList(html, count, singular, plural) {
+      document.getElementById('scealtaList').innerHTML = html;
+      document.getElementById('listCount').textContent = count + ' ' + (count === 1 ? singular : plural);
+    }
+
     function render(scealta) {
-      const listEl = document.getElementById('scealtaList');
-      const countEl = document.getElementById('listCount');
       const titleEl = document.getElementById('listTitle');
 
-      if (authorFilter) {
-        // A single member's personal seanchas.
-        const list = scealta.filter(s => s.authorId === authorFilter);
-        const who = list.length ? list[0].contributor : 'this member';
-        titleEl.textContent = (list.length && list[0].authorTitle) ? list[0].authorTitle : `Scéalta ${who}`;
-        document.getElementById('authorNav').style.display = 'block';
-        if (!list.length) { listEl.innerHTML = '<p class="no-scealta">No scéalta here yet.</p>'; countEl.textContent = ''; return; }
-        listEl.innerHTML = list.map(scealRowHtml).join('');
-        countEl.textContent = list.length === 1 ? '1 scéal' : `${list.length} scéalta`;
+      // Drill-down: a single named seanchas (may span members)
+      if (seanchasFilter) {
+        renderToggle(null, true);
+        const list = scealta.filter(s => nameOf(s) === seanchasFilter);
+        titleEl.textContent = seanchasFilter;
+        if (!list.length) return setEmpty('No scéalta in this seanchas yet.');
+        setList(list.map(s => scealRowHtml(s, true)).join(''), list.length, 'scéal', 'scéalta');
         return;
       }
 
-      // Landing: group scéalta into personal seanchas, one per author.
-      const groups = {};
-      scealta.forEach(s => {
-        if (!s.authorId) return;
-        if (!groups[s.authorId]) groups[s.authorId] = { authorId: s.authorId, name: s.contributor, title: s.authorTitle || '', count: 0, latest: s.createdAt };
-        groups[s.authorId].count++;
-        if (new Date(s.createdAt) >= new Date(groups[s.authorId].latest)) { groups[s.authorId].latest = s.createdAt; groups[s.authorId].name = s.contributor; groups[s.authorId].title = s.authorTitle || ''; }
-      });
-      const entries = Object.keys(groups).map(k => groups[k]).sort((a, b) => new Date(b.latest) - new Date(a.latest));
-
-      titleEl.textContent = 'Personal Seanchas';
-      if (!entries.length) {
-        listEl.innerHTML = '<p class="no-scealta">No scéalta yet — a member’s first scéal starts their personal seanchas here.</p>';
-        countEl.textContent = '';
-      } else {
-        listEl.innerHTML = entries.map(personalRowHtml).join('');
-        countEl.textContent = entries.length === 1 ? '1 personal seanchas' : `${entries.length} personal seanchas`;
+      // Drill-down: a single member
+      if (authorFilter) {
+        renderToggle(null, true);
+        const list = scealta.filter(s => s.authorId === authorFilter);
+        titleEl.textContent = 'Scéalta ' + (list.length ? list[0].contributor : 'this member');
+        if (!list.length) return setEmpty('No scéalta here yet.');
+        setList(list.map(s => scealRowHtml(s, false)).join(''), list.length, 'scéal', 'scéalta');
+        return;
       }
+
+      renderToggle(view, false);
+
+      if (view === 'all') {
+        titleEl.textContent = 'All scéalta';
+        if (!scealta.length) return setEmpty('No scéalta yet — be the first to add one.');
+        setList(scealta.map(s => scealRowHtml(s, true)).join(''), scealta.length, 'scéal', 'scéalta');
+        return;
+      }
+
+      if (view === 'member') {
+        titleEl.textContent = 'By member';
+        const g = {};
+        scealta.forEach(s => {
+          if (!s.authorId) return;
+          if (!g[s.authorId]) g[s.authorId] = { authorId: s.authorId, name: s.contributor, count: 0, latest: s.createdAt };
+          g[s.authorId].count++;
+          if (new Date(s.createdAt) >= new Date(g[s.authorId].latest)) { g[s.authorId].latest = s.createdAt; g[s.authorId].name = s.contributor; }
+        });
+        const entries = Object.keys(g).map(k => g[k]).sort((a, b) => new Date(b.latest) - new Date(a.latest));
+        if (!entries.length) return setEmpty('No scéalta yet.');
+        setList(entries.map(memberRowHtml).join(''), entries.length, 'member', 'members');
+        return;
+      }
+
+      // default: by seanchas (collections, which may span members)
+      titleEl.textContent = 'Seanchas';
+      const g = {};
+      scealta.forEach(s => {
+        const name = nameOf(s);
+        if (!g[name]) g[name] = { name, count: 0, authorSet: {}, latest: s.createdAt };
+        g[name].count++;
+        if (s.authorId) g[name].authorSet[s.authorId] = 1;
+        if (new Date(s.createdAt) > new Date(g[name].latest)) g[name].latest = s.createdAt;
+      });
+      const entries = Object.keys(g).map(k => ({ name: g[k].name, count: g[k].count, latest: g[k].latest, authors: Object.keys(g[k].authorSet).length }))
+        .sort((a, b) => new Date(b.latest) - new Date(a.latest));
+      if (!entries.length) return setEmpty('No scéalta yet — a member’s first scéal starts a seanchas here.');
+      setList(entries.map(collectionRowHtml).join(''), entries.length, 'seanchas', 'seanchas');
     }
 
     async function load() {
-      try {
-        const data = await UI.API.feed();
-        render(data.scealta || []);
-      } catch (err) {
-        console.error('Seanchas load failed:', err);
-        render([]);
-      }
+      try { render((await UI.API.feed()).scealta || []); }
+      catch (err) { console.error('Seanchas load failed:', err); render([]); }
     }
 
     UI.init({ onSaved: () => load(), onDeleted: () => load() });

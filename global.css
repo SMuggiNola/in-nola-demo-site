@@ -565,7 +565,34 @@ p {
 .page-content {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Ensure children are centered */
+  align-items: center; /* buttons/forms stay centered as designed */
+  text-align: left;    /* but content text reads left */
+}
+/* Stretch content-text blocks to the full column width so they left-justify
+   (buttons and other direct children stay centered via align-items). */
+.page-content > h1,
+.page-content > h2,
+.page-content > h3,
+.page-content > h4,
+.page-content > h5,
+.page-content > h6,
+.page-content > p,
+.page-content > ul,
+.page-content > ol,
+.page-content > section,
+.page-content > details,
+.page-content > blockquote,
+.page-content > .member-content,
+.page-content > .board-member,
+.page-content > .back-link {
+  align-self: stretch;
+}
+/* Left-justify content text on every page except the homepage landing.
+   (Footer is re-centered below; the homepage hero/nav stay centered.) */
+body:not(#landing) #main-content {
+  text-align: left;
+}
+.site-footer {
   text-align: center;
 }
 .nav-grid + h2 {

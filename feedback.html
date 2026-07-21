@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="./assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>Help Improve This Site • Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./global.css">
+  <style>
+    body::after { opacity: 0.06; }
+    .fb-intro { max-width: 700px; margin: 0 auto 1.5rem; line-height: 1.7; color: #fff; }
+    .fb-intro p { margin-bottom: 0.75rem; }
+    .fb-intro .lead { font-size: 1.15rem; color: var(--gold-light); }
+
+    .fb-postbox { max-width: 700px; margin: 0 auto 2.5rem; }
+    .fb-postbox textarea {
+      width: 100%; min-height: 110px; padding: 0.85rem; border-radius: 10px; resize: vertical;
+      border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: #fff; font-family: inherit; font-size: 1rem;
+    }
+    .fb-postbox textarea:focus { outline: none; border-color: var(--gold); }
+    .fb-postbox .row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; gap: 1rem; }
+    .fb-status { color: #fff; font-size: 0.9rem; }
+    .fb-gate { max-width: 700px; margin: 0 auto 2.5rem; text-align: center; color: #fff; font-style: italic; }
+    .fb-gate a { color: var(--gold); }
+
+    #fbList { max-width: 700px; margin: 0 auto; }
+    .fb-item { background: rgba(10,60,35,0.7); border: 1px solid rgba(212,175,55,0.4); border-radius: 1rem; padding: 1.1rem 1.3rem; margin-bottom: 1.1rem; }
+    .fb-who { color: var(--gold); font-weight: 600; }
+    .fb-when { color: #fff; opacity: 0.7; font-size: 0.78rem; margin-left: 0.5rem; }
+    .fb-text { color: #fff; line-height: 1.6; margin-top: 0.4rem; white-space: pre-wrap; }
+    .fb-del { float: right; background: none; border: none; color: #fff; opacity: 0.6; font-size: 0.75rem; cursor: pointer; }
+    .fb-del:hover { color: #f87171; opacity: 1; }
+
+    .fb-replies { margin-top: 0.9rem; padding-left: 1rem; border-left: 2px solid rgba(212,167,38,0.3); }
+    .fb-reply { margin-bottom: 0.6rem; }
+    .fb-reply .fb-who { font-size: 0.9rem; }
+    .fb-reply .fb-text { font-size: 0.95rem; }
+    .fb-replyform { margin-top: 0.75rem; display: flex; gap: 0.5rem; }
+    .fb-replyform input {
+      flex: 1; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.2); color: #fff; font-family: inherit; font-size: 0.95rem;
+    }
+    .fb-replyform input:focus { outline: none; border-color: var(--gold); }
+    .fb-replyform button { padding: 0.55rem 1rem; border-radius: 8px; border: 1px solid var(--gold); background: transparent; color: var(--gold); cursor: pointer; font-size: 0.9rem; }
+    .fb-replyform button:hover { background: rgba(212,167,38,0.15); }
+    .loading-message, .fb-empty { text-align: center; color: #fff; opacity: 0.8; padding: 2rem; font-style: italic; }
+  </style>
+</head>
+
+<body>
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <main class="page-content">
+      <h1>Help Improve This Site</h1>
+
+      <div class="fb-intro">
+        <p class="lead">This site needs everyone's feedback — we're cleaning it up together.</p>
+        <p>As you explore and try out features, tell us where it gets clumsy. Where is it hard to navigate? Did you go down a rabbit hole, or land on a page with no real way back? What confused you, felt slow, or looked broken?</p>
+        <p><strong>What simply is just not working for you?</strong> Big or small — every note helps. And feel free to reply to others: "Yeah, I saw that too" tells us it's worth fixing first.</p>
+      </div>
+
+      <div class="fb-postbox" id="fbPostbox" style="display:none;">
+        <textarea id="fbText" placeholder="What did you notice? Where did it trip you up?"></textarea>
+        <div class="row">
+          <span class="fb-status" id="fbStatus"></span>
+          <button type="button" class="btn btn-gold" id="fbPostBtn">Post feedback</button>
+        </div>
+      </div>
+      <p class="fb-gate" id="fbGate" style="display:none;"><a href="/membership-tools/index.html?return=/feedback.html">Log in as a member</a> to post feedback and join the discussion.</p>
+
+      <div id="fbList"><p class="loading-message">Loading feedback…</p></div>
+
+      <div class="back-link" style="margin-top:3rem;"><a href="/index.html">← Back to Home</a></div>
+    </main>
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <script src="./js/main.js?v=5"></script>
+  <script>
+    const S = () => window.Session;
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function creds() { const s = S(); return { username: s ? s.username() : '', apiToken: s ? s.apiToken() : '' }; }
+    function loggedIn() { const s = S(); return !!(s && s.isMember()); }
+    function myId() { const s = S(); return s ? s.memberId() : null; }
+    function isBoard() { const s = S(); return !!(s && s.isBoard()); }
+
+    function fmtDate(iso) {
+      try { return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }); }
+      catch (e) { return ''; }
+    }
+
+    async function api(method, path, bodyObj) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (bodyObj) opts.body = JSON.stringify(bodyObj);
+      const res = await fetch('/api/feedback' + path, opts);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    function refreshGate() {
+      document.getElementById('fbPostbox').style.display = loggedIn() ? 'block' : 'none';
+      document.getElementById('fbGate').style.display = loggedIn() ? 'none' : 'block';
+    }
+
+    function itemHtml(it) {
+      const canDelItem = (myId() && it.memberId === myId()) || isBoard();
+      const replies = (it.comments || []).map(c => {
+        const canDelC = (myId() && c.memberId === myId()) || isBoard();
+        return `<div class="fb-reply">
+          ${canDelC ? `<button class="fb-del" data-del-reply="${it.id}|${c.id}">remove</button>` : ''}
+          <span class="fb-who">${esc(c.name)}</span><span class="fb-when">${fmtDate(c.createdAt)}</span>
+          <div class="fb-text">${esc(c.text)}</div>
+        </div>`;
+      }).join('');
+      const replyForm = loggedIn() ? `<div class="fb-replyform">
+        <input type="text" placeholder="Reply…" data-reply-input="${it.id}">
+        <button type="button" data-reply-btn="${it.id}">Reply</button>
+      </div>` : '';
+      return `<div class="fb-item">
+        ${canDelItem ? `<button class="fb-del" data-del-item="${it.id}">remove</button>` : ''}
+        <span class="fb-who">${esc(it.name)}</span><span class="fb-when">${fmtDate(it.createdAt)}</span>
+        <div class="fb-text">${esc(it.text)}</div>
+        <div class="fb-replies">${replies || '<span class="fb-when" style="opacity:0.5;">No replies yet.</span>'}${replyForm}</div>
+      </div>`;
+    }
+
+    function render(items) {
+      const el = document.getElementById('fbList');
+      if (!items.length) { el.innerHTML = '<p class="fb-empty">No feedback yet — be the first to tell us what to fix.</p>'; return; }
+      el.innerHTML = items.map(itemHtml).join('');
+
+      el.querySelectorAll('[data-reply-btn]').forEach(b => b.addEventListener('click', async () => {
+        const id = b.getAttribute('data-reply-btn');
+        const input = el.querySelector(`[data-reply-input="${id}"]`);
+        const text = input.value.trim(); if (!text) return;
+        b.disabled = true;
+        try { await api('POST', '/comment', Object.assign({ id, text }, creds())); await reload(); }
+        catch (e) { alert(e.message); b.disabled = false; }
+      }));
+      el.querySelectorAll('[data-del-item]').forEach(b => b.addEventListener('click', async () => {
+        if (!confirm('Remove this feedback?')) return;
+        try { await api('DELETE', '', Object.assign({ id: b.getAttribute('data-del-item') }, creds())); reload(); }
+        catch (e) { alert(e.message); }
+      }));
+      el.querySelectorAll('[data-del-reply]').forEach(b => b.addEventListener('click', async () => {
+        const [id, commentId] = b.getAttribute('data-del-reply').split('|');
+        try { await api('POST', '/comment/delete', Object.assign({ id, commentId }, creds())); reload(); }
+        catch (e) { alert(e.message); }
+      }));
+    }
+
+    async function reload() {
+      try { render((await api('GET', '')).items || []); }
+      catch (e) { document.getElementById('fbList').innerHTML = '<p class="fb-empty">Could not load feedback.</p>'; }
+    }
+
+    document.getElementById('fbPostBtn').addEventListener('click', async () => {
+      const ta = document.getElementById('fbText');
+      const text = ta.value.trim();
+      const st = document.getElementById('fbStatus');
+      if (!text) { st.textContent = 'Write something first.'; return; }
+      const btn = document.getElementById('fbPostBtn'); btn.disabled = true; st.textContent = 'Posting…';
+      try {
+        await api('POST', '', Object.assign({ text }, creds()));
+        ta.value = ''; st.textContent = 'Thank you — posted.'; reload();
+      } catch (e) { st.textContent = e.message; }
+      btn.disabled = false;
+    });
+
+    refreshGate();
+    reload();
+  </script>
+</body>
+</html>

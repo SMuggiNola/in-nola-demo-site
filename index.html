@@ -203,6 +203,25 @@
     </div>
   </div>
 
+  <style>
+    .seanchas-activity { max-width: 640px; margin: 2.5rem auto 0; padding: 1.25rem 1.5rem; background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius); }
+    .seanchas-activity .sa-heading { font-family: 'Cinzel Decorative', serif; color: var(--gold); font-size: 1.15rem; text-align: center; margin: 0 0 1rem; }
+    .sa-item { display: block; color: var(--text-secondary); text-decoration: none; font-size: 0.92rem; line-height: 1.5; padding: 0.5rem 0; border-top: 1px solid var(--glass-border); }
+    .sa-item:first-of-type { border-top: none; }
+    .sa-item:hover { color: var(--text-primary); }
+    .sa-item b { color: var(--gold); font-weight: 600; }
+    .sa-item .sa-when { color: var(--text-secondary); opacity: 0.6; font-size: 0.78rem; }
+    .sa-more { display: block; text-align: center; margin-top: 1rem; color: var(--gold); text-decoration: none; font-size: 0.9rem; }
+    .sa-more:hover { text-decoration: underline; }
+  </style>
+
+  <!-- Seanchas Activity Feed -->
+  <section class="seanchas-activity" id="seanchasActivity" style="display:none;">
+    <h2 class="sa-heading">From the Seanchas</h2>
+    <div id="seanchasActivityItems"></div>
+    <a href="./Our-Village/Our_Library/seanchas.html" class="sa-more">Enter the Seanchas →</a>
+  </section>
+
   <!-- Navigation Cards -->
   <section class="nav-cards">
     <a href="./About-IN-NOLA/index.html" class="nav-card nav-card-sign">
@@ -1239,6 +1258,43 @@ document.addEventListener('keydown', function(e) {
   } catch (e) {
     if (isLocal) show(fallback.upcoming[0]);
   }
+})();
+
+// Seanchas activity feed — recent scéalta + comments the viewer may read.
+(async function loadSeanchasActivity() {
+  const wrap = document.getElementById('seanchasActivity');
+  const itemsEl = document.getElementById('seanchasActivityItems');
+  if (!wrap) return;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function ago(iso) {
+    const d = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (d < 3600) return Math.max(1, Math.round(d / 60)) + 'm ago';
+    if (d < 86400) return Math.round(d / 3600) + 'h ago';
+    return Math.round(d / 86400) + 'd ago';
+  }
+
+  const S = window.Session;
+  const creds = (S && S.isLoggedIn()) ? { username: S.username(), apiToken: S.apiToken() } : {};
+
+  try {
+    const res = await fetch('/api/seanchas/activity', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(creds)
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const items = (data.items || []).slice(0, 6);
+    if (!items.length) return;
+
+    itemsEl.innerHTML = items.map(it => {
+      const href = './Our-Village/Our_Library/sceal.html?id=' + encodeURIComponent(it.scealId);
+      const label = it.type === 'comment'
+        ? `<b>${esc(it.who)}</b> commented on <b>${esc(it.scealTitle)}</b>${it.snippet ? ' — “' + esc(it.snippet) + '”' : ''}`
+        : `New scéal: <b>${esc(it.scealTitle)}</b> by ${esc(it.who)}`;
+      return `<a class="sa-item" href="${href}">${label} <span class="sa-when">· ${ago(it.at)}</span></a>`;
+    }).join('');
+    wrap.style.display = '';
+  } catch (e) { /* silent */ }
 })();
 </script>
 

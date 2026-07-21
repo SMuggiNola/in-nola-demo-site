@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>Scéal • An Seanchas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../global.css">
+  <style>
+    body::after { opacity: 0.06; }
+    .uplink { display: inline-block; margin-bottom: 1.5rem; color: var(--gold); text-decoration: none; font-size: 0.95rem; }
+    .uplink:hover { text-decoration: underline; }
+
+    .sceal { max-width: 700px; margin: 0 auto; }
+    .sceal h1 { font-family: 'Cinzel Decorative', serif; color: var(--gold); font-size: 2rem; margin: 0 0 0.4rem; text-align: left; }
+    .sceal-meta { color: var(--gold-light); font-style: italic; font-size: 0.95rem; margin-bottom: 1.25rem; }
+    .sceal img { width: 100%; max-height: 460px; object-fit: contain; border-radius: 1rem; margin-bottom: 1.25rem; }
+    .sceal .story { font-size: 1.15rem; color: var(--gold-light); line-height: 1.8; white-space: pre-wrap; }
+    .sceal .byline { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.95rem; }
+    .sceal .byline a { color: var(--gold); text-decoration: none; }
+    .sceal .byline a:hover { text-decoration: underline; }
+
+    .owner-controls { display: flex; gap: 0.5rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .owner-controls button {
+      background: transparent; border: 1px solid rgba(255,255,255,0.15); color: var(--text-secondary);
+      padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease;
+    }
+    .owner-controls button:hover { border-color: var(--gold); color: var(--gold); }
+    .owner-controls .del:hover { border-color: #f87171; color: #f87171; }
+
+    /* Comments */
+    .comments { max-width: 700px; margin: 2.5rem auto 0; }
+    .comments h2 { font-family: 'Cinzel Decorative', serif; color: var(--gold); font-size: 1.3rem; border-bottom: 1px solid rgba(212,167,38,0.3); padding-bottom: 0.5rem; }
+    .comment { background: rgba(10,60,35,0.5); border: 1px solid var(--glass-border); border-radius: 0.8rem; padding: 0.9rem 1.1rem; margin-bottom: 0.75rem; }
+    .comment .who { color: var(--gold); font-weight: 600; font-size: 0.95rem; }
+    .comment .when { color: var(--text-secondary); font-size: 0.75rem; margin-left: 0.5rem; }
+    .comment .text { color: var(--text-primary); line-height: 1.6; margin-top: 0.35rem; white-space: pre-wrap; }
+    .comment .del-c { float: right; background: none; border: none; color: var(--text-secondary); font-size: 0.75rem; cursor: pointer; opacity: 0.6; }
+    .comment .del-c:hover { color: #f87171; opacity: 1; }
+    .comment-form { margin-top: 1rem; }
+    .comment-form textarea {
+      width: 100%; min-height: 90px; padding: 0.75rem; border-radius: 8px; resize: vertical;
+      border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: var(--text-primary); font-family: inherit; font-size: 1rem;
+    }
+    .comment-form textarea:focus { outline: none; border-color: var(--gold); }
+    .comment-form .row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+    .comment-note { color: var(--text-secondary); font-style: italic; font-size: 0.9rem; margin-top: 1rem; }
+    .comment-note a { color: var(--gold); }
+    .loading-message { text-align: center; color: var(--text-secondary); padding: 2rem; font-style: italic; }
+  </style>
+</head>
+
+<body>
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <main class="page-content">
+      <a href="./seanchas.html" class="uplink">← An Seanchas</a>
+      <div id="scealView"><p class="loading-message">Opening the scéal…</p></div>
+      <div id="commentsView"></div>
+      <div class="back-link" style="margin-top:3rem;"><a href="./seanchas.html">← Back to the Seanchas</a></div>
+    </main>
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <script src="../../js/main.js"></script>
+  <script src="../../js/seanchas-shared.js"></script>
+  <script>
+    const UI = window.SeanchasUI;
+    const esc = UI.esc;
+    const id = new URLSearchParams(location.search).get('id');
+    let current = null;
+
+    function fmtDate(iso) {
+      try { return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }); }
+      catch (e) { return ''; }
+    }
+
+    function renderSceal(s) {
+      current = s;
+      const metaBits = [];
+      if (s.people) metaBits.push(esc(s.people));
+      if (s.place) metaBits.push(esc(s.place));
+      if (s.era) metaBits.push(esc(s.era));
+      const badge = (s.visibility && s.visibility !== 'public')
+        ? ` <span class="sq-badge ${s.visibility === 'private' ? 'private' : ''}">${UI.visLabel(s.visibility)}</span>` : '';
+      const author = s.authorId
+        ? `<a href="./seanchas.html?author=${encodeURIComponent(s.authorId)}">${esc(s.contributor)}</a>`
+        : esc(s.contributor);
+      let html = `<article class="sceal">
+        <h1>${esc(s.title)}${badge}</h1>
+        ${metaBits.length ? `<div class="sceal-meta">${metaBits.join(' · ')}</div>` : ''}
+        ${s.image ? `<img src="${s.image}" alt="${esc(s.title)}">` : ''}
+        <div class="story">${esc(s.story)}</div>
+        <p class="byline">— told by ${author}${s.createdAt ? ' · ' + fmtDate(s.createdAt) : ''}</p>`;
+      if (s._canEdit) {
+        html += `<div class="owner-controls">
+          <button type="button" id="editBtn">Edit</button>
+          <button type="button" class="del" id="delBtn">Delete</button>
+        </div>`;
+      }
+      html += `</article>`;
+      document.getElementById('scealView').innerHTML = html;
+      document.title = s.title + ' • An Seanchas';
+      if (s._canEdit) {
+        document.getElementById('editBtn').addEventListener('click', () => UI.openEdit(current));
+        document.getElementById('delBtn').addEventListener('click', () => UI.openDelete(current));
+      }
+      renderComments(s);
+    }
+
+    function renderComments(s) {
+      const wrap = document.getElementById('commentsView');
+      const comments = s.comments || [];
+      const myId = window.Session ? window.Session.memberId() : null;
+
+      // Show the section if input is open, comments exist, or you can comment.
+      if (!s.commentsOpen && !comments.length && !s._canComment) { wrap.innerHTML = ''; return; }
+
+      let html = `<section class="comments"><h2>Member Input</h2>`;
+      if (!comments.length) {
+        html += `<p class="comment-note">No comments yet.${s._canComment ? ' Start the discussion below.' : ''}</p>`;
+      } else {
+        html += comments.map(c => {
+          const canDel = (myId && c.memberId === myId) || s._canEdit;
+          return `<div class="comment">
+            ${canDel ? `<button class="del-c" data-cid="${c.id}">remove</button>` : ''}
+            <span class="who">${esc(c.name)}</span><span class="when">${fmtDate(c.createdAt)}</span>
+            <div class="text">${esc(c.text)}</div>
+          </div>`;
+        }).join('');
+      }
+
+      if (s._canComment) {
+        html += `<div class="comment-form">
+          <textarea id="commentText" placeholder="Add to the discussion — a memory, a source, a correction, a question…"></textarea>
+          <div class="row">
+            <span class="comment-note" id="commentStatus" style="margin:0;"></span>
+            <button type="button" class="btn btn-gold" id="commentBtn">Post</button>
+          </div>
+        </div>`;
+      } else if (!UI.isLoggedIn()) {
+        html += `<p class="comment-note"><a href="/membership-tools/index.html">Log in as a member</a> to join the discussion.</p>`;
+      }
+      html += `</section>`;
+      wrap.innerHTML = html;
+
+      wrap.querySelectorAll('.del-c').forEach(b => b.addEventListener('click', async () => {
+        try { const r = await UI.API.delComment(s.id, b.getAttribute('data-cid')); renderSceal(r.sceal); }
+        catch (e) { alert(e.message); }
+      }));
+      const cb = document.getElementById('commentBtn');
+      if (cb) cb.addEventListener('click', async () => {
+        const t = document.getElementById('commentText').value.trim();
+        if (!t) return;
+        cb.disabled = true;
+        try { const r = await UI.API.comment(s.id, t); renderSceal(r.sceal); }
+        catch (e) { document.getElementById('commentStatus').textContent = e.message; cb.disabled = false; }
+      });
+    }
+
+    async function load() {
+      if (!id) { document.getElementById('scealView').innerHTML = '<p class="loading-message">No scéal specified.</p>'; return; }
+      try {
+        const data = await UI.API.getOne(id);
+        renderSceal(data.sceal);
+      } catch (err) {
+        document.getElementById('scealView').innerHTML =
+          `<p class="loading-message">This scéal could not be found, or you don't have access to read it.</p>`;
+      }
+    }
+
+    UI.init({
+      onSaved: (s) => { if (s && s.id === id) renderSceal(s); else load(); },
+      onDeleted: () => { location.href = './seanchas.html'; }
+    });
+    load();
+  </script>
+</body>
+</html>

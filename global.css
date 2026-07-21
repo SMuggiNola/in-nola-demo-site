@@ -17,8 +17,8 @@
   --glass-hover: rgba(255, 255, 255, 0.06);
 
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.65);
-  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-secondary: #ffffff;
+  --text-muted: #ffffff;
 
   --radius: 12px;
   --radius-lg: 20px;
@@ -49,6 +49,11 @@ body {
   align-items: center;
   text-align: center;
   overflow-x: hidden;
+}
+
+/* Headings of any kind stay golden; body content is solid white. */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--gold);
 }
 
 /* Animated gradient background */

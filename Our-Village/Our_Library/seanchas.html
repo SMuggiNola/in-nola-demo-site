@@ -253,6 +253,49 @@
     .modal-status { text-align: center; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; display: none; font-size: 0.9rem; }
     .modal-status.success { display: block; background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
     .modal-status.error { display: block; background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+
+    /* Visibility select + share picker */
+    .modal select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      background: rgba(0,0,0,0.2);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .modal select:focus { outline: none; border-color: var(--gold); }
+    .share-picker { margin-top: 0.5rem; }
+    .share-list {
+      max-height: 160px;
+      overflow-y: auto;
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      background: rgba(0,0,0,0.15);
+    }
+    .share-list label {
+      display: flex; align-items: center; gap: 0.5rem;
+      color: var(--text-primary); font-size: 0.9rem;
+      padding: 0.2rem 0; cursor: pointer;
+    }
+    .share-list input[type="checkbox"] { width: auto; }
+    .share-list em { color: var(--text-secondary); font-size: 0.85rem; }
+
+    /* Visibility badge on cards */
+    .vis-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      letter-spacing: 0.03em;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      margin-top: 0.4rem;
+      border: 1px solid rgba(212,167,38,0.4);
+      color: var(--gold-light);
+      background: rgba(212,167,38,0.12);
+    }
+    .vis-badge.private { border-color: rgba(248,113,113,0.5); color: #fca5a5; background: rgba(248,113,113,0.1); }
   </style>
 </head>
 
@@ -361,6 +404,20 @@
             <label for="scealRemoveImage" style="color:#fca5a5;">Remove current photo</label>
           </div>
           <p class="hint">A portrait, a document, a place — anything that belongs with the story.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="scealVisibility">Who can read this scéal?</label>
+          <select id="scealVisibility">
+            <option value="public">Anyone visiting the site</option>
+            <option value="members">Any IN-NOLA member</option>
+            <option value="shared">Only members I choose</option>
+            <option value="private">Only me (private)</option>
+          </select>
+          <div class="share-picker" id="sharePicker" style="display:none;">
+            <p class="hint" style="margin:0.5rem 0 0.35rem;">Tick the members who may read it:</p>
+            <div class="share-list" id="shareList"><em>Loading members…</em></div>
+          </div>
         </div>
 
         <div class="modal-actions">
@@ -473,6 +530,9 @@
       return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // Labels for the visibility badge (only shown for non-public scéalta).
+    const VIS_LABEL = { members: '☘ Members only', shared: '👁 Shared', private: '🔒 Private' };
+
     function createScealCard(s) {
       const metaBits = [];
       if (s.people) metaBits.push(`<span class="people">${esc(s.people)}</span>`);
@@ -480,13 +540,19 @@
       if (s.era) metaBits.push(esc(s.era));
       const meta = metaBits.length ? `<div class="sceal-meta">${metaBits.join(' · ')}</div>` : '';
 
+      // Visibility badge — shown when a scéal is not public (only visible to those who can already see it).
+      const vis = s.visibility || 'public';
+      const badge = (vis !== 'public' && VIS_LABEL[vis])
+        ? `<span class="vis-badge ${vis === 'private' ? 'private' : ''}">${VIS_LABEL[vis]}</span>` : '';
+
       let body = '';
       if (s.image) body += `<img src="${s.image}" alt="${esc(s.title)}">`;
       body += `<div class="story-text">${esc(s.story)}</div>`;
       body += `<p class="tagline">— told by ${esc(s.contributor)}</p>`;
 
+      // Edit / delete shown only when the server says this viewer may edit it.
       let admin = '';
-      if (isAdmin()) {
+      if (s._canEdit) {
         admin = `
           <div class="admin-controls">
             <button type="button" onclick="openEditModal('${s.id}')" ${isLocal ? 'disabled title="Only works on the deployed site"' : ''}>Edit</button>
@@ -500,6 +566,7 @@
             <div class="sceal-heading">
               <div class="sceal-title">${esc(s.title)}</div>
               ${meta}
+              ${badge}
             </div>
             <span class="toggle" style="color:var(--gold);font-size:1.5rem;">+</span>
           </div>
@@ -532,9 +599,17 @@
     ];
 
     async function loadScealta() {
-      const list = document.getElementById('scealtaList');
       try {
-        const res = await fetch('/api/seanchas');
+        let res;
+        if (isMemberLoggedIn()) {
+          // Personalised feed: public + members-only + shared-with-me + my own.
+          res = await fetch('/api/seanchas/feed', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: sessionUsername(), apiToken: adminPassword() })
+          });
+        } else {
+          res = await fetch('/api/seanchas'); // anonymous → public only
+        }
         const ct = res.headers.get('content-type') || '';
         if (!res.ok || !ct.includes('application/json')) { render(fallbackScealta); return; }
         const data = await res.json();
@@ -545,6 +620,47 @@
         render(fallbackScealta);
       }
     }
+
+    // ---- Member directory (for the "share with specific members" picker) ----
+    let directoryCache = null;
+    async function loadDirectory() {
+      if (directoryCache) return directoryCache;
+      try {
+        const res = await fetch('/api/seanchas/directory', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: sessionUsername(), apiToken: adminPassword() })
+        });
+        const data = await res.json();
+        directoryCache = data.members || [];
+      } catch (err) { directoryCache = []; }
+      return directoryCache;
+    }
+
+    async function renderSharePicker(selectedIds) {
+      const wrap = document.getElementById('shareList');
+      const selected = new Set(selectedIds || []);
+      const members = await loadDirectory();
+      if (!members.length) { wrap.innerHTML = '<em>No other members to share with yet.</em>'; return; }
+      wrap.innerHTML = members.map(m =>
+        `<label><input type="checkbox" class="share-cb" value="${esc(m.memberId)}" ${selected.has(m.memberId) ? 'checked' : ''}> ${esc(m.name)}</label>`
+      ).join('');
+    }
+
+    function collectSharedWith() {
+      return Array.from(document.querySelectorAll('#shareList .share-cb'))
+        .filter(cb => cb.checked).map(cb => cb.value);
+    }
+
+    // Toggle the picker when "Only members I choose" is selected.
+    document.getElementById('scealVisibility').addEventListener('change', e => {
+      const picker = document.getElementById('sharePicker');
+      if (e.target.value === 'shared') {
+        picker.style.display = 'block';
+        renderSharePicker(collectSharedWith());
+      } else {
+        picker.style.display = 'none';
+      }
+    });
 
     function render(scealta) {
       allScealta = scealta;
@@ -594,6 +710,10 @@
       const nameField = document.getElementById('scealContributor');
       if (sessionName()) { nameField.value = sessionName(); nameField.readOnly = true; }
       else { nameField.readOnly = false; }
+      // Default a new scéal to public; hide the share picker.
+      document.getElementById('scealVisibility').value = 'public';
+      document.getElementById('sharePicker').style.display = 'none';
+      document.getElementById('shareList').innerHTML = '';
       hideStatus();
       document.getElementById('scealModal').classList.add('active');
     }
@@ -618,8 +738,17 @@
       }
 
       document.getElementById('scealContributor').readOnly = false;
+      // Restore this scéal's visibility + share list.
+      const vis = s.visibility || 'public';
+      document.getElementById('scealVisibility').value = vis;
+      if (vis === 'shared') {
+        document.getElementById('sharePicker').style.display = 'block';
+        renderSharePicker(s.sharedWith || []);
+      } else {
+        document.getElementById('sharePicker').style.display = 'none';
+      }
       document.getElementById('scealModalTitle').textContent = 'Edit Scéal';
-      document.querySelector('#scealModal .modal-sub').textContent = 'Board member edit.';
+      document.querySelector('#scealModal .modal-sub').textContent = 'Edit this scéal and who can read it.';
       document.getElementById('scealSubmitBtn').textContent = 'Save Changes';
       hideStatus();
       document.getElementById('scealModal').classList.add('active');
@@ -660,13 +789,16 @@
       else if (pendingImage) imageVal = pendingImage;
       else imageVal = undefined; // keep existing (edit) / none (add)
 
+      const visibility = document.getElementById('scealVisibility').value;
       const payload = {
         title: document.getElementById('scealTitle').value.trim(),
         contributor: document.getElementById('scealContributor').value.trim(),
         story: document.getElementById('scealStory').value.trim(),
         people: document.getElementById('scealPeople').value.trim(),
         place: document.getElementById('scealPlace').value.trim(),
-        era: document.getElementById('scealEra').value.trim()
+        era: document.getElementById('scealEra').value.trim(),
+        visibility,
+        sharedWith: visibility === 'shared' ? collectSharedWith() : []
       };
       if (imageVal !== undefined) payload.image = imageVal;
 
@@ -675,13 +807,12 @@
 
       try {
         let res;
+        payload.apiToken = adminPassword();
+        payload.username = sessionUsername();
         if (editing) {
           payload.id = id;
-          payload.adminPassword = adminPassword();
           res = await fetch('/api/seanchas', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         } else {
-          payload.apiToken = adminPassword();
-          payload.username = sessionUsername();
           res = await fetch('/api/seanchas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         }
         const result = await res.json();
@@ -704,7 +835,7 @@
         const res = await fetch('/api/seanchas', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, adminPassword: adminPassword() })
+          body: JSON.stringify({ id, username: sessionUsername(), apiToken: adminPassword() })
         });
         const result = await res.json();
         if (result.success) { closeDeleteModal(); loadScealta(); }

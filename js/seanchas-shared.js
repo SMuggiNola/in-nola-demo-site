@@ -116,6 +116,9 @@
   .modal-actions .save-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none;}
   .modal-actions .delete-confirm-btn{background:#dc2626;border:none;color:#fff;}
   .modal-actions .delete-confirm-btn:hover{background:#b91c1c;}
+  .modal-actions{flex-wrap:wrap;}
+  .modal-actions .discard-btn{background:transparent;border:1px solid #f87171;color:#fca5a5;}
+  .modal-actions .discard-btn:hover{background:rgba(248,113,113,0.12);}
   .delete-warning{color:#fca5a5;font-size:0.9rem;margin-bottom:1rem;}
   .modal-status{text-align:center;padding:0.75rem;border-radius:6px;margin-top:1rem;display:none;font-size:0.9rem;}
   .modal-status.success{display:block;background:rgba(34,197,94,0.2);color:#86efac;border:1px solid rgba(34,197,94,0.3);}
@@ -214,10 +217,22 @@
         <button type="button" class="delete-confirm-btn" id="sqDeleteConfirm">Remove</button>
       </div>
     </div>
+  </div>
+  <div class="modal-overlay" id="sqCloseConfirm" style="z-index:1001;">
+    <div class="modal" style="max-width:430px;">
+      <h2>Unsaved changes</h2>
+      <p class="modal-sub" style="margin-bottom:1.25rem;">You’ve made changes to this scéal. Save them, or close without saving?</p>
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" id="sqCloseKeep">Keep editing</button>
+        <button type="button" class="discard-btn" id="sqCloseDiscard">Close without saving</button>
+        <button type="button" class="save-btn" id="sqCloseSave">Save &amp; close</button>
+      </div>
+    </div>
   </div>`;
 
   // ── modal state ────────────────────────────────────────────────────────
   var pendingImage = null, rawImageEl = null, directoryCache = null;
+  var formDirty = false; // true once the user edits any field in the open modal
   var cfg = { onSaved: function () {}, onDeleted: function () {} };
   var mounted = false;
   var isLocal = location.hostname === '127.0.0.1' || location.hostname === 'localhost' || location.port === '5500';
@@ -261,8 +276,13 @@
   }
   function status(msg, ok) { var el = $('sqStatus'); el.textContent = msg; el.className = 'modal-status ' + (ok ? 'success' : 'error'); }
   function hideStatus() { $('sqStatus').className = 'modal-status'; }
-  function closeModal() { $('sqModal').classList.remove('active'); }
+  function closeModal() { $('sqModal').classList.remove('active'); $('sqCloseConfirm').classList.remove('active'); formDirty = false; }
   function closeDelete() { $('sqDeleteModal').classList.remove('active'); }
+  // Intentional close: if there are unsaved edits, ask first.
+  function requestCloseModal() {
+    if (formDirty) $('sqCloseConfirm').classList.add('active');
+    else closeModal();
+  }
 
   function openAdd() {
     $('sqForm').reset(); $('sqId').value = ''; resetImage();
@@ -274,7 +294,7 @@
     $('sqVisibility').value = 'public'; $('sqSharePicker').style.display = 'none'; $('sqShareList').innerHTML = '';
     $('sqCommentsOpen').checked = false;
     $('sqSeanchasTitle').value = '';
-    hideStatus(); $('sqModal').classList.add('active');
+    hideStatus(); formDirty = false; $('sqModal').classList.add('active');
   }
 
   function openEdit(s) {
@@ -294,7 +314,7 @@
     $('sqModalTitle').textContent = 'Edit Scéal';
     $('sqModalSub').textContent = 'Edit this scéal, who can read it, and whether comments are open.';
     $('sqSubmit').textContent = 'Save Changes';
-    hideStatus(); $('sqModal').classList.add('active');
+    hideStatus(); formDirty = false; $('sqModal').classList.add('active');
   }
 
   function openDelete(s) { $('sqDeleteId').value = s.id; $('sqDeleteTitle').textContent = s.title || ''; $('sqDeleteModal').classList.add('active'); }
@@ -309,9 +329,21 @@
       if (e.target.value === 'shared') { $('sqSharePicker').style.display = 'block'; renderShareList(collectShared()); }
       else $('sqSharePicker').style.display = 'none';
     });
-    $('sqCancel').addEventListener('click', closeModal);
+    // Any edit marks the form dirty.
+    $('sqForm').addEventListener('input', function () { formDirty = true; });
+    $('sqForm').addEventListener('change', function () { formDirty = true; });
+
+    // Cancel and outside-clicks are close *requests* — they confirm if there are unsaved edits.
+    $('sqCancel').addEventListener('click', requestCloseModal);
     $('sqDeleteCancel').addEventListener('click', closeDelete);
-    document.querySelectorAll('.modal-overlay').forEach(function (o) { o.addEventListener('click', function (e) { if (e.target === o) o.classList.remove('active'); }); });
+    $('sqModal').addEventListener('click', function (e) { if (e.target === $('sqModal')) requestCloseModal(); });
+    $('sqDeleteModal').addEventListener('click', function (e) { if (e.target === $('sqDeleteModal')) closeDelete(); });
+    $('sqCloseConfirm').addEventListener('click', function (e) { if (e.target === $('sqCloseConfirm')) $('sqCloseConfirm').classList.remove('active'); });
+
+    // Unsaved-changes dialog buttons.
+    $('sqCloseKeep').addEventListener('click', function () { $('sqCloseConfirm').classList.remove('active'); });
+    $('sqCloseDiscard').addEventListener('click', function () { closeModal(); });
+    $('sqCloseSave').addEventListener('click', function () { $('sqCloseConfirm').classList.remove('active'); $('sqForm').requestSubmit(); });
 
     $('sqForm').addEventListener('submit', async function (e) {
       e.preventDefault();

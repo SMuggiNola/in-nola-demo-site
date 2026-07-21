@@ -44,6 +44,12 @@ function json(data, status = 200) {
 function makeId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
+// Unguessable token for "anyone with the link" sharing.
+function makeToken() {
+  const a = new Uint8Array(16);
+  crypto.getRandomValues(a);
+  return Array.from(a).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 // ── identity ──────────────────────────────────────────────────────────
 async function getViewer(env, body) {
@@ -116,7 +122,10 @@ function present(sceal, viewer, full) {
     _canEdit: editable,
     _canComment: canComment(sceal, viewer)
   };
-  if (editable) out.sharedWith = Array.isArray(sceal.sharedWith) ? sceal.sharedWith : [];
+  if (editable) {
+    out.sharedWith = Array.isArray(sceal.sharedWith) ? sceal.sharedWith : [];
+    out.shareToken = sceal.shareToken || '';   // only the author/board can see the secret link
+  }
   if (full) out.comments = comments;
   return out;
 }
@@ -137,6 +146,7 @@ export async function onRequest(context) {
   if (path === '/api/seanchas/feed' && method === 'POST') return feed(request, env);
   if (path === '/api/seanchas/get' && method === 'POST') return getOne(request, env);
   if (path === '/api/seanchas/directory' && method === 'POST') return directory(request, env);
+  if (path === '/api/seanchas/share' && method === 'POST') return share(request, env);
   if (path === '/api/seanchas/comment' && method === 'POST') return addComment(request, env);
   if (path === '/api/seanchas/comment/delete' && method === 'POST') return delComment(request, env);
   if (path === '/api/seanchas/activity' && method === 'POST') return activity(request, env);
@@ -196,7 +206,9 @@ async function getOne(request, env) {
   if (!body.id) return json({ error: 'Missing scéal ID' }, 400);
   const viewer = await getViewer(env, body);
   const sceal = (await readAll(env)).find(s => s.id === body.id);
-  if (!sceal || !canRead(sceal, viewer)) return json({ error: 'Scéal not found' }, 404);
+  // A valid share key grants read access to this one scéal, whatever its visibility.
+  const viaKey = !!(body.key && sceal && sceal.shareToken && body.key === sceal.shareToken);
+  if (!sceal || (!canRead(sceal, viewer) && !viaKey)) return json({ error: 'Scéal not found' }, 404);
   const titles = await loadTitles(env);
   return json({ sceal: withTitle(present(sceal, viewer, true), titles) });
 }
@@ -313,6 +325,28 @@ async function remove(request, env) {
   data.scealta = data.scealta.filter(s => s.id !== body.id);
   await env.SEANCHAS_KV.put(SEANCHAS_KEY, JSON.stringify(data));
   return json({ success: true, message: 'Scéal removed.' });
+}
+
+// POST /api/seanchas/share — create / regenerate / disable a scéal's share link (author or board)
+async function share(request, env) {
+  if (!env.SEANCHAS_KV) return json({ error: 'KV not configured' }, 500);
+  const body = await request.json().catch(() => ({}));
+  const viewer = await getViewer(env, body);
+  if (!viewer) return json({ error: 'Please log in.' }, 401);
+  if (!body.id) return json({ error: 'Missing scéal ID' }, 400);
+
+  const data = (await env.SEANCHAS_KV.get(SEANCHAS_KEY, 'json')) || { scealta: [] };
+  const idx = data.scealta.findIndex(s => s.id === body.id);
+  if (idx === -1) return json({ error: 'Scéal not found' }, 404);
+  const s = data.scealta[idx];
+  if (!canEdit(s, viewer)) return json({ error: 'You do not have permission to share this scéal.' }, 403);
+
+  const action = body.action || 'enable';
+  if (action === 'disable') s.shareToken = '';
+  else if (action === 'regenerate' || !s.shareToken) s.shareToken = makeToken();
+
+  await env.SEANCHAS_KV.put(SEANCHAS_KEY, JSON.stringify(data));
+  return json({ success: true, shareToken: s.shareToken });
 }
 
 // POST /api/seanchas/comment — add a comment

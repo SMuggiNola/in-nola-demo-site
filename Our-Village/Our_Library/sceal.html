@@ -31,6 +31,15 @@
     }
     .owner-controls button:hover { border-color: var(--gold); color: var(--gold); }
     .owner-controls .del:hover { border-color: #f87171; color: #f87171; }
+    .share-box { max-width: 700px; margin: 0.75rem 0 0; padding: 0.9rem 1.1rem; background: rgba(212,167,38,0.08); border: 1px solid rgba(212,167,38,0.3); border-radius: 0.6rem; }
+    .share-note { color: var(--gold-light); font-size: 0.85rem; margin: 0 0 0.5rem; }
+    .share-row { display: flex; gap: 0.5rem; }
+    .share-row input { flex: 1; padding: 0.5rem 0.7rem; border: 1px solid var(--glass-border); border-radius: 6px; background: rgba(0,0,0,0.25); color: var(--text-primary); font-size: 0.8rem; }
+    .share-row button { padding: 0.5rem 0.9rem; border-radius: 6px; border: 1px solid var(--glass-border); background: transparent; color: var(--gold); cursor: pointer; font-size: 0.8rem; }
+    .share-row button:hover { border-color: var(--gold); }
+    .share-sub { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+    .share-sub button { padding: 0.3rem 0.6rem; border: none; background: none; color: var(--text-secondary); cursor: pointer; font-size: 0.75rem; text-decoration: underline; }
+    .share-sub button:hover { color: var(--gold); }
 
     /* Comments */
     .comments { max-width: 700px; margin: 2.5rem auto 0; }
@@ -72,8 +81,28 @@
   <script>
     const UI = window.SeanchasUI;
     const esc = UI.esc;
-    const id = new URLSearchParams(location.search).get('id');
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    const shareKey = params.get('key');
     let current = null;
+
+    function shareUrl(token) { return location.origin + location.pathname + '?id=' + encodeURIComponent(id) + '&key=' + token; }
+    function showShareBox(token) { const b = document.getElementById('shareBox'); if (!b) return; b.style.display = 'block'; document.getElementById('shareLink').value = shareUrl(token); document.getElementById('shareNote').textContent = 'Anyone with this link can read this scéal:'; }
+    async function ensureShare(action) {
+      try {
+        const r = await UI.API.share(id, action);
+        current.shareToken = r.shareToken;
+        if (r.shareToken) showShareBox(r.shareToken);
+        else { const b = document.getElementById('shareBox'); if (b) { document.getElementById('shareLink').value = ''; document.getElementById('shareNote').textContent = 'Sharing is off — the old link no longer works.'; document.querySelector('#shareBox .share-row').style.display = 'none'; } }
+      } catch (e) { alert(e.message); }
+    }
+    function copyShareLink() {
+      const inp = document.getElementById('shareLink');
+      inp.select();
+      navigator.clipboard.writeText(inp.value)
+        .then(() => { document.getElementById('shareNote').textContent = 'Link copied — send it to anyone.'; })
+        .catch(() => {});
+    }
 
     function fmtDate(iso) {
       try { return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }); }
@@ -102,6 +131,18 @@
         html += `<div class="owner-controls">
           <button type="button" id="editBtn">Edit</button>
           <button type="button" class="del" id="delBtn">Delete</button>
+          <button type="button" id="shareBtn">🔗 Share link</button>
+        </div>
+        <div class="share-box" id="shareBox" style="display:none;">
+          <p class="share-note" id="shareNote">Anyone with this link can read this scéal:</p>
+          <div class="share-row">
+            <input type="text" id="shareLink" readonly>
+            <button type="button" id="copyLink">Copy</button>
+          </div>
+          <div class="share-sub">
+            <button type="button" id="newLink">New link</button>
+            <button type="button" id="offLink">Turn off sharing</button>
+          </div>
         </div>`;
       }
       html += `</article>`;
@@ -110,6 +151,13 @@
       if (s._canEdit) {
         document.getElementById('editBtn').addEventListener('click', () => UI.openEdit(current));
         document.getElementById('delBtn').addEventListener('click', () => UI.openDelete(current));
+        document.getElementById('shareBtn').addEventListener('click', () => {
+          if (current.shareToken) showShareBox(current.shareToken);
+          else ensureShare('enable');
+        });
+        document.getElementById('copyLink').addEventListener('click', copyShareLink);
+        document.getElementById('newLink').addEventListener('click', () => ensureShare('regenerate'));
+        document.getElementById('offLink').addEventListener('click', () => ensureShare('disable'));
       }
       renderComments(s);
     }
@@ -167,7 +215,7 @@
     async function load() {
       if (!id) { document.getElementById('scealView').innerHTML = '<p class="loading-message">No scéal specified.</p>'; return; }
       try {
-        const data = await UI.API.getOne(id);
+        const data = await UI.API.getOne(id, shareKey);
         renderSceal(data.sceal);
       } catch (err) {
         document.getElementById('scealView').innerHTML =

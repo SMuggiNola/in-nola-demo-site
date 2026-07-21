@@ -46,7 +46,8 @@
         ? req('POST', '/feed', creds())
         : req('GET', '');
     },
-    getOne: function (id) { return req('POST', '/get', Object.assign({ id: id }, creds())); },
+    getOne: function (id, key) { var b = Object.assign({ id: id }, creds()); if (key) b.key = key; return req('POST', '/get', b); },
+    share: function (id, action) { return req('POST', '/share', Object.assign({ id: id, action: action }, creds())); },
     create: function (p) { return req('POST', '', Object.assign({}, p, creds())); },
     edit: function (p) { return req('PUT', '', Object.assign({}, p, creds())); },
     del: function (id) { return req('DELETE', '', Object.assign({ id: id }, creds())); },

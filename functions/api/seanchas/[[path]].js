@@ -152,13 +152,25 @@ async function readAll(env) {
 }
 function byNewest(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }
 
+// Per-member personal-seanchas titles (e.g. "Scéalta Sheáin Uí Mhongabháin").
+const TITLES_KEY = 'member_titles';
+async function loadTitles(env) { return (await env.SEANCHAS_KV.get(TITLES_KEY, 'json')) || {}; }
+async function saveTitle(env, memberId, title) {
+  if (!memberId) return;
+  const t = await loadTitles(env);
+  if (title) t[memberId] = title.slice(0, 120); else delete t[memberId];
+  await env.SEANCHAS_KV.put(TITLES_KEY, JSON.stringify(t));
+}
+function withTitle(p, titles) { p.authorTitle = titles[p.authorId] || ''; return p; }
+
 // GET /api/seanchas — public summaries
 async function listPublic(env) {
   if (!env.SEANCHAS_KV) return json({ error: 'KV not configured', scealta: [] });
+  const titles = await loadTitles(env);
   const scealta = (await readAll(env))
     .filter(s => (s.visibility || 'public') === 'public')
     .sort(byNewest)
-    .map(s => present(s, null, false));
+    .map(s => withTitle(present(s, null, false), titles));
   return json({ scealta });
 }
 
@@ -168,10 +180,11 @@ async function feed(request, env) {
   const body = await request.json().catch(() => ({}));
   const viewer = await getViewer(env, body);
   if (!viewer) return listPublic(env);
+  const titles = await loadTitles(env);
   const scealta = (await readAll(env))
     .filter(s => canRead(s, viewer))
     .sort(byNewest)
-    .map(s => present(s, viewer, false));
+    .map(s => withTitle(present(s, viewer, false), titles));
   return json({ scealta, viewer: { memberId: viewer.memberId, role: viewer.role, displayName: viewer.displayName } });
 }
 
@@ -183,7 +196,8 @@ async function getOne(request, env) {
   const viewer = await getViewer(env, body);
   const sceal = (await readAll(env)).find(s => s.id === body.id);
   if (!sceal || !canRead(sceal, viewer)) return json({ error: 'Scéal not found' }, 404);
-  return json({ sceal: present(sceal, viewer, true) });
+  const titles = await loadTitles(env);
+  return json({ sceal: withTitle(present(sceal, viewer, true), titles) });
 }
 
 // POST /api/seanchas/directory — active members for the share picker
@@ -236,7 +250,9 @@ async function create(request, env) {
   const data = (await env.SEANCHAS_KV.get(SEANCHAS_KEY, 'json')) || { scealta: [] };
   data.scealta.push(newSceal);
   await env.SEANCHAS_KV.put(SEANCHAS_KEY, JSON.stringify(data));
-  return json({ success: true, sceal: present(newSceal, viewer, true), message: 'Go raibh maith agat — your scéal has been added.' }, 201);
+  if (body.seanchasTitle !== undefined) await saveTitle(env, viewer.memberId, (body.seanchasTitle || '').trim());
+  const titles = await loadTitles(env);
+  return json({ success: true, sceal: withTitle(present(newSceal, viewer, true), titles), message: 'Go raibh maith agat — your scéal has been added.' }, 201);
 }
 
 // PUT /api/seanchas — edit a scéal
@@ -275,7 +291,9 @@ async function edit(request, env) {
     updatedAt: new Date().toISOString()
   };
   await env.SEANCHAS_KV.put(SEANCHAS_KEY, JSON.stringify(data));
-  return json({ success: true, sceal: present(data.scealta[idx], viewer, true), message: 'Scéal updated.' });
+  if (body.seanchasTitle !== undefined) await saveTitle(env, existing.memberId || viewer.memberId, (body.seanchasTitle || '').trim());
+  const titles = await loadTitles(env);
+  return json({ success: true, sceal: withTitle(present(data.scealta[idx], viewer, true), titles), message: 'Scéal updated.' });
 }
 
 // DELETE /api/seanchas — remove a scéal

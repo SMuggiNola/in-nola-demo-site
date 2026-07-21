@@ -183,6 +183,11 @@
           </div>
         </div>
         <div class="form-group">
+          <label for="sqSeanchasTitle">Your personal seanchas title <span class="opt">(optional)</span></label>
+          <input type="text" id="sqSeanchasTitle" placeholder="e.g., Scéalta Sheáin Uí Mhongabháin">
+          <p class="hint">Names your whole collection on the Seanchas page. Leave blank to use your name.</p>
+        </div>
+        <div class="form-group">
           <label class="sq-check"><input type="checkbox" id="sqCommentsOpen"> Welcome IN-NOLA member input (open comments)</label>
           <p class="hint">Members who can read this scéal will be able to comment and help the research along.</p>
         </div>
@@ -263,6 +268,7 @@
     var cf = $('sqContributor'); cf.value = nm; cf.readOnly = false; // editable so you can render your name in Irish
     $('sqVisibility').value = 'public'; $('sqSharePicker').style.display = 'none'; $('sqShareList').innerHTML = '';
     $('sqCommentsOpen').checked = false;
+    $('sqSeanchasTitle').value = '';
     hideStatus(); $('sqModal').classList.add('active');
   }
 
@@ -278,6 +284,7 @@
     if (vis === 'shared') { $('sqSharePicker').style.display = 'block'; renderShareList(s.sharedWith || []); }
     else $('sqSharePicker').style.display = 'none';
     $('sqCommentsOpen').checked = !!s.commentsOpen;
+    $('sqSeanchasTitle').value = s.authorTitle || '';
     $('sqModalTitle').textContent = 'Edit Scéal';
     $('sqModalSub').textContent = 'Edit this scéal, who can read it, and whether comments are open.';
     $('sqSubmit').textContent = 'Save Changes';
@@ -317,6 +324,9 @@
         commentsOpen: $('sqCommentsOpen').checked
       };
       if (imageVal !== undefined) payload.image = imageVal;
+      // Only overwrite the stored collection title when editing (field prefilled) or when set on add.
+      var seanchasTitle = $('sqSeanchasTitle').value.trim();
+      if (editing || seanchasTitle) payload.seanchasTitle = seanchasTitle;
       btn.disabled = true; btn.textContent = editing ? 'Saving…' : 'Adding…';
       try {
         var result = editing ? await API.edit(Object.assign({ id: id }, payload)) : await API.create(payload);

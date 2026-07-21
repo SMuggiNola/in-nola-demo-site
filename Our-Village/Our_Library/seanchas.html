@@ -145,8 +145,9 @@
 
     // A member's personal seanchas — a link to all their scéalta.
     function personalRowHtml(g) {
+      const heading = g.title || ('Scéalta ' + g.name);
       return `<div class="sceal-row">
-        <a class="sceal-row-title" href="./seanchas.html?author=${encodeURIComponent(g.authorId)}">Scéalta ${esc(g.name)}</a>
+        <a class="sceal-row-title" href="./seanchas.html?author=${encodeURIComponent(g.authorId)}">${esc(heading)}</a>
         <div class="sceal-row-by">${g.count === 1 ? '1 scéal' : g.count + ' scéalta'}</div>
       </div>`;
     }
@@ -160,7 +161,7 @@
         // A single member's personal seanchas.
         const list = scealta.filter(s => s.authorId === authorFilter);
         const who = list.length ? list[0].contributor : 'this member';
-        titleEl.textContent = `Scéalta ${who}`;
+        titleEl.textContent = (list.length && list[0].authorTitle) ? list[0].authorTitle : `Scéalta ${who}`;
         document.getElementById('authorNav').style.display = 'block';
         if (!list.length) { listEl.innerHTML = '<p class="no-scealta">No scéalta here yet.</p>'; countEl.textContent = ''; return; }
         listEl.innerHTML = list.map(scealRowHtml).join('');
@@ -172,9 +173,9 @@
       const groups = {};
       scealta.forEach(s => {
         if (!s.authorId) return;
-        if (!groups[s.authorId]) groups[s.authorId] = { authorId: s.authorId, name: s.contributor, count: 0, latest: s.createdAt };
+        if (!groups[s.authorId]) groups[s.authorId] = { authorId: s.authorId, name: s.contributor, title: s.authorTitle || '', count: 0, latest: s.createdAt };
         groups[s.authorId].count++;
-        if (new Date(s.createdAt) > new Date(groups[s.authorId].latest)) { groups[s.authorId].latest = s.createdAt; groups[s.authorId].name = s.contributor; }
+        if (new Date(s.createdAt) >= new Date(groups[s.authorId].latest)) { groups[s.authorId].latest = s.createdAt; groups[s.authorId].name = s.contributor; groups[s.authorId].title = s.authorTitle || ''; }
       });
       const entries = Object.keys(groups).map(k => groups[k]).sort((a, b) => new Date(b.latest) - new Date(a.latest));
 

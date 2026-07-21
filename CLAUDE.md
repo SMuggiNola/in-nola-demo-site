@@ -26,25 +26,41 @@ Irish Network New Orleans (IN-NOLA) community website with membership management
 - **KV Namespace:** `INNOLA_EVENTS` (ID: 925270a52e634821b5ca2dce22c66e9e)
 - **Admin PINs:** `112233`, `445566`, `778899`
 
-### An Seanchas (Community Story Collection)
-- **Replaces the old GNOIC slide deck** (`gnoic.html` removed). Reframes the "Greater
-  New Orleans Irish Continuum" as a simpler, member-driven collection of stories.
-- **Grammar:** *an seanchas* = the whole collection · *scéal* / *scéalta* = one story /
-  the stories · a family's telling = *seanchas mhuintir X* (e.g. Muintir Mhongabháin).
+### An Seanchas — "Seanchas Líonra Gaeilge Nola" (live)
+Replaced the old GNOIC slide deck (`gnoic.html` removed). A member-driven story
+collection with three levels: the org **collection** → each member's **personal
+seanchas** (grouped by author) → individual **scéalta**, each with its own page.
+- **Grammar:** *an seanchas* = the whole holding · *scéal* / *scéalta* = one story /
+  the stories · a member's collection is titled e.g. *Scéalta Sheáin Uí Mhongabháin*.
 - **Pages:**
-  - `Our-Village/Our_Library/seanchas.html` — the collection. Any member can **Add a
-    Scéal** via an inline modal (open POST, no login). Board members see subtle
-    inline Edit/Delete (gated by the admin password in sessionStorage).
-  - `Our-Village/Our_Library/Paddy_Profile.html` — reframed as **Seanchas Mhuintir
-    Mhongabháin** (the Muggivan Seanchas), the founding family archive: opens with the
-    story of the name (*Ó Mongabháin*), then Scéal a hAon (Paddy) + Scéal a Dó (JJ).
-- **API:** `functions/api/seanchas.js` — GET/POST(open)/PUT(admin)/DELETE(admin).
-  `functions/api/seanchas-seed.js` — POST to seed the two founding Muggivan scéalta.
-- **Admin password:** same `innola2026!` used by events (edit/delete only).
-- **⚠️ Setup still needed to go live (graceful fallback until then):**
-  1. `npx wrangler kv namespace create SEANCHAS_KV`
-  2. Paste the id into `wrangler.toml` and uncomment the SEANCHAS_KV stanza.
-  3. Deploy, then seed: `fetch('/api/seanchas-seed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:'innola2026!'})}).then(r=>r.json()).then(console.log)`
+  - `Our-Village/Our_Library/seanchas.html` — landing: overview + mission + tips +
+    **Add a Scéal** (members only) + list of personal seanchas. `?author=<memberId>`
+    shows one member's scéalta.
+  - `Our-Village/Our_Library/sceal.html?id=<id>` — one scéal + comment thread.
+  - `Our-Village/Our_Library/Paddy_Profile.html` — the Muggivan family page (name
+    story *Ó Mongabháin*; Paddy & JJ are "Scéal coming soon").
+  - Home `index.html` shows a "From the Seanchas" activity feed.
+  - `js/seanchas-shared.js` — shared modal + image pipeline + API client for both pages.
+- **API:** `functions/api/seanchas/[[path]].js` (catch-all): `GET /api/seanchas`
+  (public), `POST /feed` (viewer-filtered), `POST /get`, `POST /directory`,
+  `POST /comment`, `POST /comment/delete`, `POST /activity`, and POST/PUT/DELETE.
+- **Visibility per scéal:** public / members / shared (member picker) / private.
+  Owner (architect) sees all; board = a normal reader. **Comments** are author-opt-in
+  (`commentsOpen`); any logged-in member who can read may comment.
+- **Auth:** POST/PUT/DELETE/comment require the unified session (username + shared
+  apiToken `innola2026!`); active-membership + per-scéal permission enforced server-side.
+- **KV:** `SEANCHAS_KV` id `f35d0ddd2822499ba4bc380d65c550cb` (bound in wrangler.toml).
+  Keys: `all_scealta` (stories), `member_titles` (per-member personal-seanchas titles).
+  No seed endpoint — the collection starts empty and members populate it.
+
+### Unified login / session (live)
+One canonical session in **localStorage `innola_member_session`** (24h). `js/main.js`
+exposes **`window.Session`** (isLoggedIn/role/username/memberId/apiToken/isMember/
+isBoard/isArchitect/logout) and mirrors it into the legacy `sessionStorage` keys so
+admin pages + `admin-auth.js` keep working. Both login doors (`/membership-tools/` and
+`/admin-portal/`) write it; `admin-auth.js` self-hydrates from it. One role-aware
+floating control ("Log In" → name + Log Out + Admin for board/architect); login
+honours `?return=`. `_headers` makes `/js/*` revalidate so JS updates ship immediately.
 
 ### Contact Form
 - Working with Resend API

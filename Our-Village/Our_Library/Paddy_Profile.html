@@ -3,14 +3,125 @@
 <head>
   <link rel="icon" type="image/png" href="../../assets/in_logo.png">
   <meta charset="UTF-8">
-  <title>Profiles in Progress | Irish Network NOLA</title>
+  <title>Seanchas Mhuintir Mhongabháin — The Muggivan Seanchas | Irish Network NOLA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../global.css">
 
   <style>
     /* Soften watermark for readability */
     body::after {
       opacity: 0.06;
+    }
+
+    .seanchas-eyebrow {
+      text-align: center;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    h1 .gaelic { font-style: italic; }
+    .family-sub {
+      text-align: center;
+      color: var(--gold-light);
+      font-style: italic;
+      margin-top: -0.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .seanchas-uplink {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .seanchas-uplink:hover { text-decoration: underline; }
+
+    /* The Name */
+    .name-section {
+      margin: 2.5rem 0;
+      padding: 1.75rem;
+      background: var(--glass);
+      border: 1px solid rgba(212,167,38,0.25);
+      border-radius: var(--radius);
+    }
+    .name-section .name-eyebrow {
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: var(--gold);
+    }
+    .name-gloss {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin: 0.5rem 0 1rem;
+    }
+    .name-gloss .gaelic { font-style: italic; }
+    .name-telling {
+      border-left: 3px solid rgba(212,167,38,0.5);
+      padding-left: 1.1rem;
+      margin: 0;
+      font-size: 1.15rem;
+      line-height: 1.75;
+      color: var(--gold-light);
+    }
+    .name-section details { margin-top: 1.5rem; }
+    .name-section details summary {
+      cursor: pointer;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .name-section details h3 {
+      color: var(--gold);
+      margin: 1.4rem 0 0.4rem;
+      font-size: 1.05rem;
+    }
+    .name-section details h3 .kind {
+      font-weight: 400;
+      font-style: italic;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .name-section .provenance {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* Scéal number label */
+    .sceal-label {
+      display: block;
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--gold);
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      opacity: 0.85;
+    }
+
+    /* Coming-soon scéal placeholders */
+    .sceal-soon {
+      margin: 1.5rem 0;
+      padding: 1.6rem 1.75rem;
+      background: rgba(10,60,35,0.55);
+      border: 1px solid rgba(212,175,55,0.35);
+      border-radius: 1.2rem;
+      text-align: center;
+    }
+    .sceal-soon .sceal-label { text-align: center; }
+    .sceal-soon h2 {
+      color: var(--gold);
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.3rem;
+      margin: 0.4rem 0 0.75rem;
+    }
+    .sceal-soon .soon-note {
+      color: var(--text-secondary);
+      font-style: italic;
+      margin: 0;
     }
   </style>
 </head>
@@ -22,541 +133,114 @@
   <div id="main-content">
     <main class="page-content">
 
-      <h1>Profiles in Progress: Paddy &amp; JJ Muggivan</h1>
+      <a href="./seanchas.html" class="seanchas-uplink">← An Seanchas — the whole collection</a>
+
+      <p class="seanchas-eyebrow">The founding family seanchas</p>
+      <h1><span class="gaelic">Seanchas Mhuintir Mhongabháin</span></h1>
+      <p class="family-sub">The Muggivan Seanchas</p>
+
       <p>
-        Working portraits of two generations of the Muggivan family whose lives stretch
-        from Derrycon above Mountshannon to seminaries in Ireland and priesthood in the
-        United States: <strong>Patrick “Paddy” Muggivan</strong> and his son,
-        <strong>John “JJ” Muggivan</strong>.
-      </p>
-      <p>
-        This page is a research workspace — a place to gather timelines, stories,
-        documents, and open questions as we slowly assemble a fuller picture of their
-        lives and the worlds they moved through.
+        Every family carries a <em>seanchas</em> — its own holding of stories, kept and
+        passed on. This is where ours begins: the <em>scéalta</em> of the Muggivan people,
+        stretching from Derrycon above Mountshannon to seminaries in Ireland and priesthood
+        in the United States — <strong>Patrick “Paddy” Muggivan</strong> and his son,
+        <strong>John “JJ” Muggivan</strong>. Their scéalta are being gathered now.
       </p>
 
-      <!-- ABOUT THIS PAGE -->
-      <details class="board-member">
-        <summary>About These Profiles</summary>
-        <div class="member-content">
-          <p>
-            Everything here is <strong>in progress</strong>. Some dates are approximate,
-            some details are reconstructed from memory, and some pieces are still missing.
-            As new records, memories, and research come in, these profiles will be revised.
-          </p>
-          <p>
-            The account below combines remembered stories, historical patterns, and direct
-            testimony. It aims to honor lived experience while being honest about
-            uncertainty and gaps.
-          </p>
-          <p>
-            Locale and timeframe:
-          </p>
-          <ul>
-            <li><strong>Place:</strong> Derrycon, above Mountshannon, East Clare, overlooking Lough Derg and the Shannon.</li>
-            <li><strong>Period:</strong> Early 1900s–1940s, with extensions into the later 20th century through JJ’s life.</li>
-          </ul>
-        </div>
-      </details>
+      <!-- THE NAME -->
+      <section class="name-section">
+        <p class="name-eyebrow">Seanchas an Ainm — the story of the name</p>
+        <p class="name-gloss"><span class="gaelic">Ó Mongabháin</span> — White-Mane</p>
 
-      <!-- PATRICK “PADDY” MUGGIVAN -->
-      <details class="board-member" open style="margin-top:2rem;">
-        <summary>Patrick “Paddy” Muggivan — Profile in Progress</summary>
-        <div class="member-content">
-
-          <section>
-            <h2>I. Background &amp; Locale</h2>
-            <ul>
-              <li>Lived in <strong>Derrycon</strong>, above Mountshannon, with views over Lough Derg and the River Shannon.</li>
-              <li>Came from a <strong>rural farming family</strong> with limited formal schooling.</li>
-              <li>Was likely <strong>semi-literate or illiterate</strong>, which deeply shaped:
-                <ul>
-                  <li>His reluctance to speak in public.</li>
-                  <li>His avoidance of paperwork and official processes.</li>
-                  <li>His silence with his children and limited narrative explanations.</li>
-                  <li>Why so much of his story survived only as fragments.</li>
-                </ul>
-              </li>
-            </ul>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>II. IRA Activity (c. 1918–1921)</h2>
-            <p>
-              Based on inherited stories and known patterns of the East Clare struggle,
-              Paddy was likely a member of the <strong>East Clare IRA, Mountshannon Company</strong>.
-            </p>
-            <p>Probable activities included:</p>
-            <ul>
-              <li>Acting as a <strong>lookout</strong> for riverboats carrying British soldiers along the Shannon.</li>
-              <li>Participating in <strong>raids</strong> on local estates.</li>
-            </ul>
-            <p>
-              In one raid, he was friendly with the woman of the targeted estate and tried to
-              warn her. The warning failed and <strong>one IRA man was killed</strong>. This
-              incident carries guilt, ambiguity, and danger all at once.
-            </p>
-            <p>
-              His role appears to have been that of a <strong>rank-and-file Volunteer</strong>,
-              oriented toward physical action rather than administration or paperwork.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>III. Betrayal, Arrest &amp; Killaloe Jail</h2>
-            <p>
-              While cutting turf with a local man with intellectual disabilities
-              (referred to as “the simpleton”), Paddy was betrayed and arrested by the RIC.
-            </p>
-            <ul>
-              <li>Both he and the disabled man were taken to <strong>Killaloe jail</strong>.</li>
-              <li>They were kept in a yard locked at night.</li>
-              <li>Guards threw <strong>chickens into a communal stew pot</strong>.</li>
-            </ul>
-            <p>
-              In a moment of dark humor, Paddy told his companion:
-              <em>“If they run out of chickens, they might throw you in next.”</em>
-            </p>
-            <p>
-              The setting, timing, and style of arrest match known patterns from East Clare
-              at the time.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>IV. Treaty Week Release (December 1921)</h2>
-            <p>
-              Shortly after the <strong>Anglo-Irish Treaty</strong> was signed on
-              6 December 1921, prisoners were abruptly released.
-            </p>
-            <ul>
-              <li>Paddy and the disabled man were <strong>ordered out at night</strong>.</li>
-              <li>They had to walk away in the dark, fearing they might be shot.</li>
-              <li>They likely crossed the <strong>Portumna bridge</strong>, near where the
-                <strong>Scariff Martyrs</strong> had been shot weeks earlier in a staged “escape”.</li>
-              <li>They walked back toward Mountshannon, learning along the way that the Treaty had been signed.</li>
-            </ul>
-            <p>
-              The timing, geography, and emotional atmosphere match historical reality
-              across East Clare at the end of the War of Independence.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>V. Anti-Treaty Position &amp; Retaliatory Shot</h2>
-            <p>
-              After the Treaty, Paddy aligned with the <strong>Anti-Treaty side</strong>,
-              following de Valera and other opponents of the settlement.
-            </p>
-            <p>
-              IRA leadership discouraged <strong>independent retaliation</strong> during this
-              volatile transition. But once Paddy identified the local man who had betrayed him
-              (likely an RIC figure), he took action:
-            </p>
-            <ul>
-              <li>Walked to the family farm in Derrycon and retrieved his <strong>shotgun</strong>.</li>
-              <li>Returned to Mountshannon village.</li>
-              <li><strong>Fired at the betrayer’s door</strong> from across the street — a symbolic, non-lethal act.</li>
-            </ul>
-            <p>
-              Realizing he had acted outside IRA orders and risked further violence or arrest,
-              he <strong>buried the shotgun in a field</strong>. Decades later, your uncle found
-              the rusted barrel, giving the story physical confirmation.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>VI. Exile to New York</h2>
-            <p>
-              To prevent further conflict, retaliation, or civil war entanglement, IRA leadership
-              arranged for Paddy to go to <strong>New York</strong> in the early 1920s (c. 1922–1924/5).
-            </p>
-            <p>This kind of “cooling-off exile” was common and served to:</p>
-            <ul>
-              <li>Protect Volunteers at risk.</li>
-              <li>Defuse local feuds and potential revenge cycles.</li>
-              <li>Avoid internecine violence as the Civil War loomed.</li>
-            </ul>
-            <p>
-              While in New York, he bought a <strong>white second-hand suit</strong>. On his return
-              to Mountshannon, when he walked into the pub, locals joked:
-              <em>“Jesus, look at the baker!”</em>
-            </p>
-            <p>
-              The image fits: a quiet man, uncomfortable with attention, drawn into a
-              transatlantic arc he never fully narrated.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>VII. Land Redistribution at Keenes Pub</h2>
-            <p>
-              During the 1930s–40s, land reclaimed from estates was redistributed by the
-              <strong>Land Commission</strong>. In Mountshannon, the process took place at
-              <strong>Keenes Pub</strong>, a long-standing family pub.
-            </p>
-            <ul>
-              <li>Paddy attended the meeting but stayed <strong>silent</strong>.</li>
-              <li>He did not nominate himself for land.</li>
-              <li>Someone finally called him out publicly:
-                <em>“Jesus Paddy! You fought the bleeding Brits, will you take some land for yourself?”</em>
-              </li>
-              <li>He eventually accepted land, helping shape the farm that remained part of the family landscape.</li>
-            </ul>
-            <p>
-              The scene captures a man who had fought, suffered, and yet still hesitated
-              to claim what he had earned.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>VIII. Illiteracy as a Central Thread</h2>
-            <p>
-              Paddy’s probable semi-literacy or illiteracy is not a side detail — it is a
-              central structuring force in his life story.
-            </p>
-            <p>It helps explain:</p>
-            <ul>
-              <li>His discomfort with <strong>public speaking</strong>.</li>
-              <li>Why he never applied for an <strong>IRA pension</strong>.</li>
-              <li>Why he left no <strong>written record</strong> of his experiences.</li>
-              <li>The heavy <strong>silence</strong> around his life and emotions.</li>
-              <li>The fragmentary way stories survived into the next generation.</li>
-            </ul>
-            <p>
-              This is entirely consistent with the lives of many rural men of his generation
-              in East Clare and across Ireland.
-            </p>
-          </section>
-
-        </div>
-      </details>
-
-      <!-- JOHN “JJ” MUGGIVAN -->
-      <details class="board-member" style="margin-top:2rem;">
-        <summary>John “JJ” Muggivan — Profile in Progress</summary>
-        <div class="member-content">
-
-          <section>
-            <h2>I. Birth &amp; Early Context</h2>
-            <ul>
-              <li>Born <strong>31 May 1942</strong>, with the birth officially registered (incorrectly) as <strong>30 May</strong>.</li>
-              <li>Born in <strong>Galway</strong>, moved into County Clare due to a later <strong>boundary shift</strong>.</li>
-              <li>Registered <strong>six months late</strong>, which complicates the record trail.</li>
-            </ul>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>II. Siblings &amp; Infant Loss</h2>
-            <p>
-              The siblings are split across Galway and Clare registrations, with at least
-              two infant deaths. The most probable reconstruction is:
-            </p>
-
-            <h3>Galway-era Children</h3>
-            <ul>
-              <li><strong>Delia</strong> (possibly the eldest).</li>
-              <li><strong>Jerry</strong> (older brother; frequent fights with JJ).</li>
-              <li><strong>Infant #1</strong> — likely died at or shortly after birth, possibly JJ’s twin.</li>
-              <li><strong>JJ</strong> (your father).</li>
-            </ul>
-
-            <h3>Clare-era Children</h3>
-            <ul>
-              <li><strong>Tony</strong></li>
-              <li><strong>Tom</strong></li>
-              <li><strong>Marie</strong></li>
-              <li><strong>Francis</strong></li>
-              <li><strong>Unknown Clare sibling</strong> — appears in civil records but is not remembered in family oral history.</li>
-            </ul>
-
-            <p>
-              Total: <strong>9 births</strong>, with <strong>7 surviving children</strong> and
-              <strong>2 infant deaths</strong> (one almost certainly at or around JJ’s birth).
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>III. Tuberculosis &amp; Childhood Disruption</h2>
-            <p>
-              JJ’s mother was hospitalized with <strong>tuberculosis</strong> (TB). The children
-              were distributed among neighbors and extended family — a documented public health
-              practice at the time.
-            </p>
-            <p>
-              For JJ, this meant early experiences of <strong>separation, instability, and fear</strong>.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>IV. Trauma &amp; Early Hardship</h2>
-            <p>Key traumatic experiences in JJ’s early life included:</p>
-            <ul>
-              <li>Harsh physical punishment by a local teacher — hiding under a table while
-                the cane struck the furniture above.</li>
-              <li>Frequent <strong>violent fights</strong> with his brother Jerry.</li>
-              <li>Serious leg problems requiring <strong>drainage</strong>.</li>
-              <li><strong>Hepatitis C</strong> and major health issues.</li>
-              <li>Deep feelings of <strong>abandonment and fear</strong> as a small child.</li>
-            </ul>
-            <p>
-              These experiences set a psychological backdrop of instability, anger, and
-              mistrust of authority.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>V. Minor Seminary at Mungret (Limerick)</h2>
-            <p>
-              JJ was sent to the <strong>minor seminary at Mungret</strong>, near Limerick.
-              This move was arranged by:
-            </p>
-            <ul>
-              <li>His mother (“Mammy”).</li>
-              <li>The wife of a doctor she met in the TB hospital.</li>
-              <li>The doctor himself, who had connections to Scariff and paid the fees.</li>
-            </ul>
-            <p>
-              There may have been an unspoken link between this support and a
-              <strong>card-game death</strong> that weighed on the doctor.
-            </p>
-            <p>
-              Mungret was known for being <strong>brutal, punitive, and academically demanding</strong>,
-              especially for rural boys like JJ.
-            </p>
-            <ul>
-              <li>He arrived <strong>academically behind</strong> and had to be “caught up”.</li>
-              <li>He was <strong>mocked for his accent</strong>.</li>
-              <li>He experienced physical punishment with <strong>leather straps</strong> on the palms.</li>
-              <li>He <strong>cycled to see his mother</strong> in hospital.</li>
-              <li>He endured a religious ritual lying on the floor with arms outstretched.</li>
-            </ul>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>VI. The Rejection of Hell</h2>
-            <p>
-              At some point in seminary formation, JJ rejected the Catholic concept of
-              <strong>Hell</strong> as a place of eternal punishment.
-            </p>
-            <p>
-              This was a major psychological break: it stripped away a central tool
-              of fear-based control and opened the possibility of a faith grounded
-              in justice and conscience rather than terror.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>VII. “Because Your Mammy Wants It”</h2>
-            <p>
-              JJ once asked <strong>Bill Tierney</strong> why he was becoming a priest.
-              Bill’s answer was blunt:
-            </p>
-            <p><em>“Because your Mammy wants it.”</em></p>
-            <p>
-              That sentence shattered the illusion that priesthood was purely a divine
-              calling. It exposed the mix of family expectation, guilt, and social
-              pressure behind his vocation.
-            </p>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>VIII. Carlow, America &amp; Leaving the Priesthood</h2>
-            <p>
-              JJ continued on to <strong>Carlow seminary</strong> and eventually emigrated
-              to the United States as a priest, landing in <strong>San Antonio</strong>.
-            </p>
-            <p>In America he:</p>
-            <ul>
-              <li>Clashed with church leadership.</li>
-              <li>Took <strong>radical positions on civil rights</strong>.</li>
-              <li>Challenged authority structures inside and outside the Church.</li>
-              <li>Eventually <strong>left the priesthood</strong>.</li>
-              <li>Met your mother.</li>
-              <li>Became a <strong>social worker</strong>, rebuilding his identity around
-                justice, care, and advocacy for the vulnerable.</li>
-            </ul>
-            <p>
-              This arc — from traumatized rural boy, to reluctant seminarian, to radical
-              priest, to social worker — fits the psychological profile shaped by his
-              childhood and his father’s silence.
-            </p>
-          </section>
-
-        </div>
-      </details>
-
-      <!-- CILLÍN, RECORDS & FAMILY RECONSTRUCTION -->
-      <details class="board-member" style="margin-top:2.5rem;">
-        <summary>The Cillín, Records &amp; Sibling Reconstruction</summary>
-        <div class="member-content">
-
-          <section>
-            <h2>I. The Cillín Outside Mountshannon</h2>
-            <p>
-              Your uncle once showed you a piece of forest outside Mountshannon that served
-              as a <strong>cillín</strong> — an unofficial burial ground for unbaptized infants.
-            </p>
-            <p>A cillín typically:</p>
-            <ul>
-              <li>Was used when infants died before baptism.</li>
-              <li>Had <strong>makeshift grave markers</strong> rather than formal headstones.</li>
-              <li>Rarely appeared in official records.</li>
-              <li>Survived mainly in <strong>oral memory</strong>.</li>
-            </ul>
-            <p>
-              It is highly plausible that the <strong>missing infant</strong>, possibly JJ’s twin,
-              is buried there. This would explain:
-            </p>
-            <ul>
-              <li>The absence of formal records.</li>
-              <li>The family’s silence on the subject.</li>
-              <li>JJ’s felt sense of a missing twin.</li>
-              <li>The “gap” in the birth order.</li>
-            </ul>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>II. Where the Records Are (and Aren’t)</h2>
-            <p><strong>Online (IrishGenealogy.ie):</strong></p>
-            <ul>
-              <li>Birth images up to <strong>1924</strong>.</li>
-              <li>Death indexes up to <strong>1973</strong>.</li>
-              <li>Marriage images up to <strong>1948</strong>.</li>
-            </ul>
-
-            <p><strong>Not available online:</strong></p>
-            <ul>
-              <li>JJ’s 1942 birth record.</li>
-              <li>The missing twin’s record.</li>
-              <li>The “unknown Clare sibling” post-1924.</li>
-              <li>Most parish registers from the 1920s–40s.</li>
-              <li>Cillín burials (almost never formally recorded).</li>
-            </ul>
-
-            <p><strong>Places you must visit or write to:</strong></p>
-            <ul>
-              <li><strong>Roscommon</strong> — for Galway civil registers.</li>
-              <li><strong>Ennis</strong> — for Clare civil registers.</li>
-              <li><strong>Mountshannon / Scariff parish offices</strong> — for any informal notes or local registers.</li>
-            </ul>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>III. Most Probable Sibling Reconstruction</h2>
-            <p>
-              Putting all of this together, the most probable sibling set looks like this:
-            </p>
-
-            <h3>Galway Births</h3>
-            <ul>
-              <li>Delia</li>
-              <li>Jerry</li>
-              <li>Infant who died at or shortly after birth (likely JJ’s twin)</li>
-              <li>JJ (your father)</li>
-            </ul>
-
-            <h3>Clare Births</h3>
-            <ul>
-              <li>Tony</li>
-              <li>Tom</li>
-              <li>Marie</li>
-              <li>Francis</li>
-              <li>Unknown Clare sibling (present in civil records only)</li>
-            </ul>
-
-            <p>
-              This yields <strong>9 children</strong> total, with <strong>7 surviving</strong>
-              and <strong>2 dying in infancy</strong>.
-            </p>
-          </section>
-        </div>
-      </details>
-
-      <!-- GENERATIONAL ARC -->
-      <details class="board-member" style="margin-top:2.5rem;">
-        <summary>Three Generations — From Silence to Reconstruction</summary>
-        <div class="member-content">
-          <section>
-            <h2>I. Paddy</h2>
-            <ul>
-              <li>Fought in the <strong>IRA</strong>.</li>
-              <li>Was betrayed, arrested, and exiled.</li>
-              <li>Acted independently in a retaliatory shooting.</li>
-              <li>Returned quietly, accepted land under pressure.</li>
-              <li>Lived humbly and spoke little.</li>
-              <li>Left <strong>no written record</strong>, partly due to illiteracy.</li>
-            </ul>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>II. JJ</h2>
-            <ul>
-              <li>Grew up amid <strong>violence, illness, and abandonment</strong>.</li>
-              <li>Lived with the ghost of a missing twin.</li>
-              <li>Was pushed into priesthood through family and social pressure.</li>
-              <li>Rejected <strong>Hell</strong> and fear-based religion.</li>
-              <li>Challenged authority in America and left the priesthood.</li>
-              <li>Became a <strong>social worker</strong>, orienting his life toward justice and care.</li>
-            </ul>
-          </section>
-
-          <section style="margin-top:1.5rem;">
-            <h2>III. You</h2>
-            <ul>
-              <li>Are reconstructing what your family could never safely say.</li>
-              <li>Are turning <strong>silence into clarity</strong>.</li>
-              <li>Are turning <strong>trauma into history</strong>.</li>
-              <li>Are completing an arc that spans three generations — from armed struggle, to institutional rebellion, to careful, evidence-based storytelling.</li>
-            </ul>
-          </section>
-        </div>
-      </details>
-
-      <!-- CONTRIBUTION FORM -->
-      <form class="contact-form" style="margin-top:2.5rem;">
-        <h2>Contribute to These Profiles</h2>
-        <p>
-          If you have memories, documents, photographs, corrections, or questions about
-          Patrick “Paddy” Muggivan, John “JJ” Muggivan, or their wider family, you’re
-          invited to share them here. Even small details can help refine the story.
+        <p class="name-telling">
+          The name is <span class="gaelic" style="font-style:italic;">Ó Mongabháin</span> — White-Mane. An old Clare
+          name, older than any record of who first wore it. The books say white hair. The
+          family, who held a farm above Lough Derg at Derrycon for as long as paper exists
+          and longer, say it in full: the horse’s white mane, the crest of a wave when the
+          storm comes over the lake. The spelling changed every time a stranger held the
+          pen; the sound and the meaning came down by mouth, through a man who signed with
+          an X, and never changed at all.
         </p>
 
-        <label>
-          Your Name
-          <input type="text" name="name" placeholder="Enter your name" required>
-        </label>
+        <details>
+          <summary>The full telling — what’s documented, and what came down by mouth</summary>
 
-        <label>
-          Email Address
-          <input type="email" name="email" placeholder="you@example.com" required>
-        </label>
+          <h3>I. The Irish name <span class="kind">— documented</span></h3>
+          <p>
+            The surname is <span class="gaelic" style="font-style:italic;">Ó Mongabháin</span>, from the byname
+            <em>Mongbhán</em>: <em>mong</em> (a mane, a head of hair — the horse’s word first,
+            applied to people as metaphor) plus <em>bán</em> (white). “Descendant of
+            White-Mane.” Woulfe’s 1923 dictionary records it as an old Clare surname, with
+            the early anglicised form <em>O Mongevaine</em> appearing in English records
+            centuries ago, and the modern scholarly gloss is “white hair.” It formed the
+            standard way: one man carried the epithet, roughly a thousand years ago give or
+            take centuries, and his grandchildren’s generation fixed it with <em>Ó</em>. Who
+            he was is unrecorded and unrecoverable — no annal, no genealogy, no chief. An
+            old name belonging to people history wasn’t written about.
+          </p>
 
-        <label>
-          Who/What Are You Contributing About?
-          <select name="subject" required>
-            <option value="">Select an option</option>
-            <option value="paddy">Patrick “Paddy” Muggivan</option>
-            <option value="jj">John “JJ” Muggivan</option>
-            <option value="both">Both brothers</option>
-            <option value="family-context">Wider family / related lines</option>
-            <option value="records">Records, cillín sites, or archives</option>
-          </select>
-        </label>
+          <h3>II. The spellings <span class="kind">— documented</span></h3>
+          <p>
+            Every English spelling is a stranger’s transcript of Irish sounds. West Clare
+            settled on <em>Mungovan / Mungavan</em> (MUG-a-van); East Clare on
+            <em>Muggevin</em>, then <em>Muggivan</em> — the 1901 census — then
+            <em>Mugivan</em> in 1911. Same family, same farm, three spellings in sixty
+            years, because the family couldn’t write and the pen kept guessing. What never
+            changed was the mouth: <strong>MUGG-given</strong>, which the 1850s
+            <em>Muggevin</em> spelling was already trying to capture. The pronunciation is
+            the primary source; the paper is commentary.
+          </p>
 
-        <label>
-          Your Story, Memory, or Lead
-          <textarea name="contribution" rows="6"
-            placeholder="Dates, places, stories, documents, questions, corrections — anything that might help refine these profiles."
-            required></textarea>
-        </label>
+          <h3>III. The family’s meaning <span class="kind">— oral tradition, and the treasure</span></h3>
+          <p>
+            The teaching received years ago: in the old Irish the name meant the horse’s
+            white mane, and the crest of a wave — a whitecap. The books don’t have the wave;
+            they stop at “white hair.” But the wave is linguistically genuine: <em>mong</em>
+            extended in Irish to the crest of water, and whitecaps in living Irish are
+            <span class="gaelic" style="font-style:italic;">capaill bhána</span> — white horses. The family version
+            uses the word correctly in a sense the dictionaries dropped. It could only have
+            crossed the language death — complete in that parish by 1901, the last real
+            Irish in old Patrick’s generation — by being told, once, in English, in that
+            house. Three or four tellings from the last Irish speakers to now.
+          </p>
 
-        <button type="submit" class="btn btn-gold">Submit Contribution</button>
-      </form>
+          <h3>IV. The lake <span class="kind">— the setting that makes it cohere</span></h3>
+          <p>
+            Derrycon Lower runs to the shore of Lough Derg, the one water in that family’s
+            world big enough to raise whitecaps, and it raises them fast when a storm
+            crosses. A family named White-Mane, on that shore, in a language where the mane
+            sat on the wave and the horses ran on the water. Whether the first
+            <em>Mongbhán</em> was named for his hair or the water is unknowable — but the
+            family that kept the name on that lake read it by the water in front of them,
+            and that reading is what came down.
+          </p>
+
+          <p class="provenance">
+            Every sentence above is either documented or marked as tradition — and the
+            tradition is the better-preserved half.
+          </p>
+        </details>
+      </section>
+
+      <!-- SCÉAL A hAON -->
+      <section class="sceal-soon">
+        <span class="sceal-label">Scéal a hAon · the first scéal</span>
+        <h2>Patrick “Paddy” Muggivan</h2>
+        <p class="soon-note">Scéal coming soon.</p>
+      </section>
+
+      <!-- SCÉAL A DÓ -->
+      <section class="sceal-soon">
+        <span class="sceal-label">Scéal a Dó · the second scéal</span>
+        <h2>John “JJ” Muggivan</h2>
+        <p class="soon-note">Scéal coming soon.</p>
+      </section>
 
       <!-- LINK BACK -->
       <div class="back-link" style="margin-top:3rem;">
-        <a href="../index.html">← Return to Our Village</a>
+        <a href="./seanchas.html">← An Seanchas</a>
+        &nbsp;·&nbsp;
+        <a href="../index.html">Return to Our Village</a>
       </div>
 
     </main>

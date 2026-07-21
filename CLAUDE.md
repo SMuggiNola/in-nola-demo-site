@@ -26,6 +26,26 @@ Irish Network New Orleans (IN-NOLA) community website with membership management
 - **KV Namespace:** `INNOLA_EVENTS` (ID: 925270a52e634821b5ca2dce22c66e9e)
 - **Admin PINs:** `112233`, `445566`, `778899`
 
+### An Seanchas (Community Story Collection)
+- **Replaces the old GNOIC slide deck** (`gnoic.html` removed). Reframes the "Greater
+  New Orleans Irish Continuum" as a simpler, member-driven collection of stories.
+- **Grammar:** *an seanchas* = the whole collection · *scéal* / *scéalta* = one story /
+  the stories · a family's telling = *seanchas mhuintir X* (e.g. Muintir Mhongabháin).
+- **Pages:**
+  - `Our-Village/Our_Library/seanchas.html` — the collection. Any member can **Add a
+    Scéal** via an inline modal (open POST, no login). Board members see subtle
+    inline Edit/Delete (gated by the admin password in sessionStorage).
+  - `Our-Village/Our_Library/Paddy_Profile.html` — reframed as **Seanchas Mhuintir
+    Mhongabháin** (the Muggivan Seanchas), the founding family archive: opens with the
+    story of the name (*Ó Mongabháin*), then Scéal a hAon (Paddy) + Scéal a Dó (JJ).
+- **API:** `functions/api/seanchas.js` — GET/POST(open)/PUT(admin)/DELETE(admin).
+  `functions/api/seanchas-seed.js` — POST to seed the two founding Muggivan scéalta.
+- **Admin password:** same `innola2026!` used by events (edit/delete only).
+- **⚠️ Setup still needed to go live (graceful fallback until then):**
+  1. `npx wrangler kv namespace create SEANCHAS_KV`
+  2. Paste the id into `wrangler.toml` and uncomment the SEANCHAS_KV stanza.
+  3. Deploy, then seed: `fetch('/api/seanchas-seed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:'innola2026!'})}).then(r=>r.json()).then(console.log)`
+
 ### Contact Form
 - Working with Resend API
 - Emails to sean.muggivan@gmail.com

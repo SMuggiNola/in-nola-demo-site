@@ -22,6 +22,7 @@ id = "dc52dbe3b66e4b47b58f9da4fd0a1888"
 binding = "MEMBERS_KV"
 id = "936fda0c56ad41359ad331c365c276c4"
 
+# An Seanchas — community story collection (functions/api/seanchas.js)
 [[kv_namespaces]]
-binding = "TENEMENT_KV"
-id = "1b6af5e274614d1cbcfde82b3413d664"
+binding = "SEANCHAS_KV"
+id = "f35d0ddd2822499ba4bc380d65c550cb"

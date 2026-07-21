@@ -157,19 +157,19 @@
     <span class="featured-teaser-arrow">→</span>
   </div>
 
-  <!-- The Tenement Teaser -->
-  <div class="featured-teaser" id="tenement-teaser" onclick="document.getElementById('tenement-modal').classList.add('active')" style="animation-delay: 1.5s;">
+  <!-- An Seanchas Teaser -->
+  <a class="featured-teaser" id="seanchas-teaser" href="./Our-Village/Our_Library/seanchas.html" style="animation-delay: 1.5s; text-decoration: none;">
     <div class="featured-teaser-glow"></div>
     <div class="featured-teaser-image">
-      <img src="./assets/tenement-life.jpg" alt="Dublin, 1920s">
+      <img src="./assets/kells/book_of_kells_2.jpg" alt="Illuminated manuscript">
     </div>
     <div class="featured-teaser-content">
-      <span class="featured-teaser-badge">Members Only</span>
-      <span class="featured-teaser-title">The Se&aacute;n O'Casey Experience</span>
-      <span class="featured-teaser-author">Juno and the Paycock &middot; by Se&aacute;n O'Casey</span>
+      <span class="featured-teaser-badge">Community Stories</span>
+      <span class="featured-teaser-title">An Seanchas</span>
+      <span class="featured-teaser-author">The stories of our people &mdash; add your own</span>
     </div>
     <span class="featured-teaser-arrow">&rarr;</span>
-  </div>
+  </a>
 
   <!-- Next Event Banner -->
   <div id="next-event-wrapper" class="next-event-wrapper" style="display:none;">
@@ -259,6 +259,9 @@
       <a href="/assets/in-nola-qr-code.jpg" download="IN-NOLA-QR-Code.jpg" aria-label="Download QR Code">QR</a>
     </div>
     <p class="footer-line">
+      Questions? <a href="mailto:tech@in-nola.org">tech@in-nola.org</a>
+    </p>
+    <p class="footer-line">
       Copyright &copy; 2026, Irish Network New Orleans. All Rights Reserved.
     </p>
     <p class="footer-line">
@@ -313,70 +316,6 @@
         <span class="article-modal-pub">Published in <em>64 Parishes</em> · March 2026</span>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- Tenement Poster Modal -->
-<div class="poster-modal-backdrop" id="tenement-modal" onclick="if(event.target===this)closeTenementModal()">
-  <div class="poster-frame">
-
-    <button class="poster-close" onclick="closeTenementModal()" aria-label="Close">
-      <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-    </button>
-
-    <div class="poster-card">
-      <!-- Parchment background -->
-      <div class="poster-bg"></div>
-      <!-- Period photo watermark -->
-      <div class="poster-watermark"></div>
-      <!-- Paper grain -->
-      <div class="poster-grain"></div>
-      <!-- Vignette -->
-      <div class="poster-vignette"></div>
-
-      <div class="poster-content">
-        <div class="poster-presents">Irish Network New Orleans presents&hellip;</div>
-
-        <div class="poster-title">Juno</div>
-        <div class="poster-title-and">and the</div>
-        <div class="poster-title">Paycock</div>
-
-        <div class="poster-byline">by</div>
-        <div class="poster-author">Se&aacute;n O'Casey</div>
-
-        <div class="poster-directed">Directed by Qwen</div>
-
-        <div class="poster-divider"></div>
-
-        <div class="poster-label">An Interactive Literary Experience</div>
-
-        <div class="poster-starring">Starring&hellip;</div>
-        <div class="poster-starring-you">YOU!</div>
-
-        <div class="poster-divider"></div>
-
-        <div class="poster-opening">Opening</div>
-        <div class="poster-date">March 8th, 2026</div>
-
-        <p class="poster-desc">
-          Step inside Dublin, 1922. Bring your problems to the Boyle family flat.
-          They have enough of their own. An interactive AI-powered experience where the characters
-          of O'Casey's masterpiece respond to <em>you</em>.
-        </p>
-
-        <a class="poster-cta" href="./Our-Village/The_Tenement/index.html">
-          Enter the Experience
-        </a>
-
-        <div class="poster-venue">
-          <div class="poster-venue-name">The Se&aacute;n O'Casey Experience &mdash; IN-NOLA Village</div>
-          <div>Irish Network New Orleans</div>
-          <div>Members Only Experience</div>
-          <div class="poster-url">www.irishnetworkneworleans.com</div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -1215,15 +1154,11 @@ function closeArticleModal() {
   document.getElementById('article-modal').classList.remove('active');
 }
 
-function closeTenementModal() {
-  document.getElementById('tenement-modal').classList.remove('active');
-}
 
 // Close on Escape key
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     closeArticleModal();
-    closeTenementModal();
   }
 });
 </script>

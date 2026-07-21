@@ -57,9 +57,9 @@ const DEFAULT_MEMBERS = [
   {
     id: 'sean',
     name: 'Seán Muggivan, LCSW',
-    role: 'Data Manager & AI Strategist',
+    role: 'Website and Data Manager',
     email: 'muggs@muggsofdatasci.net',
-    bio: 'Seán Muggivan, LCSW, is a Licensed Clinical Social Worker and longtime New Orleans public school educator with over a decade of experience. As Data Manager & AI Strategist, he manages IN-NOLA\'s digital infrastructure and web presence, developing data tools and member-facing resources. He focuses on building accessible digital infrastructure, responsible offline AI tools, and community-centered data systems that strengthen and share the Irish cultural legacy in New Orleans.',
+    bio: 'Seán Muggivan, LCSW, is a Licensed Clinical Social Worker and longtime New Orleans public school educator with over a decade of experience. As the Website and Data Manager, he manages IN-NOLA\'s digital infrastructure and web presence, developing data tools and member-facing resources. He focuses on building accessible digital infrastructure, responsible offline AI tools, and community-centered data systems that strengthen and share the Irish cultural legacy in New Orleans.',
     photo: '',
     order: 6
   }

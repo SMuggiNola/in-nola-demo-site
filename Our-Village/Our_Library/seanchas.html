@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/in_logo.png">
+  <meta charset="UTF-8">
+  <title>An Seanchas • Irish Network NOLA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../global.css">
+
+  <style>
+    body::after { opacity: 0.06; }
+
+    h1 { margin-bottom: 0.25rem; }
+
+    .gaelic { font-style: italic; }
+
+    .section-intro {
+      text-align: center;
+      color: var(--text-secondary);
+      max-width: 640px;
+      margin: 0 auto 1.5rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    /* The small grammar note that teaches the words */
+    .lexicon {
+      max-width: 640px;
+      margin: 0 auto 2rem;
+      padding: 1rem 1.25rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .lexicon b { color: var(--gold); font-style: normal; }
+
+    .seanchas-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .add-gate {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .add-gate a { color: var(--gold); }
+
+    .featured-family {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin: -1.25rem auto 0.75rem;
+      max-width: 560px;
+    }
+    .featured-family a { color: var(--gold); text-decoration: none; }
+    .featured-family a:hover { text-decoration: underline; }
+    .featured-family .gaelic { font-style: italic; }
+
+    .seanchas-count {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin: 0 0 1.5rem;
+      opacity: 0.8;
+    }
+
+    /* Scéal cards — an accordion, one story each */
+    .sceal-card {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(10, 60, 35, 0.82);
+      border: 1px solid rgba(212,175,55,0.5);
+      border-radius: 1.4rem;
+      margin: 1rem auto;
+      overflow: hidden;
+      backdrop-filter: blur(2px);
+      cursor: pointer;
+    }
+
+    .sceal-header {
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .sceal-header:hover { background: rgba(23,77,49,0.5); }
+
+    .sceal-heading {
+      flex: 1;
+      text-align: left;
+    }
+    .sceal-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.35rem;
+      color: var(--gold);
+      line-height: 1.25;
+    }
+    .sceal-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.35rem;
+    }
+    .sceal-meta .people {
+      color: var(--gold-light);
+      font-style: italic;
+    }
+
+    .sceal-body {
+      display: none;
+      padding: 0.4rem 1.6rem 1.8rem;
+      font-size: 1.1rem;
+      color: var(--gold-light);
+      line-height: 1.7;
+    }
+    .sceal-card.open .sceal-body { display: block; }
+
+    .sceal-body img {
+      width: 100%;
+      max-height: 460px;
+      object-fit: contain;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+    .sceal-body .story-text { white-space: pre-wrap; }
+    .sceal-body .tagline {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .loading-message, .no-scealta {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 2rem;
+      font-style: italic;
+    }
+
+    /* Admin controls — subtle, only for logged-in board members */
+    .admin-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      justify-content: flex-end;
+    }
+    .admin-controls button {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-secondary);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.2s ease;
+    }
+    .admin-controls button:hover { opacity: 1; border-color: var(--gold); color: var(--gold); }
+    .admin-controls .delete-btn:hover { border-color: #f87171; color: #f87171; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: #0a2818;
+      border: 1px solid rgba(212,167,38,0.4);
+      border-radius: var(--radius);
+      max-width: 560px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.75rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .modal h2 { color: var(--gold); margin: 0 0 0.25rem; font-size: 1.4rem; }
+    .modal .modal-sub { color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 1.25rem; }
+
+    .modal .form-group { margin-bottom: 1rem; }
+    .modal label { display: block; color: var(--gold); font-size: 0.85rem; margin-bottom: 0.3rem; }
+    .modal label .opt { color: var(--text-secondary); font-weight: 400; font-style: italic; }
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      background: rgba(0,0,0,0.2);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .modal input:focus, .modal textarea:focus { outline: none; border-color: var(--gold); }
+    .modal textarea { min-height: 150px; resize: vertical; }
+    .modal .hint { font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    .modal input[type="file"] {
+      padding: 0.5rem;
+      border: 1px dashed var(--glass-border);
+      background: rgba(0,0,0,0.2);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .modal .current-preview img { max-width: 100%; max-height: 140px; border-radius: 6px; margin-top: 0.5rem; }
+    .modal .image-controls { margin-top: 0.5rem; display: none; }
+    .modal .image-controls label { font-size: 0.72rem; color: var(--text-secondary); }
+    .modal .image-controls input[type="range"] {
+      width: 100%; margin: 0.2rem 0; accent-color: var(--gold);
+      padding: 0; border: none; background: transparent;
+    }
+    .modal .image-controls .size-info {
+      font-size: 0.7rem; color: var(--text-secondary);
+      display: flex; justify-content: space-between;
+    }
+    .modal .remove-check {
+      display: flex; align-items: center; gap: 0.4rem;
+      margin-top: 0.4rem; font-size: 0.8rem; color: #fca5a5;
+    }
+    .modal .remove-check input[type="checkbox"] { width: auto; }
+
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; justify-content: flex-end; }
+    .modal-actions button { padding: 0.65rem 1.3rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .modal-actions .cancel-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); }
+    .modal-actions .cancel-btn:hover { border-color: var(--text-primary); color: var(--text-primary); }
+    .modal-actions .save-btn { background: var(--gold); border: none; color: var(--green-900); }
+    .modal-actions .save-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(212,167,38,0.4); }
+    .modal-actions .save-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .modal-actions .delete-confirm-btn { background: #dc2626; border: none; color: white; }
+    .modal-actions .delete-confirm-btn:hover { background: #b91c1c; }
+    .delete-warning { color: #fca5a5; font-size: 0.9rem; margin-bottom: 1rem; }
+
+    .modal-status { text-align: center; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; display: none; font-size: 0.9rem; }
+    .modal-status.success { display: block; background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+    .modal-status.error { display: block; background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+  </style>
+</head>
+
+<body>
+
+  <div id="main-header-placeholder"></div>
+
+  <div id="main-content">
+    <main class="page-content">
+
+      <h1>An Seanchas</h1>
+      <p class="section-intro">
+        The lore we hold together — the stories of our people, kept and passed on.
+        Every family, every scéal, adds to the whole.
+      </p>
+
+      <div class="lexicon">
+        <b class="gaelic">an seanchas</b> — the lore entire, our whole holding of stories.<br>
+        <b class="gaelic">scéal</b> — one story; <b class="gaelic">scéalta</b> — the stories.<br>
+        <span style="opacity:0.85;">So a family's telling is its own seanchas — <span class="gaelic">seanchas mhuintir Mhongabháin</span>, the seanchas of the Muggivan people — and all of them together make this collection.</span>
+      </div>
+
+      <div class="seanchas-actions">
+        <button class="btn btn-gold" id="addScealBtn" style="display:none;">＋ Add a Scéal</button>
+        <p class="add-gate" id="addScealGate" style="display:none;">
+          <a href="/membership-tools/index.html">Log in as a member</a> to add your scéal.
+        </p>
+      </div>
+
+      <p class="featured-family">
+        The collection begins with <a href="./Paddy_Profile.html"><span class="gaelic">Seanchas Mhuintir Mhongabháin</span> — the Muggivan Seanchas</a>.
+      </p>
+
+      <p class="seanchas-count" id="scealCount"></p>
+
+      <div id="scealtaList">
+        <p class="loading-message">Gathering the scéalta…</p>
+      </div>
+
+      <div class="back-link" style="margin-top:3rem;">
+        <a href="./index.html">← Back to Our Library</a>
+      </div>
+
+    </main>
+
+    <div id="main-footer-placeholder"></div>
+  </div>
+
+  <!-- Add / Edit Scéal Modal -->
+  <div class="modal-overlay" id="scealModal">
+    <div class="modal">
+      <h2 id="scealModalTitle">Add a Scéal</h2>
+      <p class="modal-sub">Share a story for the seanchas — a memory, a family history, a moment worth keeping. It posts to the collection straight away.</p>
+
+      <form id="scealForm">
+        <input type="hidden" id="scealId">
+
+        <div class="form-group">
+          <label for="scealTitle">Title of the scéal *</label>
+          <input type="text" id="scealTitle" required placeholder="e.g., How the Muggivans came to New Orleans">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="scealContributor">Your name *</label>
+            <input type="text" id="scealContributor" required placeholder="Who is telling it">
+          </div>
+          <div class="form-group">
+            <label for="scealPeople">Family / people <span class="opt">(optional)</span></label>
+            <input type="text" id="scealPeople" placeholder="e.g., Muintir Mhongabháin / the Muggivans">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="scealStory">The story *</label>
+          <textarea id="scealStory" required placeholder="Tell it in your own words. As long or as short as you like."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="scealPlace">Place <span class="opt">(optional)</span></label>
+            <input type="text" id="scealPlace" placeholder="Townland, parish, or city">
+          </div>
+          <div class="form-group">
+            <label for="scealEra">When <span class="opt">(optional)</span></label>
+            <input type="text" id="scealEra" placeholder="e.g., 1840s, or 'my grandmother's time'">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="scealImage">Photo <span class="opt">(optional)</span></label>
+          <input type="file" id="scealImage" accept="image/*">
+          <div class="current-preview" id="scealImagePreview" style="display:none;">
+            <img id="scealImagePreviewImg" alt="Photo preview">
+          </div>
+          <div class="image-controls" id="scealImageControls">
+            <label>Resize: <span id="scealSizeLabel">800px</span> wide</label>
+            <input type="range" id="scealSizeSlider" min="300" max="1200" step="50" value="800">
+            <div class="size-info">
+              <span id="scealDimensionsLabel"></span>
+              <span id="scealFileSizeLabel"></span>
+            </div>
+          </div>
+          <div class="remove-check" id="scealImageRemoveWrap" style="display:none;">
+            <input type="checkbox" id="scealRemoveImage">
+            <label for="scealRemoveImage" style="color:#fca5a5;">Remove current photo</label>
+          </div>
+          <p class="hint">A portrait, a document, a place — anything that belongs with the story.</p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" onclick="closeScealModal()">Cancel</button>
+          <button type="submit" class="save-btn" id="scealSubmitBtn">Add to the Seanchas</button>
+        </div>
+
+        <div class="modal-status" id="scealStatus"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="max-width: 400px;">
+      <h2>Remove Scéal</h2>
+      <p class="delete-warning">Remove "<span id="deleteScealTitle"></span>" from the seanchas? This cannot be undone.</p>
+      <input type="hidden" id="deleteScealId">
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" class="delete-confirm-btn" onclick="confirmDelete()">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/main.js"></script>
+
+  <script>
+    let allScealta = [];
+    const isLocal = window.location.hostname === '127.0.0.1' ||
+                    window.location.hostname === 'localhost' ||
+                    window.location.port === '5500';
+
+    // A logged-in user carries a session token + identity in sessionStorage.
+    function adminPassword() { return sessionStorage.getItem('adminPassword') || ''; }
+    function sessionUsername() { return sessionStorage.getItem('boardUser') || ''; }
+    function sessionRole() { return sessionStorage.getItem('userRole') || ''; }
+    function sessionName() { return sessionStorage.getItem('displayName') || ''; }
+    // Board members / architect can edit & delete.
+    function isAdmin() {
+      return sessionStorage.getItem('boardAuth') === 'true' &&
+             ['board', 'architect'].includes(sessionRole()) && !!adminPassword();
+    }
+    // Any logged-in member (or board/architect) may add a scéal. Active status is
+    // enforced server-side; this only controls whether the button is shown.
+    function isMemberLoggedIn() {
+      return sessionStorage.getItem('boardAuth') === 'true' &&
+             ['member', 'board', 'architect'].includes(sessionRole());
+    }
+
+    // Show the Add button only to logged-in members; otherwise show the login gate.
+    function refreshAddGate() {
+      const btn = document.getElementById('addScealBtn');
+      const gate = document.getElementById('addScealGate');
+      if (isMemberLoggedIn()) {
+        btn.style.display = '';
+        gate.style.display = 'none';
+      } else {
+        btn.style.display = 'none';
+        gate.style.display = 'block';
+      }
+    }
+
+    // ---- Image compression ----
+    let pendingImage = null;   // base64 data URL for a newly chosen photo
+    let rawImageEl = null;
+
+    function compressFromImage(img, maxW) {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      return { dataUrl: canvas.toDataURL('image/jpeg', 0.7), w, h };
+    }
+    function loadImageFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = e.target.result; };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    function updatePreview(maxW) {
+      if (!rawImageEl) return;
+      const { dataUrl, w, h } = compressFromImage(rawImageEl, maxW);
+      pendingImage = dataUrl;
+      document.getElementById('scealImagePreviewImg').src = dataUrl;
+      document.getElementById('scealImagePreview').style.display = 'block';
+      document.getElementById('scealSizeLabel').textContent = maxW + 'px';
+      document.getElementById('scealDimensionsLabel').textContent = w + ' × ' + h + 'px';
+      const kb = Math.round(dataUrl.length * 3 / 4 / 1024);
+      document.getElementById('scealFileSizeLabel').textContent = '~' + kb + ' KB';
+    }
+    document.getElementById('scealImage').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        rawImageEl = await loadImageFromFile(file);
+        document.getElementById('scealSizeSlider').value = 800;
+        updatePreview(800);
+        document.getElementById('scealImageControls').style.display = 'block';
+        const rm = document.getElementById('scealRemoveImage'); if (rm) rm.checked = false;
+      } catch (err) { console.error('Image load failed:', err); }
+    });
+    document.getElementById('scealSizeSlider').addEventListener('input', e => updatePreview(parseInt(e.target.value)));
+
+    // ---- Rendering ----
+    function esc(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function createScealCard(s) {
+      const metaBits = [];
+      if (s.people) metaBits.push(`<span class="people">${esc(s.people)}</span>`);
+      if (s.place) metaBits.push(esc(s.place));
+      if (s.era) metaBits.push(esc(s.era));
+      const meta = metaBits.length ? `<div class="sceal-meta">${metaBits.join(' · ')}</div>` : '';
+
+      let body = '';
+      if (s.image) body += `<img src="${s.image}" alt="${esc(s.title)}">`;
+      body += `<div class="story-text">${esc(s.story)}</div>`;
+      body += `<p class="tagline">— told by ${esc(s.contributor)}</p>`;
+
+      let admin = '';
+      if (isAdmin()) {
+        admin = `
+          <div class="admin-controls">
+            <button type="button" onclick="openEditModal('${s.id}')" ${isLocal ? 'disabled title="Only works on the deployed site"' : ''}>Edit</button>
+            <button type="button" class="delete-btn" onclick="openDeleteModal('${s.id}')" ${isLocal ? 'disabled title="Only works on the deployed site"' : ''}>Delete</button>
+          </div>`;
+      }
+
+      return `
+        <div class="sceal-card" data-id="${s.id}">
+          <div class="sceal-header">
+            <div class="sceal-heading">
+              <div class="sceal-title">${esc(s.title)}</div>
+              ${meta}
+            </div>
+            <span class="toggle" style="color:var(--gold);font-size:1.5rem;">+</span>
+          </div>
+          <div class="sceal-body">
+            ${body}
+            ${admin}
+          </div>
+        </div>`;
+    }
+
+    // The founding scéalta — the Muggivan Seanchas (seanchas mhuintir Mhongabháin).
+    // The two people are the first and second scéalta; their fuller telling — and the
+    // story of the name — lives at Paddy_Profile.html. Also used to seed KV via
+    // /api/seanchas-seed, and shown as a fallback before KV is configured.
+    const fallbackScealta = [
+      {
+        id: 'mug-paddy', title: 'Patrick “Paddy” Muggivan',
+        contributor: 'The Muggivan family', people: 'Muintir Mhongabháin',
+        place: 'Derrycon, East Clare', era: 'Scéal a hAon',
+        story: 'Scéal coming soon.',
+        image: ''
+      },
+      {
+        id: 'mug-jj', title: 'John “JJ” Muggivan',
+        contributor: 'The Muggivan family', people: 'Muintir Mhongabháin',
+        place: 'Galway & Clare', era: 'Scéal a Dó',
+        story: 'Scéal coming soon.',
+        image: ''
+      }
+    ];
+
+    async function loadScealta() {
+      const list = document.getElementById('scealtaList');
+      try {
+        const res = await fetch('/api/seanchas');
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('application/json')) { render(fallbackScealta); return; }
+        const data = await res.json();
+        if (data.error === 'KV not configured') { render(fallbackScealta); return; }
+        render(data.scealta || []);
+      } catch (err) {
+        console.error('Failed to load the seanchas:', err);
+        render(fallbackScealta);
+      }
+    }
+
+    function render(scealta) {
+      allScealta = scealta;
+      const list = document.getElementById('scealtaList');
+      const count = document.getElementById('scealCount');
+
+      if (!scealta.length) {
+        list.innerHTML = '<p class="no-scealta">No scéalta yet — be the first to add one.</p>';
+        count.textContent = '';
+      } else {
+        list.innerHTML = scealta.map(createScealCard).join('');
+        count.textContent = scealta.length === 1 ? '1 scéal in the seanchas' : `${scealta.length} scéalta in the seanchas`;
+      }
+
+      document.querySelectorAll('.sceal-card').forEach(card => {
+        card.addEventListener('click', e => {
+          if (e.target.closest('.admin-controls')) return;
+          card.classList.toggle('open');
+          const t = card.querySelector('.toggle');
+          if (t) t.textContent = card.classList.contains('open') ? '−' : '+';
+        });
+      });
+    }
+
+    function findById(id) { return allScealta.find(s => s.id === id); }
+
+    // ---- Modal (shared add/edit) ----
+    function resetImageState() {
+      pendingImage = null; rawImageEl = null;
+      document.getElementById('scealImage').value = '';
+      document.getElementById('scealImagePreview').style.display = 'none';
+      document.getElementById('scealImageControls').style.display = 'none';
+      document.getElementById('scealImageRemoveWrap').style.display = 'none';
+      document.getElementById('scealRemoveImage').checked = false;
+      document.getElementById('scealSizeSlider').value = 800;
+    }
+
+    function openAddModal() {
+      document.getElementById('scealForm').reset();
+      document.getElementById('scealId').value = '';
+      resetImageState();
+      document.getElementById('scealModalTitle').textContent = 'Add a Scéal';
+      document.querySelector('#scealModal .modal-sub').textContent =
+        'Share a story for the seanchas — a memory, a family history, a moment worth keeping. It posts to the collection straight away.';
+      document.getElementById('scealSubmitBtn').textContent = 'Add to the Seanchas';
+      // Contribute under your own name — prefilled and locked from your login.
+      const nameField = document.getElementById('scealContributor');
+      if (sessionName()) { nameField.value = sessionName(); nameField.readOnly = true; }
+      else { nameField.readOnly = false; }
+      hideStatus();
+      document.getElementById('scealModal').classList.add('active');
+    }
+
+    function openEditModal(id) {
+      const s = findById(id);
+      if (!s) return;
+      document.getElementById('scealForm').reset();
+      resetImageState();
+      document.getElementById('scealId').value = id;
+      document.getElementById('scealTitle').value = s.title || '';
+      document.getElementById('scealContributor').value = s.contributor || '';
+      document.getElementById('scealPeople').value = s.people || '';
+      document.getElementById('scealStory').value = s.story || '';
+      document.getElementById('scealPlace').value = s.place || '';
+      document.getElementById('scealEra').value = s.era || '';
+
+      if (s.image) {
+        document.getElementById('scealImagePreviewImg').src = s.image;
+        document.getElementById('scealImagePreview').style.display = 'block';
+        document.getElementById('scealImageRemoveWrap').style.display = 'flex';
+      }
+
+      document.getElementById('scealContributor').readOnly = false;
+      document.getElementById('scealModalTitle').textContent = 'Edit Scéal';
+      document.querySelector('#scealModal .modal-sub').textContent = 'Board member edit.';
+      document.getElementById('scealSubmitBtn').textContent = 'Save Changes';
+      hideStatus();
+      document.getElementById('scealModal').classList.add('active');
+    }
+
+    function closeScealModal() { document.getElementById('scealModal').classList.remove('active'); }
+
+    function openDeleteModal(id) {
+      const s = findById(id);
+      document.getElementById('deleteScealId').value = id;
+      document.getElementById('deleteScealTitle').textContent = s ? s.title : '';
+      document.getElementById('deleteModal').classList.add('active');
+    }
+    function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); }
+
+    function showStatus(msg, ok) {
+      const el = document.getElementById('scealStatus');
+      el.textContent = msg;
+      el.className = 'modal-status ' + (ok ? 'success' : 'error');
+    }
+    function hideStatus() { document.getElementById('scealStatus').className = 'modal-status'; }
+
+    // ---- Submit (add or edit) ----
+    document.getElementById('scealForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('scealSubmitBtn');
+      const id = document.getElementById('scealId').value;
+      const editing = !!id;
+
+      if (isLocal) {
+        showStatus('Saving is disabled in local dev — deploy to Cloudflare to contribute for real.', false);
+        return;
+      }
+
+      // Resolve the photo value
+      let imageVal;
+      if (editing && document.getElementById('scealRemoveImage').checked) imageVal = '';
+      else if (pendingImage) imageVal = pendingImage;
+      else imageVal = undefined; // keep existing (edit) / none (add)
+
+      const payload = {
+        title: document.getElementById('scealTitle').value.trim(),
+        contributor: document.getElementById('scealContributor').value.trim(),
+        story: document.getElementById('scealStory').value.trim(),
+        people: document.getElementById('scealPeople').value.trim(),
+        place: document.getElementById('scealPlace').value.trim(),
+        era: document.getElementById('scealEra').value.trim()
+      };
+      if (imageVal !== undefined) payload.image = imageVal;
+
+      btn.disabled = true;
+      btn.textContent = editing ? 'Saving…' : 'Adding…';
+
+      try {
+        let res;
+        if (editing) {
+          payload.id = id;
+          payload.adminPassword = adminPassword();
+          res = await fetch('/api/seanchas', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        } else {
+          payload.apiToken = adminPassword();
+          payload.username = sessionUsername();
+          res = await fetch('/api/seanchas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        }
+        const result = await res.json();
+        if (res.ok && result.success) {
+          showStatus(result.message || 'Saved.', true);
+          setTimeout(() => { closeScealModal(); loadScealta(); }, 1200);
+        } else {
+          throw new Error(result.error || 'Something went wrong');
+        }
+      } catch (err) {
+        showStatus(err.message || 'Failed to save. Please try again.', false);
+        btn.disabled = false;
+        btn.textContent = editing ? 'Save Changes' : 'Add to the Seanchas';
+      }
+    });
+
+    async function confirmDelete() {
+      const id = document.getElementById('deleteScealId').value;
+      try {
+        const res = await fetch('/api/seanchas', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, adminPassword: adminPassword() })
+        });
+        const result = await res.json();
+        if (result.success) { closeDeleteModal(); loadScealta(); }
+        else alert(result.error || 'Failed to remove the scéal');
+      } catch (err) { alert('Error removing scéal: ' + err.message); }
+    }
+
+    document.getElementById('addScealBtn').addEventListener('click', openAddModal);
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); });
+    });
+
+    refreshAddGate();
+    loadScealta();
+  </script>
+
+</body>
+</html>

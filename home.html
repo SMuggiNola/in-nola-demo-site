@@ -9,7 +9,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Oswald:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Uncial+Antiqua&display=swap" rel="stylesheet">
 
 <!-- the site theme, then this page's own layout on top of it -->
 <link rel="stylesheet" href="./global.css">
@@ -39,7 +39,7 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 .lp-brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:#fff;margin-right:auto}
 .lp-brand img{width:46px;height:auto}
 .lp-brand .k{display:block;font-family:var(--ui);font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
-.lp-brand .b{display:block;font-family:var(--display);font-size:1.32rem;letter-spacing:.03em;text-transform:uppercase;line-height:1.05}
+.lp-brand .b{display:block;font-family:var(--display);font-weight:700;font-size:1.32rem;letter-spacing:.03em;text-transform:uppercase;line-height:1.05}
 .lp-links{display:flex;gap:.2rem;flex-wrap:wrap}
 .lp-links a{font-family:var(--ui);text-transform:uppercase;letter-spacing:.09em;font-size:.86rem;color:#fff;text-decoration:none;padding:.5rem .7rem;border-radius:4px}
 .lp-links a:hover,.lp-links a:focus{background:rgba(212,167,38,.16);color:var(--gold)}
@@ -53,7 +53,7 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 .lp-hero .wrap{position:relative;z-index:2}
 .lp-hero img.mark{width:clamp(120px,16vw,168px);margin:0 auto 1.4rem}
 .eyebrow{font-family:var(--ui);text-transform:uppercase;letter-spacing:.28em;font-size:.8rem;color:var(--gold);margin:0 0 .9rem}
-.lp-hero h1{font-family:var(--display);font-size:clamp(2.4rem,6vw,4.2rem);line-height:1.03;color:var(--gold);margin:0 0 .5rem}
+.lp-hero h1{font-family:var(--display);font-weight:900;font-size:clamp(2.6rem,6.6vw,5rem);line-height:1;letter-spacing:-.015em;color:var(--gold);margin:0 0 .5rem}
 .lp-hero .lede{font-family:var(--body);font-size:clamp(1.05rem,1.6vw,1.25rem);line-height:1.6;color:#fff;max-width:56ch;margin:0 auto 1.8rem;text-align:center}
 .btn-row{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
 .lp-btn{font-family:var(--ui);text-transform:uppercase;letter-spacing:.09em;font-size:.92rem;text-decoration:none;padding:.85rem 1.5rem;border-radius:4px;border:1px solid var(--gold);color:var(--gold);background:transparent}
@@ -65,8 +65,8 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 .band{padding:clamp(2.75rem,6vw,4.5rem) 0;border-top:1px solid rgba(212,167,38,.22)}
 .band.alt{background:var(--band-mid)}
 .band-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem}
-.band-head h2{font-family:var(--display);font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1.05;color:var(--gold);margin:0}
-.band-head .gaelic{font-family:var(--display);font-style:italic;font-size:1.05rem;color:#fff;opacity:.72;margin:0 0 .25rem}
+.band-head h2{font-family:var(--display);font-weight:700;font-size:clamp(2rem,4.2vw,3.2rem);line-height:1.05;color:var(--gold);margin:0}
+.band-head .gaelic{font-family:var(--gaelic);font-size:1.4rem;color:var(--gold);opacity:.95;margin:0 0 .3rem;letter-spacing:.02em}
 .band-head .more{font-family:var(--ui);text-transform:uppercase;letter-spacing:.1em;font-size:.82rem;color:var(--gold);text-decoration:none;white-space:nowrap;border-bottom:1px solid rgba(212,167,38,.5);padding-bottom:2px}
 .band-head .more:hover{color:var(--gold-light);border-color:var(--gold-light)}
 .band p.lede{font-family:var(--body);font-size:1.05rem;line-height:1.65;color:#fff;max-width:68ch;margin:0 0 1.6rem;text-align:left}
@@ -99,7 +99,7 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 .feature{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(1.4rem,4vw,2.6rem);align-items:center}
 .feature img{width:100%;border:1px solid rgba(212,167,38,.35);border-radius:6px}
 .feature .badge{display:inline-block;font-family:var(--ui);text-transform:uppercase;letter-spacing:.2em;font-size:.72rem;color:#071a0e;background:var(--gold);padding:.3rem .65rem;border-radius:3px;margin-bottom:.9rem}
-.feature h2{font-family:var(--display);font-size:clamp(1.8rem,3.6vw,2.7rem);line-height:1.06;color:var(--gold);margin:0 0 .35rem}
+.feature h2{font-family:var(--display);font-weight:900;font-size:clamp(2rem,4.4vw,3.3rem);line-height:1.06;color:var(--gold);margin:0 0 .35rem}
 .feature .by{font-family:var(--body);font-style:italic;color:#fff;opacity:.82;margin:0 0 .9rem}
 .feature p.lede{margin-bottom:1.2rem}
 .feature .pub{font-family:var(--ui);text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;color:#fff;opacity:.65;margin-top:.9rem}
@@ -163,7 +163,7 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 <header class="lp-hero">
   <div class="wrap">
     <img class="mark" src="./assets/in_logo.png" alt="Irish Network New Orleans">
-    <p class="eyebrow">F&aacute;ilte &mdash; Welcome</p>
+    <p class="eyebrow" style="font-family:var(--gaelic);font-size:1.2rem;letter-spacing:.1em;text-transform:none">F&aacute;ilte</p>
     <h1>Irish Network New Orleans</h1>
     <p class="lede">Connecting Irish heritage, culture, and community across the Greater New Orleans area. Come for the music and the history, stay for the people.</p>
     <div class="btn-row">

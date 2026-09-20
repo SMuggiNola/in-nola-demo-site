@@ -1,0 +1,243 @@
+{
+ "viewBox": [
+  1400,
+  900
+ ],
+ "places": {
+  "Garrykennedy": {
+   "x": 1056.9,
+   "y": 549.8,
+   "kind": "village"
+  },
+  "Mountshannon": {
+   "x": 740.3,
+   "y": 375.6,
+   "kind": "village"
+  },
+  "Ogonnelloe": {
+   "x": 620.8,
+   "y": 658.4,
+   "kind": "locality"
+  },
+  "Portroe": {
+   "x": 1037.7,
+   "y": 691.4,
+   "kind": "village"
+  },
+  "Scarriff": {
+   "x": 327.5,
+   "y": 508.8,
+   "kind": "village"
+  },
+  "Tuamgraney": {
+   "x": 290.8,
+   "y": 591.9,
+   "kind": "village"
+  },
+  "Coolcoosaun": {
+   "x": 315.6,
+   "y": 413.6,
+   "kind": "hamlet"
+  },
+  "Coole": {
+   "x": 949.0,
+   "y": 548.6,
+   "kind": "hamlet"
+  },
+  "Cornagnoe Valley": {
+   "x": 323.7,
+   "y": 815.9,
+   "kind": "hamlet"
+  },
+  "Lough Hill": {
+   "x": 872.7,
+   "y": 70.8,
+   "kind": "hamlet"
+  },
+  "Whitegate": {
+   "x": 956.7,
+   "y": 248.0,
+   "kind": "hamlet"
+  },
+  "Ardnagreena": {
+   "x": 710.3,
+   "y": 732.8,
+   "kind": "locality"
+  },
+  "Balgwee Callows": {
+   "x": 1050.7,
+   "y": 78.8,
+   "kind": "locality"
+  },
+  "Binburra": {
+   "x": 1073.5,
+   "y": 51.8,
+   "kind": "locality"
+  },
+  "Carrowgar": {
+   "x": 643.9,
+   "y": 767.1,
+   "kind": "locality"
+  },
+  "Castletown": {
+   "x": 929.5,
+   "y": 719.6,
+   "kind": "locality"
+  },
+  "Clery's Point": {
+   "x": 935.8,
+   "y": 394.8,
+   "kind": "locality"
+  },
+  "Coolcam Point": {
+   "x": 850.6,
+   "y": 423.6,
+   "kind": "locality"
+  },
+  "Derry Point": {
+   "x": 750.6,
+   "y": 847.8,
+   "kind": "locality"
+  },
+  "Farraghill": {
+   "x": 1055.3,
+   "y": 393.7,
+   "kind": "locality"
+  },
+  "Gorrybloxam": {
+   "x": 698.2,
+   "y": 406.2,
+   "kind": "locality"
+  },
+  "Killoran": {
+   "x": 952.4,
+   "y": 850.7,
+   "kind": "locality"
+  },
+  "Knockalewnaghla": {
+   "x": 891.4,
+   "y": 100.5,
+   "kind": "locality"
+  },
+  "Knockfelidan": {
+   "x": 1012.0,
+   "y": 611.7,
+   "kind": "locality"
+  },
+  "Knocknakeha": {
+   "x": 466.8,
+   "y": 458.9,
+   "kind": "locality"
+  },
+  "Laghtea Hill": {
+   "x": 869.2,
+   "y": 809.1,
+   "kind": "locality"
+  },
+  "marina 338,542": {
+   "x": 338.5,
+   "y": 542.0,
+   "kind": "marina"
+  },
+  "marina 936,541": {
+   "x": 936.1,
+   "y": 540.6,
+   "kind": "marina"
+  },
+  "marina 1118,297": {
+   "x": 1118.4,
+   "y": 296.7,
+   "kind": "marina"
+  },
+  "marina 730,389": {
+   "x": 729.5,
+   "y": 389.1,
+   "kind": "marina"
+  },
+  "marina 1078,548": {
+   "x": 1077.6,
+   "y": 547.6,
+   "kind": "marina"
+  },
+  "marina 329,577": {
+   "x": 329.3,
+   "y": 576.6,
+   "kind": "marina"
+  },
+  "marina 723,383": {
+   "x": 723.1,
+   "y": 382.8,
+   "kind": "marina"
+  },
+  "high_cross 657,480": {
+   "x": 656.9,
+   "y": 480.0,
+   "kind": "high_cross"
+  },
+  "high_cross 656,480": {
+   "x": 655.6,
+   "y": 479.6,
+   "kind": "high_cross"
+  },
+  "castle 884,603": {
+   "x": 884.0,
+   "y": 602.8,
+   "kind": "castle"
+  },
+  "Saint Brigid's Church": {
+   "x": 652.5,
+   "y": 484.8,
+   "kind": "church"
+  },
+  "Saint Mary's Church": {
+   "x": 653.7,
+   "y": 487.6,
+   "kind": "church"
+  },
+  "Round Tower": {
+   "x": 656.1,
+   "y": 479.8,
+   "kind": "round_tower"
+  },
+  "The Church of the Wounded Men": {
+   "x": 658.4,
+   "y": 478.7,
+   "kind": "church"
+  },
+  "Saint Caimin's Church": {
+   "x": 657.3,
+   "y": 479.2,
+   "kind": "church"
+  },
+  "O'Grady's Castle": {
+   "x": 294.8,
+   "y": 600.0,
+   "kind": "ruins"
+  },
+  "church 869,688": {
+   "x": 868.9,
+   "y": 687.5,
+   "kind": "church"
+  },
+  "Garrykennedy Castle": {
+   "x": 1063.1,
+   "y": 544.9,
+   "kind": "castle"
+  },
+  "Townlough Castle": {
+   "x": 793.7,
+   "y": 817.3,
+   "kind": "castle"
+  },
+  "Castle Baun": {
+   "x": 528.1,
+   "y": 586.6,
+   "kind": "castle"
+  },
+  "Saint Michael's Church": {
+   "x": 650.1,
+   "y": 477.1,
+   "kind": "church"
+  }
+ }
+}

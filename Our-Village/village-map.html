@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Our Village &mdash; the map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Walk Our Village on a real map of East Clare: the library, the stories, the music, the dancing, and what is coming up.">
+<link rel="icon" type="image/png" href="../assets/in_logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Uncial+Antiqua&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../global.css">
+<style>
+/* ======================================================================
+   The village as a map. The drawing is real: it is East Clare around
+   Mountshannon, pulled from OpenStreetMap by tools/map-mountshannon.
+   The markers are map symbols, one per room of the village.
+   ==================================================================== */
+body.villagemap{display:block;text-align:left;background:#071a0e;overflow-x:hidden}
+body.villagemap::before{display:none}
+.vm-wrap{width:100%;max-width:1240px;margin-inline:auto;padding:0 clamp(1rem,4vw,2.25rem) 3rem}
+
+.vm-head{padding:clamp(1.6rem,4vw,2.6rem) 0 1.2rem;text-align:center}
+.vm-head .ga{font-family:'Uncial Antiqua',serif;font-size:clamp(1.5rem,3.4vw,2.2rem);color:var(--gold);margin-bottom:.2rem}
+.vm-head h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2.1rem,5vw,3.4rem);line-height:1;color:var(--gold);margin:0 0 .5rem}
+.vm-head p{font-family:'Source Sans 3',sans-serif;font-size:1.05rem;line-height:1.6;color:#fff;max-width:64ch;margin:0 auto;text-align:center}
+
+.vm-frame{position:relative;border:1px solid rgba(212,167,38,.35);border-radius:8px;background:#0a2113;padding:.6rem;margin-top:1.4rem}
+.vm-frame svg{width:100%;height:auto;display:block;color:#F5F1E8}
+.vm-frame .marker{cursor:pointer}
+.vm-frame .marker .hit{fill:transparent}
+.vm-frame .marker .glyph{color:var(--gold);transition:transform .18s ease}
+.vm-frame .marker .plate{fill:#071a0e;fill-opacity:.93;stroke:var(--gold);stroke-opacity:.55;stroke-width:1}
+.vm-frame .marker .en{font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;fill:#F5F1E8}
+.vm-frame .marker .ga{font-family:'Uncial Antiqua',serif;font-size:14px;fill:var(--gold)}
+.vm-frame .marker:hover .plate,.vm-frame .marker:focus .plate{fill-opacity:.95;stroke-opacity:1}
+.vm-frame .marker:hover .glyph,.vm-frame .marker:focus .glyph{transform:translateY(-2px)}
+.vm-frame .marker:focus{outline:none}
+.vm-frame .marker:focus .plate{stroke:#fff}
+
+.vm-key{margin-top:1.5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.85rem}
+.vm-key a{display:flex;align-items:center;gap:.7rem;text-decoration:none;padding:.7rem .85rem;border:1px solid rgba(212,167,38,.3);border-radius:6px;background:rgba(255,255,255,.04)}
+.vm-key a:hover{border-color:rgba(212,167,38,.65);background:rgba(255,255,255,.07)}
+.vm-key svg{width:26px;height:26px;color:var(--gold);flex:0 0 auto}
+.vm-key .t{font-family:'Archivo',sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:.9rem;color:#F5F1E8}
+.vm-key .g{font-family:'Uncial Antiqua',serif;font-size:.95rem;color:var(--gold);display:block}
+.vm-note{font-family:'Source Sans 3',sans-serif;font-size:.92rem;line-height:1.55;color:#fff;opacity:.72;margin-top:1.4rem;max-width:70ch}
+.vm-note a{color:var(--gold)}
+@media (max-width:640px){.vm-frame{padding:.3rem}}
+</style>
+</head>
+<body class="villagemap">
+
+<!-- the map symbols, drawn once and used on the map and in the key -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="sym-book" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-9 -7 Q0 -4 9 -7 V7 Q0 10 -9 7 Z"/><path d="M0 -4 V10"/></g>
+  <g id="sym-tower" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-4 9 V-5 Q0 -11 4 -5 V9 Z"/><path d="M-6 9 H6"/><circle cx="0" cy="-2" r="1.4"/></g>
+  <g id="sym-harp" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-6 9 V-4 Q-6 -9 2 -9"/><path d="M-6 9 H7"/><path d="M-2 9 V-7"/><path d="M2 9 V-9"/></g>
+  <g id="sym-dance" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="0" cy="-7" r="2.4"/><path d="M0 -4 V2"/><path d="M-6 -1 L0 1 L6 -3"/><path d="M0 2 L-4 9"/><path d="M0 2 L5 8"/></g>
+  <g id="sym-tent" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-9" y="-8" width="18" height="13" rx="1.5"/><path d="M-9 -3.5 H9"/>
+    <path d="M-5 -8 V-11"/><path d="M5 -8 V-11"/><path d="M-4 5 V9"/><path d="M4 5 V9"/></g>
+  <g id="sym-shelf" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-8 -8 V6"/><path d="M-4 -8 V6"/><path d="M0 -6 V6"/><path d="M5 -8 L8 6"/><path d="M-10 6 H10"/></g>
+  <g id="sym-hearth" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-8 8 V-3 Q0 -11 8 -3 V8 Z"/><path d="M-3 8 Q-3 2 0 -1 Q3 2 3 8"/></g>
+  <g id="sym-gate" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-8 8 V-6"/><path d="M8 8 V-6"/><path d="M-8 -6 H8"/><path d="M-8 1 H8"/><path d="M-8 8 L8 -6"/></g>
+</defs></svg>
+
+<div class="vm-wrap">
+
+  <div class="vm-head">
+    <p class="ga">&Aacute;r Sr&aacute;idbhaile</p>
+    <h1>Our Village</h1>
+    <p>Every room of the village sits on a real place in East Clare, around Mountshannon on Lough Derg. The drawing is not decoration: it is the actual roads, shoreline and townlands, drawn from open map data. Follow a symbol to where it leads.</p>
+  </div>
+
+  <div class="vm-frame" id="frame" aria-label="A map of the greater Mountshannon area with a marker for each part of Our Village"></div>
+
+  <nav class="vm-key" id="key" aria-label="Everything on the map"></nav>
+
+  <p class="vm-note">Map data &copy; OpenStreetMap contributors, ODbL. Drawn by
+    <code>tools/map-mountshannon</code> on one machine, no map service, no key.
+    <a href="./index.html">The older village page is still here.</a></p>
+
+</div>
+
+<script>
+/* Each room of the village, pinned to a real place. The coordinates come from the
+   same build that drew the map, so a marker can never drift off its village. */
+const ROOMS = [
+  {at:"Tuamgraney",   sym:"sym-book",   ga:"An Leabharlann", en:"The Library",  href:"./Our_Library/index.html",            note:"Long reads: the Famine, emigration, the Irish in Louisiana."},
+  {at:"Mountshannon", sym:"sym-hearth", ga:"An Seanchas",    en:"The Stories",  href:"./Our_Library/seanchas.html",         note:"Members' own scéalta, and the comments under them."},
+  {at:"Whitegate",    sym:"sym-shelf",  ga:"Na Seilfeanna",  en:"The Stacks",   href:"./Our_Library/stacks.html",           note:"Sources and documents, the shelf we keep adding to."},
+  {at:"Scarriff",     sym:"sym-tent",   ga:"Imeachtaí",      en:"Events",       href:"./Events-Page/index.html",            note:"What is coming up, and what has just been."},
+  {at:"Garrykennedy", sym:"sym-harp",   ga:"Ceol",           en:"Music",        href:"./music.html",                        note:"Sessions and players, and where to find a tune."},
+  {at:"Portroe",      sym:"sym-dance",  ga:"Rince",          en:"Dancing",      href:"./dancing.html",                      note:"Classes, ceilis, and the steps that keep going."},
+  {at:"Coole",        sym:"sym-gate",   ga:"Bí Linn",        en:"Join Us",      href:"../join.html",                        note:"Become a member, or sign back in."},
+];
+
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(name, attrs, text){
+  const n = document.createElementNS(SVGNS, name);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+Promise.all([
+  fetch("../assets/mountshannon-map.svg").then(r => r.text()),
+  fetch("../assets/mountshannon-places.json").then(r => r.json()),
+]).then(([svgText, data]) => {
+  const frame = document.getElementById("frame");
+  frame.innerHTML = svgText;
+  const svg = frame.querySelector("svg");
+  svg.removeAttribute("style");            // let the page's colours take over
+  svg.setAttribute("role", "group");
+
+  ROOMS.forEach(room => {
+    const p = data.places[room.at];
+    if (!p) return;                        // a place that moved in the data simply loses its marker
+    const g = el("a", {class:"marker", href:room.href, tabindex:"0",
+                       "aria-label": room.en + " at " + room.at});
+    const w = Math.max(room.en.length, room.ga.length) * 9 + 34;
+    g.appendChild(el("rect", {class:"plate", x:p.x - w/2, y:p.y - 86, width:w, height:46, rx:4}));
+    const use = el("use", {href:"#" + room.sym, x:p.x - w/2 + 18, y:p.y - 63, class:"glyph"});
+    g.appendChild(use);
+    g.appendChild(el("text", {class:"ga", x:p.x - w/2 + 34, y:p.y - 68}, room.ga));
+    g.appendChild(el("text", {class:"en", x:p.x - w/2 + 34, y:p.y - 50}, room.en));
+    g.appendChild(el("line", {x1:p.x, y1:p.y - 40, x2:p.x, y2:p.y - 5,
+                              stroke:"var(--gold)", "stroke-width":"1.5"}));
+    g.appendChild(el("circle", {cx:p.x, cy:p.y, r:3.4, fill:"var(--gold)"}));
+    svg.appendChild(g);
+  });
+
+  // the key doubles as the plain list of links, so the page works without the map
+  const key = document.getElementById("key");
+  ROOMS.forEach(room => {
+    key.insertAdjacentHTML("beforeend",
+      `<a href="${room.href}">
+         <svg viewBox="-12 -12 24 24" aria-hidden="true"><use href="#${room.sym}"/></svg>
+         <span><span class="g">${room.ga}</span><span class="t">${room.en}</span></span>
+       </a>`);
+  });
+}).catch(() => {
+  document.getElementById("frame").innerHTML =
+    '<p style="font-family:Source Sans 3,sans-serif;color:#fff;padding:1rem">The map could not load. Everything on it is listed below.</p>';
+  const key = document.getElementById("key");
+  ROOMS.forEach(room => {
+    key.insertAdjacentHTML("beforeend",
+      `<a href="${room.href}"><span><span class="g">${room.ga}</span><span class="t">${room.en}</span></span></a>`);
+  });
+});
+</script>
+<script src="../js/main.js"></script>
+</body>
+</html>

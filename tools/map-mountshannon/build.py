@@ -10,6 +10,7 @@ from shapely.ops import linemerge, unary_union
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.abspath(os.path.join(HERE, "..", "..", "assets", "mountshannon-map.svg"))
+PLACES_OUT = os.path.abspath(os.path.join(HERE, "..", "..", "assets", "mountshannon-places.json"))
 BOX = (52.855, -8.545, 52.985, -8.330)        # must match fetch.py
 W, H, MARGIN = 1400, 900, 26
 FONT = "font-family=\"'Source Sans 3', 'Segoe UI', sans-serif\""
@@ -119,6 +120,7 @@ def poly_path(g):
 
 # ---------- labels, straight, no overlaps ----------
 taken = []
+coords = {}
 def place_label(x, y, text, size):
     w, h = len(text) * size * 0.52, size * 1.25
     b = (x - w/2 - 5, y - h - 3, x + w/2 + 5, y + 5)
@@ -165,6 +167,7 @@ for rank, name, c, kind in places:
     size = SIZE.get(kind, 14)
     x, y = P(c.x, c.y)
     if place_label(x, y - 10, name, size) is None: continue
+    coords[name] = {"x": round(x, 1), "y": round(y, 1), "kind": kind}
     dot = 3.4 if kind in ("town", "village") else 2.2
     svg.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{dot}" fill="currentColor" opacity=".9"/>')
     svg.append(f'<text x="{x:.1f}" y="{y-10:.1f}" text-anchor="middle" {FONT} font-size="{size}" '
@@ -185,5 +188,15 @@ svg.append('</svg>')
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 open(OUT, "w", encoding="utf-8").write("\n".join(svg))
-print(f"wrote {OUT}: {len(roads)} road pieces, {drawn} names, "
+
+# the marinas and the old church sites too, so a page can hang markers on real places
+for c in marinas:
+    x, y = P(c.x, c.y)
+    coords.setdefault(f"marina {x:.0f},{y:.0f}", {"x": round(x, 1), "y": round(y, 1), "kind": "marina"})
+for c, k, n in holy:
+    x, y = P(c.x, c.y)
+    coords.setdefault(n or f"{k} {x:.0f},{y:.0f}", {"x": round(x, 1), "y": round(y, 1), "kind": k})
+json.dump({"viewBox": [W, H], "places": coords}, open(PLACES_OUT, "w", encoding="utf-8"), indent=1)
+
+print(f"wrote {OUT} and {PLACES_OUT}: {len(roads)} road pieces, {drawn} names, "
       f"{len(marinas)} marinas, {len(holy)} historic marks, water: {'yes' if water and not water.is_empty else 'no'}")

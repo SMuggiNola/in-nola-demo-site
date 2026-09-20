@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IN-NOLA type options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Archivo:ital,wght@0,400;0,600;0,700;1,700&family=Overpass:ital,wght@0,400;0,600;0,700;1,700&family=Source+Sans+3:wght@400;600&family=Barlow+Condensed:wght@500;600&family=Uncial+Antiqua&family=Grenze+Gotisch:wght@400;600&family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=IM+Fell+English:ital@0;1&family=Bevan&family=Abril+Fatface&family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#d4a726;--green:#071a0e;--mid:#0d2818}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--green);color:#fff;padding:28px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.col{background:var(--mid);border:1px solid rgba(212,167,38,.3);border-radius:8px;padding:22px}
+.tag{font-family:'Archivo',sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.tag b{display:block;font-size:.68rem;letter-spacing:.06em;color:#fff;opacity:.7;margin-top:4px;text-transform:none}
+h2{font-size:2.1rem;line-height:1.05;color:var(--gold);margin-bottom:6px}
+.eyebrow{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+p.body{font-size:.98rem;line-height:1.6;margin:10px 0 16px}
+.nav{display:flex;gap:10px;font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;margin-bottom:16px;opacity:.95}
+.btn{display:inline-block;background:var(--gold);color:#071a0e;padding:.6rem 1rem;border-radius:4px;font-size:.82rem;letter-spacing:.09em;text-transform:uppercase}
+.sign{background:#fff;border:3px solid #000;border-radius:16px;padding:.9rem 1rem;text-align:center;margin:16px 0 6px}
+.sign .ga{display:block;color:#000;font-style:italic;font-size:1.3rem;line-height:1.1}
+.sign .en{display:block;color:#000;text-transform:uppercase;font-size:1.05rem;letter-spacing:.09em;line-height:1.2}
+
+/* ---- A: Cormorant + Archivo ---- */
+.a h2{font-family:'Cormorant Garamond',serif}
+.a .eyebrow,.a .nav,.a .btn{font-family:'Archivo',sans-serif;font-weight:600}
+.a p.body{font-family:'Source Sans 3',sans-serif}
+.a .sign .ga{font-family:'Archivo',sans-serif;font-weight:700}
+.a .sign .en{font-family:'Archivo',sans-serif;font-weight:700}
+
+/* ---- B: EB Garamond + Overpass (highway lettering) ---- */
+.b h2{font-family:'EB Garamond',serif}
+.b .eyebrow,.b .nav,.b .btn{font-family:'Overpass',sans-serif;font-weight:600}
+.b p.body{font-family:'Overpass',sans-serif}
+.b .sign .ga{font-family:'Overpass',sans-serif;font-weight:700}
+.b .sign .en{font-family:'Overpass',sans-serif;font-weight:700}
+
+/* ---- C: Libre Baskerville + Barlow Condensed ---- */
+.c h2{font-family:'Libre Baskerville',serif;font-size:1.8rem}
+.c .eyebrow,.c .nav,.c .btn{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.9rem}
+.c p.body{font-family:'Source Sans 3',sans-serif}
+.c .sign .ga{font-family:'Archivo',sans-serif;font-weight:700}
+.c .sign .en{font-family:'Archivo',sans-serif;font-weight:700}
+</style>
+</head>
+<body>
+<div class="grid">
+
+  <div class="col a">
+    <p class="tag">Option A<b>Cormorant Garamond &middot; Archivo &middot; Source Sans 3</b></p>
+    <div class="nav"><span>Events</span><span>Our Village</span><span>About</span><span>Join</span></div>
+    <p class="eyebrow">F&aacute;ilte &mdash; Welcome</p>
+    <h2>Irish Network New Orleans</h2>
+    <p class="body">Sessions, talks, film nights, the parade, and the gatherings in between. Everything we host is open to members and newcomers alike.</p>
+    <a class="btn" href="#">Become a member</a>
+    <div class="sign"><span class="ga">&Aacute;r Sr&aacute;idbhaile</span><span class="en">Our Village</span></div>
+  </div>
+
+  <div class="col b">
+    <p class="tag">Option B<b>EB Garamond &middot; Overpass &middot; Overpass</b></p>
+    <div class="nav"><span>Events</span><span>Our Village</span><span>About</span><span>Join</span></div>
+    <p class="eyebrow">F&aacute;ilte &mdash; Welcome</p>
+    <h2>Irish Network New Orleans</h2>
+    <p class="body">Sessions, talks, film nights, the parade, and the gatherings in between. Everything we host is open to members and newcomers alike.</p>
+    <a class="btn" href="#">Become a member</a>
+    <div class="sign"><span class="ga">&Aacute;r Sr&aacute;idbhaile</span><span class="en">Our Village</span></div>
+  </div>
+
+  <div class="col c">
+    <p class="tag">Option C<b>Libre Baskerville &middot; Barlow Condensed &middot; Source Sans 3</b></p>
+    <div class="nav"><span>Events</span><span>Our Village</span><span>About</span><span>Join</span></div>
+    <p class="eyebrow">F&aacute;ilte &mdash; Welcome</p>
+    <h2>Irish Network New Orleans</h2>
+    <p class="body">Sessions, talks, film nights, the parade, and the gatherings in between. Everything we host is open to members and newcomers alike.</p>
+    <a class="btn" href="#">Become a member</a>
+    <div class="sign"><span class="ga">&Aacute;r Sr&aacute;idbhaile</span><span class="en">Our Village</span></div>
+  </div>
+
+</div>
+
+<h3 style="font-family:'Archivo',sans-serif;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:#d4a726;margin:34px 0 16px">The display face: the Irish answer to Carey Type</h3>
+<div class="grid">
+
+  <div class="col">
+    <p class="tag">Display 1 &mdash; Uncial Antiqua<b>Open Font License &middot; insular uncial, the Book of Kells hand</b></p>
+    <p style="font-family:'Uncial Antiqua',serif;font-size:2.5rem;line-height:1.15;color:#d4a726">Irish Network</p>
+    <p style="font-family:'Uncial Antiqua',serif;font-size:2.5rem;line-height:1.15;color:#d4a726;margin-bottom:10px">New Orleans</p>
+    <p style="font-family:'Uncial Antiqua',serif;font-size:1.35rem;color:#fff;opacity:.9">An Seanchas &middot; F&aacute;ilte</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif;margin-top:12px">Headlines only. Long paragraphs in this hand get tiring, and the lowercase is unfamiliar to most readers.</p>
+  </div>
+
+  <div class="col">
+    <p class="tag">Display 2 &mdash; Grenze Gotisch<b>Open Font License &middot; blackletter-leaning, heavier texture</b></p>
+    <p style="font-family:'Grenze Gotisch',serif;font-size:2.9rem;line-height:1.1;color:#d4a726">Irish Network</p>
+    <p style="font-family:'Grenze Gotisch',serif;font-size:2.9rem;line-height:1.1;color:#d4a726;margin-bottom:10px">New Orleans</p>
+    <p style="font-family:'Grenze Gotisch',serif;font-size:1.5rem;color:#fff;opacity:.9">An Seanchas &middot; F&aacute;ilte</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif;margin-top:12px">Reads as old-world rather than Irish; closer to a German or English manuscript.</p>
+  </div>
+
+  <div class="col">
+    <p class="tag">Display 3 &mdash; Cinzel<b>Open Font License &middot; Roman inscriptional caps, already loaded on the site</b></p>
+    <p style="font-family:'Cinzel',serif;font-size:2.1rem;line-height:1.2;color:#d4a726">IRISH NETWORK</p>
+    <p style="font-family:'Cinzel',serif;font-size:2.1rem;line-height:1.2;color:#d4a726;margin-bottom:10px">NEW ORLEANS</p>
+    <p style="font-family:'Cinzel',serif;font-size:1.3rem;color:#fff;opacity:.9">AN SEANCHAS &middot; F&Aacute;ILTE</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif;margin-top:12px">Formal and sharp, but it says monument, not island.</p>
+  </div>
+
+  <div class="col">
+    <p class="tag">Display 4 &mdash; Uncial Antiqua for statements, EB Garamond beneath<b>The pairing I would ship</b></p>
+    <p style="font-family:'Uncial Antiqua',serif;font-size:2.2rem;line-height:1.2;color:#d4a726">An Seanchas</p>
+    <p style="font-family:'EB Garamond',serif;font-size:1.65rem;line-height:1.25;color:#fff;margin:6px 0 10px">The stories of our people</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif">The Gaelic hand carries the Irish word, the serif carries the English. That is how the signs already work, and it keeps every heading legible.</p>
+  </div>
+
+</div>
+
+<h3 style="font-family:'Archivo',sans-serif;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:#d4a726;margin:34px 0 16px">Diaspora lettering: the Irish in America, not the manuscript</h3>
+<div class="grid">
+
+  <div class="col">
+    <p class="tag">Diaspora 1 &mdash; Playfair Display<b>OFL &middot; Scotch roman, the face of the 19th century Irish-American press</b></p>
+    <p style="font-family:'Playfair Display',serif;font-weight:900;font-size:2.3rem;line-height:1.08;color:#d4a726">An Irish Republican in Louisiana</p>
+    <p style="font-family:'Playfair Display',serif;font-size:1.25rem;font-style:italic;color:#fff;opacity:.9;margin-top:8px">F&aacute;ilte &middot; Irish Network New Orleans</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif;margin-top:12px">The newspaper the emigrants actually read. Sharp, high contrast, reads as a masthead.</p>
+  </div>
+
+  <div class="col">
+    <p class="tag">Diaspora 2 &mdash; Bevan<b>OFL &middot; American slab, the wood type on broadsides and ward posters</b></p>
+    <p style="font-family:'Bevan',serif;font-size:1.95rem;line-height:1.15;color:#d4a726">An Irish Republican in Louisiana</p>
+    <p style="font-family:'Bevan',serif;font-size:1.1rem;color:#fff;opacity:.9;margin-top:8px">F&aacute;ilte &middot; Irish Network New Orleans</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif;margin-top:12px">Loud and civic. Parade banners, union halls, saloon windows.</p>
+  </div>
+
+  <div class="col">
+    <p class="tag">Diaspora 3 &mdash; IM Fell English<b>OFL &middot; old printing house types, already loaded on this site</b></p>
+    <p style="font-family:'IM Fell English',serif;font-size:2.2rem;line-height:1.12;color:#d4a726">An Irish Republican in Louisiana</p>
+    <p style="font-family:'IM Fell English',serif;font-style:italic;font-size:1.2rem;color:#fff;opacity:.9;margin-top:8px">F&aacute;ilte &middot; Irish Network New Orleans</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif;margin-top:12px">Ink-bitten and handset. Reads as archive and ballad sheet rather than brand.</p>
+  </div>
+
+  <div class="col">
+    <p class="tag">Diaspora 4 &mdash; Abril Fatface over Zilla Slab<b>OFL &middot; Victorian display with a slab beneath it</b></p>
+    <p style="font-family:'Abril Fatface',serif;font-size:2.3rem;line-height:1.1;color:#d4a726">An Irish Republican in Louisiana</p>
+    <p style="font-family:'Zilla Slab',serif;font-weight:600;font-size:1.15rem;color:#fff;opacity:.92;margin-top:8px">F&aacute;ilte &middot; Irish Network New Orleans</p>
+    <p class="body" style="font-family:'Source Sans 3',sans-serif;margin-top:12px">Playbill energy. Strong for headlines, needs a plain companion everywhere else.</p>
+  </div>
+
+</div>
+</body>
+</html>

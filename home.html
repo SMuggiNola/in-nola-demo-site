@@ -71,11 +71,11 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 .band-head .more:hover{color:var(--gold-light);border-color:var(--gold-light)}
 .band p.lede{font-family:var(--body);font-size:1.05rem;line-height:1.65;color:#fff;max-width:68ch;margin:0 0 1.6rem;text-align:left}
 
-.doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:1rem}
-.door{display:block;text-decoration:none;background:rgba(255,255,255,.045);border:1px solid rgba(212,167,38,.3);border-radius:6px;padding:1.15rem 1.25rem;transition:border-color .2s,background .2s,transform .2s}
-.door:hover{border-color:rgba(212,167,38,.62);background:rgba(255,255,255,.075);transform:translateY(-2px)}
-.door .t{display:block;font-family:var(--ui);text-transform:uppercase;letter-spacing:.06em;font-size:1rem;color:var(--gold);margin-bottom:.35rem}
-.door .d{display:block;font-family:var(--body);font-size:.96rem;line-height:1.5;color:#fff;opacity:.88;text-align:left}
+/* the doorways are the Irish road signs, set on a measured grid */
+.signs{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1.15rem;align-items:stretch}
+.signpost{display:flex;flex-direction:column;gap:.5rem}
+.landing .nav-card-sign{margin:0;min-height:96px;width:100%;justify-content:center}
+.sign-note{font-family:var(--body);font-size:.9rem;line-height:1.45;color:#fff;opacity:.78;text-align:center;margin:0;padding-inline:.25rem}
 
 .split{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(1.5rem,4vw,3rem);align-items:center}
 .split img{border:1px solid rgba(212,167,38,.3);border-radius:6px}
@@ -94,6 +94,16 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 .landing .welcome-ticker:hover .welcome-ticker-track{animation-play-state:paused}
 @keyframes lpTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.landing .welcome-ticker-track{animation:none}}
+
+/* the featured piece: a news band, image beside the headline */
+.feature{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(1.4rem,4vw,2.6rem);align-items:center}
+.feature img{width:100%;border:1px solid rgba(212,167,38,.35);border-radius:6px}
+.feature .badge{display:inline-block;font-family:var(--ui);text-transform:uppercase;letter-spacing:.2em;font-size:.72rem;color:#071a0e;background:var(--gold);padding:.3rem .65rem;border-radius:3px;margin-bottom:.9rem}
+.feature h2{font-family:var(--display);font-size:clamp(1.8rem,3.6vw,2.7rem);line-height:1.06;color:var(--gold);margin:0 0 .35rem}
+.feature .by{font-family:var(--body);font-style:italic;color:#fff;opacity:.82;margin:0 0 .9rem}
+.feature p.lede{margin-bottom:1.2rem}
+.feature .pub{font-family:var(--ui);text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;color:#fff;opacity:.65;margin-top:.9rem}
+@media (max-width:820px){.feature{grid-template-columns:1fr}}
 
 @media (max-width:520px){
   .lp-hero h1{font-size:clamp(1.9rem,8.5vw,2.6rem)}
@@ -163,6 +173,26 @@ body.landing::before{display:none}           /* the animated wash fights the ban
   </div>
 </header>
 
+<!-- ====================================================== featured -->
+<section class="band alt" id="feature">
+  <div class="wrap">
+    <div class="feature">
+      <img src="./obrien_image.webp" alt="J.F.X. O'Brien" loading="lazy">
+      <div>
+        <span class="badge">Nuacht &mdash; New from IN-NOLA</span>
+        <h2>An Irish Republican in Louisiana</h2>
+        <p class="by">by board member Andrew R. Jones</p>
+        <p class="lede">The story of J.F.X. O'Brien: Irish nationalist, Civil War surgeon, political prisoner, and a resident of New Orleans and Baton Rouge. One life that ran from a rising in Ireland to a street in this city.</p>
+        <div class="btn-row" style="justify-content:flex-start">
+          <a class="lp-btn solid" href="https://64parishes.org/irish-republican-in-louisiana" target="_blank" rel="noopener">Read the full article</a>
+          <a class="lp-btn" href="/Our-Village/Our_Library/index.html">More from the library</a>
+        </div>
+        <p class="pub">Published in 64 Parishes &middot; March 2026</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ========================================================= events -->
 <section class="band" id="events">
   <div class="wrap">
@@ -174,16 +204,34 @@ body.landing::before{display:none}           /* the animated wash fights the ban
       <a class="more" href="/Our-Village/Events-Page/index.html">All events &rarr;</a>
     </div>
     <p class="lede">Sessions, talks, film nights, the parade, and the gatherings in between. Everything we host is open to members and newcomers alike, and most of it happens in a room where somebody will say hello.</p>
-    <div class="doors">
-      <a class="door" href="/Our-Village/Events-Page/index.html"><span class="t">What's coming up</span><span class="d">The next gatherings, with dates, places, and how to get in.</span></a>
-      <a class="door" href="/Our-Village/music.html"><span class="t">Music</span><span class="d">Sessions and players around the city, and where to find a tune.</span></a>
-      <a class="door" href="/Our-Village/dancing.html"><span class="t">Dancing</span><span class="d">Classes, ceilis, and the people who keep the steps going.</span></a>
+    <div class="signs">
+      <div class="signpost">
+        <a href="/Our-Village/Events-Page/index.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">Imeachta&iacute;</span>
+          <span class="sign-english">Events</span>
+        </a>
+        <p class="sign-note">What's coming up, with dates, places, and how to get in.</p>
+      </div>
+      <div class="signpost">
+        <a href="/Our-Village/music.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">Ceol</span>
+          <span class="sign-english">Music</span>
+        </a>
+        <p class="sign-note">Sessions and players around the city, and where to find a tune.</p>
+      </div>
+      <div class="signpost">
+        <a href="/Our-Village/dancing.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">Rince</span>
+          <span class="sign-english">Dancing</span>
+        </a>
+        <p class="sign-note">Classes, ceilis, and the people keeping the steps going.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ========================================================= village -->
-<section class="band alt" id="village">
+<section class="band" id="village">
   <div class="wrap">
     <div class="band-head">
       <div>
@@ -193,16 +241,34 @@ body.landing::before{display:none}           /* the animated wash fights the ban
       <a class="more" href="/Our-Village/index.html">Walk the village &rarr;</a>
     </div>
     <p class="lede">The part of the site that belongs to the members: a library of Irish and Irish-American history, the music and dancing pages, and the rooms where our own work gets published.</p>
-    <div class="doors">
-      <a class="door" href="/Our-Village/Our_Library/index.html"><span class="t">The Library</span><span class="d">Long reads on the Famine, emigration, and the Irish in Louisiana.</span></a>
-      <a class="door" href="/Our-Village/Our_Library/stacks.html"><span class="t">The Stacks</span><span class="d">Sources, documents, and the shelf we keep adding to.</span></a>
-      <a class="door" href="/Our-Village/index.html"><span class="t">Everything else</span><span class="d">Music, dancing, and the rest of the village.</span></a>
+    <div class="signs">
+      <div class="signpost">
+        <a href="/Our-Village/index.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">&Aacute;r Sr&aacute;idbhaile</span>
+          <span class="sign-english">Our Village</span>
+        </a>
+        <p class="sign-note">Every room the members share.</p>
+      </div>
+      <div class="signpost">
+        <a href="/Our-Village/Our_Library/index.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">An Leabharlann</span>
+          <span class="sign-english">The Library</span>
+        </a>
+        <p class="sign-note">Long reads on the Famine, emigration, and the Irish in Louisiana.</p>
+      </div>
+      <div class="signpost">
+        <a href="/Our-Village/Our_Library/stacks.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">Na Seilfeanna</span>
+          <span class="sign-english">The Stacks</span>
+        </a>
+        <p class="sign-note">Sources and documents, the shelf we keep adding to.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ======================================================= seanchas -->
-<section class="band" id="seanchas">
+<section class="band alt" id="seanchas">
   <div class="wrap">
     <div class="split">
       <div>
@@ -224,7 +290,7 @@ body.landing::before{display:none}           /* the animated wash fights the ban
 </section>
 
 <!-- ========================================================== about -->
-<section class="band alt" id="about">
+<section class="band" id="about">
   <div class="wrap">
     <div class="band-head">
       <div>
@@ -234,16 +300,34 @@ body.landing::before{display:none}           /* the animated wash fights the ban
       <a class="more" href="/About-IN-NOLA/index.html">About us &rarr;</a>
     </div>
     <p class="lede">Irish Network New Orleans is part of Irish Network USA, run by volunteers who wanted the Irish side of this city to have somewhere to gather. We put on events, keep the history, and make room for anybody curious about it.</p>
-    <div class="doors">
-      <a class="door" href="/About-IN-NOLA/index.html"><span class="t">Who we are</span><span class="d">What the network does and how it started.</span></a>
-      <a class="door" href="/About-IN-NOLA/board.html"><span class="t">The board</span><span class="d">The volunteers running it, and how to reach them.</span></a>
-      <a class="door" href="/feedback.html"><span class="t">Help improve this site</span><span class="d">Tell us what's clumsy or broken. We fix it together.</span></a>
+    <div class="signs">
+      <div class="signpost">
+        <a href="/About-IN-NOLA/index.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">F&uacute;inn</span>
+          <span class="sign-english">About Us</span>
+        </a>
+        <p class="sign-note">What the network does, and how it started.</p>
+      </div>
+      <div class="signpost">
+        <a href="/About-IN-NOLA/board.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">An B&oacute;rd</span>
+          <span class="sign-english">The Board</span>
+        </a>
+        <p class="sign-note">The volunteers running it, and how to reach them.</p>
+      </div>
+      <div class="signpost">
+        <a href="/feedback.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">Cabhair</span>
+          <span class="sign-english">Help Us</span>
+        </a>
+        <p class="sign-note">Tell us what's clumsy or broken. We fix it together.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- =================================================== join, donate -->
-<section class="band" id="join">
+<section class="band alt" id="join">
   <div class="wrap">
     <div class="band-head">
       <div>
@@ -253,10 +337,28 @@ body.landing::before{display:none}           /* the animated wash fights the ban
       <a class="more" href="/join.html">Membership &rarr;</a>
     </div>
     <p class="lede">Membership keeps the lights on and gets you into the members' rooms: your own seanchas, the member directory, and first word on what is coming up.</p>
-    <div class="doors">
-      <a class="door" href="/join.html"><span class="t">Become a member</span><span class="d">Sign up, renew, and find your membership card.</span></a>
-      <a class="door" href="/membership-tools/index.html"><span class="t">Member log in</span><span class="d">Your certificate, your stories, your details.</span></a>
-      <a class="door" href="/donate.html"><span class="t">Tabhartais &mdash; Donate</span><span class="d">Support the events, the library, and the work.</span></a>
+    <div class="signs">
+      <div class="signpost">
+        <a href="/join.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">B&iacute; Linn</span>
+          <span class="sign-english">Join Us</span>
+        </a>
+        <p class="sign-note">Sign up, renew, and find your membership card.</p>
+      </div>
+      <div class="signpost">
+        <a href="/membership-tools/index.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">Log&aacute;il Isteach</span>
+          <span class="sign-english">Member Log In</span>
+        </a>
+        <p class="sign-note">Your certificate, your stories, your details.</p>
+      </div>
+      <div class="signpost">
+        <a href="/donate.html" class="nav-card nav-card-sign">
+          <span class="sign-irish">Tabhartais</span>
+          <span class="sign-english">Donate</span>
+        </a>
+        <p class="sign-note">Support the events, the library, and the work.</p>
+      </div>
     </div>
     <p class="lp-foot-note">Questions before you join? Write to tech@in-nola.org</p>
   </div>

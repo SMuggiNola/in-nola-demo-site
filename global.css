@@ -1229,8 +1229,7 @@ h3{font-size:clamp(1.05rem,1.6vw,1.25rem)}
   font-size:.9rem;border-radius:var(--radius);
 }
 .site-header-main{border-bottom:1px solid var(--hair);padding-bottom:1.1rem}
-.sign-irish{font-family:var(--display);letter-spacing:.01em}
-.sign-english{font-family:var(--ui);text-transform:uppercase;letter-spacing:.14em;font-size:.78rem}
+/* the Irish road signs keep their own lettering: they are the identity, not decoration */
 
 /* ---- buttons: flat, condensed, no glow -------------------------------- */
 .btn,.btn-gold,.btn-hero,.inusa-btn,.top-btn,.paypal-donate-btn,

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap');
 /* =========================================
    GLOBAL THEME — IN-NOLA Demo (Modern)
 ========================================= */
@@ -1143,4 +1144,133 @@ button.floating-btn {
   .nav-cards {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* =========================================================================
+   RESTYLE LAYER — 2026-09-20
+   Structure only: type voices, measure, alignment, flat surfaces, rhythm.
+   Colors stay dark green and gold. Nothing here changes behaviour; this file
+   is the only file the restyle touches. Later in the file = wins, so these
+   rules override the ones above without deleting them. Page-level <style>
+   blocks still win over this, by design.
+   ========================================================================= */
+
+:root{
+  --display:'Cormorant Garamond', Georgia, serif;
+  --ui:'Oswald','Arial Narrow',Impact,sans-serif;
+  --body:'Source Sans 3',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --wrap:1120px;
+  --gutter:clamp(1.25rem,4vw,2.5rem);
+  --radius:6px;
+  --radius-lg:10px;
+  --radius-full:9999px;
+  --hair:rgba(212,167,38,.30);
+  --hair-strong:rgba(212,167,38,.55);
+  --panel:rgba(255,255,255,.045);
+  --gold-glow:rgba(212,167,38,.18);
+}
+
+/* ---- type ------------------------------------------------------------- */
+body{
+  font-family:var(--body);
+  font-size:clamp(1rem,.3vw + .95rem,1.11rem);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h4{font-family:var(--display);line-height:1.08;letter-spacing:.005em;text-shadow:none}
+h1{font-size:clamp(2.2rem,5.2vw,3.6rem);margin:0 0 .35em}
+h2{font-size:clamp(1.65rem,3.4vw,2.4rem);margin:0 0 .45em}
+/* sub-headings go condensed: a column of serif titles shouts over itself */
+h3,h5,h6{
+  font-family:var(--ui);font-weight:500;text-transform:uppercase;
+  letter-spacing:.06em;line-height:1.2;margin:0 0 .5em;text-shadow:none;
+}
+h3{font-size:clamp(1.05rem,1.6vw,1.25rem)}
+
+/* ---- measure and alignment: prose reads left, decoration stays centered - */
+.page-content,#main-content,.member-content{
+  width:100%;max-width:var(--wrap);margin-inline:auto;
+  padding-inline:var(--gutter);
+}
+.page-content p,.page-content li,.page-content blockquote,.page-content dd,
+.member-content p,.member-content li,.contact-form label{
+  text-align:left;max-width:72ch;
+}
+.page-content p,.page-content li{margin-block:0 .85em}
+.page-content > section{margin-block:clamp(2rem,5vw,3.25rem)}
+
+/* ---- flat surfaces: hairline instead of glass ------------------------- */
+.nav-card,.featured-teaser,.board-member,.donation-option,.sa-item,
+.seanchas-activity,.next-event-banner,.contact-form,.responsive-form-container{
+  background:var(--panel);
+  border:1px solid var(--hair);
+  border-radius:var(--radius);
+  box-shadow:none;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.nav-card:hover,.featured-teaser:hover,.donation-option:hover,.sa-item:hover{
+  border-color:var(--hair-strong);
+  background:rgba(255,255,255,.065);
+  transform:translateY(-2px);
+  box-shadow:none;
+}
+.featured-teaser-glow{display:none}
+.nav-card-title,.featured-teaser-title,.sa-heading{font-family:var(--ui);text-transform:uppercase;letter-spacing:.05em}
+.nav-card-text,.nav-card-desc,.featured-teaser-content{font-family:var(--body);text-transform:none;letter-spacing:0}
+.featured-teaser-badge,.sa-when,.next-event-label,.featured-teaser-author{
+  font-family:var(--ui);text-transform:uppercase;letter-spacing:.22em;font-size:.72rem;
+}
+
+/* ---- navigation ------------------------------------------------------- */
+.main-nav,.nav-stack,.nav-grid,.nav-cards{gap:.75rem}
+.nav-link{
+  font-family:var(--ui);text-transform:uppercase;letter-spacing:.09em;
+  font-size:.9rem;border-radius:var(--radius);
+}
+.site-header-main{border-bottom:1px solid var(--hair);padding-bottom:1.1rem}
+.sign-irish{font-family:var(--display);letter-spacing:.01em}
+.sign-english{font-family:var(--ui);text-transform:uppercase;letter-spacing:.14em;font-size:.78rem}
+
+/* ---- buttons: flat, condensed, no glow -------------------------------- */
+.btn,.btn-gold,.btn-hero,.inusa-btn,.top-btn,.paypal-donate-btn,
+.floating-btn-primary,.floating-btn-secondary,.floating-btn-tertiary,.back-link{
+  font-family:var(--ui);text-transform:uppercase;letter-spacing:.09em;font-weight:500;
+  border-radius:4px;box-shadow:none;text-shadow:none;
+}
+.btn-gold,.btn-hero{background:var(--gold);color:var(--green-900);border:1px solid var(--gold)}
+.btn-gold:hover,.btn-hero:hover{background:var(--gold-light);border-color:var(--gold-light);box-shadow:none;transform:translateY(-1px)}
+.btn,.inusa-btn,.back-link{border:1px solid var(--hair-strong);background:transparent;color:var(--gold)}
+.btn:hover,.inusa-btn:hover,.back-link:hover{background:rgba(212,167,38,.12);box-shadow:none}
+
+/* ---- forms: same hairline language, never touching their scripts ------ */
+.contact-form input,.contact-form textarea,.contact-form select,
+.donation-input,input[type=text],input[type=email],input[type=tel],
+input[type=number],input[type=password],textarea,select{
+  font-family:var(--body);font-size:1rem;
+  border:1px solid var(--hair);border-radius:4px;box-shadow:none;
+}
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus,
+input:focus,textarea:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.contact-form label,label{font-family:var(--ui);text-transform:uppercase;letter-spacing:.07em;font-size:.82rem}
+
+/* ---- footer ----------------------------------------------------------- */
+.site-footer{border-top:1px solid var(--hair);box-shadow:none;background:transparent}
+.footer-line{font-family:var(--ui);text-transform:uppercase;letter-spacing:.1em;font-size:.78rem;opacity:.85}
+.social-links a,.partner-link{box-shadow:none}
+
+/* ---- quiet the decoration -------------------------------------------- */
+body::before{opacity:.45;animation-duration:60s}
+.welcome-ticker{border-block:1px solid var(--hair);background:transparent}
+.welcome-ticker-content{font-family:var(--ui);text-transform:uppercase;letter-spacing:.16em;font-size:.8rem}
+
+@media (prefers-reduced-motion:reduce){
+  body::before{animation:none}
+  .nav-card:hover,.featured-teaser:hover,.donation-option:hover,.sa-item:hover,
+  .btn-gold:hover,.btn-hero:hover{transform:none}
+}
+
+@media (max-width:640px){
+  .page-content,#main-content,.member-content{padding-inline:1.1rem}
+  .page-content p,.page-content li{max-width:none}
 }

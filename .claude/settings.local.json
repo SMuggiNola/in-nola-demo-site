@@ -10,7 +10,16 @@
       "Bash(where:*)",
       "Bash(git restore:*)",
       "Bash(curl:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "WebFetch(domain:archive.org)",
+      "Bash(ls:*)",
+      "WebFetch(domain:www.gutenberg.org)",
+      "WebFetch(domain:en.wikisource.org)",
+      "WebFetch(domain:www.fadedpage.com)",
+      "Bash(npx serve:*)",
+      "Bash(wrangler:*)",
+      "Bash(npx wrangler:*)",
+      "Bash(node:*)"
     ]
   }
 }

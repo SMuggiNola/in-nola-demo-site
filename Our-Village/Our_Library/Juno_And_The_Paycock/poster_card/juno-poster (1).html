@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juno and the Paycock — The Tenement</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #1a1510;
+    font-family: 'IM Fell English', serif;
+  }
+
+  .poster {
+    width: 540px;
+    max-width: 95vw;
+    aspect-ratio: 2/3;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #8a7a5a;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+
+  .poster-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 30% 20%, rgba(210, 190, 150, 0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 70%, rgba(180, 160, 120, 0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(200, 180, 140, 0.15) 0%, transparent 70%),
+      linear-gradient(180deg, #d4c4a0 0%, #c8b890 30%, #bfad82 60%, #b8a478 100%);
+    z-index: 0;
+  }
+
+  .photo-watermark {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-image: url('tenement-life-2.jpg');
+    background-size: cover;
+    background-position: center top;
+    opacity: 0.15;
+    filter: sepia(0.6) contrast(1.1);
+  }
+
+  .grain {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(60,40,20,0.35) 100%);
+    pointer-events: none;
+  }
+
+  .poster-content {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 30px 30px 25px;
+    text-align: center;
+  }
+
+  .presents {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: #5a4a2a;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
+  }
+
+  .title-line1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.8rem, 8vw, 3.5rem);
+    color: #2a6830;
+    line-height: 0.95;
+    text-shadow: 1px 2px 3px rgba(0,0,0,0.15);
+    margin-bottom: 0;
+  }
+
+  .title-and {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: #8a6a20;
+    margin: 2px 0;
+  }
+
+  .title-line2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.8rem, 8vw, 3.5rem);
+    color: #2a6830;
+    line-height: 0.95;
+    text-shadow: 1px 2px 3px rgba(0,0,0,0.15);
+    margin-bottom: 10px;
+  }
+
+  .byline {
+    font-family: 'IM Fell English', serif;
+    font-size: 1rem;
+    color: #5a4a2a;
+    margin-bottom: 2px;
+  }
+
+  .author {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #2a6830;
+    letter-spacing: 0.08em;
+    margin-bottom: 15px;
+  }
+
+  .directed {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #8a6a10;
+    margin-bottom: 10px;
+  }
+
+  .divider {
+    width: 180px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #8a7a3a, transparent);
+    margin: 8px auto;
+  }
+
+  .interactive-label {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #7a6a3a;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
+
+  .starring {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(1.6rem, 5vw, 2rem);
+    color: #8a6a10;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    margin-bottom: 3px;
+  }
+
+  .starring-you {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 2.8rem);
+    color: #2a6830;
+    letter-spacing: 0.05em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+    margin-bottom: 12px;
+  }
+
+  .opening {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+    color: #8a6a10;
+    margin-bottom: 3px;
+  }
+
+  .date {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+    color: #2a6830;
+    letter-spacing: 0.05em;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+  }
+
+  .venue-block {
+    margin-top: auto;
+    padding-top: 10px;
+  }
+
+  .venue {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    color: #6a5a3a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1.8;
+  }
+
+  .venue-name {
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #4a3a1a;
+  }
+
+  .url {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    color: #2a6830;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 400px) {
+    .poster-content { padding: 20px 20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="poster">
+  <div class="poster-bg"></div>
+  <div class="photo-watermark"></div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+
+  <div class="poster-content">
+
+    <div class="presents">Irish Network New Orleans presents...</div>
+
+    <div style="height: 25px;"></div>
+
+    <div class="title-line1">Juno</div>
+    <div class="title-and">and the</div>
+    <div class="title-line2">Paycock</div>
+
+    <div class="byline">by</div>
+    <div class="author">Sean O'Casey</div>
+
+    <div class="directed">Directed by Sean Muggivan</div>
+
+    <div class="divider"></div>
+
+    <div class="interactive-label">An Interactive Literary Experience</div>
+
+    <div class="starring">Starring....</div>
+    <div class="starring-you">YOU!</div>
+
+    <div class="divider"></div>
+
+    <div class="opening">Opening</div>
+    <div class="date">March 8th, 2026</div>
+
+    <div class="venue-block">
+      <div class="venue venue-name">The Tenement — IN-NOLA Village</div>
+      <div class="venue">Irish Network New Orleans</div>
+      <div class="venue">Members Only Experience</div>
+      <div class="url">www.irishnetworkneworleans.com</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

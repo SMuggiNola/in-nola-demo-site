@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IN-NOLA — Featured Article</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --emerald: #1B6B4A;
+    --emerald-deep: #0F4A32;
+    --gold: #C8A951;
+    --gold-light: #D4BA6A;
+    --cream: #F5F0E8;
+    --ink: #1A1A18;
+    --warm-gray: #6B665C;
+  }
+
+  body {
+    font-family: 'Libre Franklin', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Backdrop */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 74, 50, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Modal */
+  .modal {
+    background: var(--cream);
+    max-width: 540px;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow:
+      0 25px 60px rgba(0,0,0,0.35),
+      0 0 0 1px rgba(200, 169, 81, 0.3);
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Close button */
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .modal-close:hover {
+    background: #fff;
+    transform: scale(1.1);
+  }
+  .modal-close svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--ink);
+    stroke-width: 2.5;
+  }
+
+  /* Image area */
+  .modal-image {
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+    position: relative;
+    background: var(--ink);
+  }
+  .modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 15%;
+    display: block;
+    filter: sepia(0.15) contrast(1.05);
+  }
+  .modal-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to top, var(--cream) 0%, transparent 100%);
+  }
+
+  /* Image credit */
+  .image-credit {
+    position: absolute;
+    bottom: 10px;
+    left: 16px;
+    font-size: 10px;
+    color: var(--warm-gray);
+    letter-spacing: 0.04em;
+    z-index: 2;
+  }
+
+  /* Content */
+  .modal-content {
+    padding: 28px 36px 36px;
+    text-align: center;
+  }
+
+  /* IN-NOLA tag */
+  .org-tag {
+    display: inline-block;
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--emerald);
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .org-tag::before,
+  .org-tag::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--gold);
+    vertical-align: middle;
+    margin: 0 10px;
+  }
+
+  /* Headline */
+  .modal-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+
+  /* Byline */
+  .modal-byline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--emerald);
+    margin-bottom: 20px;
+  }
+
+  /* Divider */
+  .divider {
+    width: 40px;
+    height: 2px;
+    background: var(--gold);
+    margin: 0 auto 20px;
+    border-radius: 1px;
+  }
+
+  /* Body text */
+  .modal-body {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 14.5px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--warm-gray);
+    margin-bottom: 28px;
+  }
+  .modal-body strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* CTA button */
+  .modal-cta {
+    display: inline-block;
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--cream);
+    background: var(--emerald);
+    padding: 15px 40px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .modal-cta:hover {
+    background: var(--emerald-deep);
+    box-shadow: 0 4px 20px rgba(27, 107, 74, 0.3);
+    transform: translateY(-1px);
+  }
+  .modal-cta::after {
+    content: ' →';
+  }
+
+  /* Publication badge */
+  .pub-badge {
+    display: block;
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--warm-gray);
+    letter-spacing: 0.03em;
+  }
+  .pub-badge em {
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+  }
+
+  /* Celtic knot decorative border top */
+  .celtic-top {
+    height: 4px;
+    background: linear-gradient(90deg, var(--emerald), var(--gold), var(--emerald));
+  }
+
+  /* Responsive */
+  @media (max-width: 580px) {
+    .modal-content { padding: 24px 24px 30px; }
+    .modal-headline { font-size: 24px; }
+    .modal-image { height: 260px; }
+    .modal-body { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Demo: click anywhere outside modal to close -->
+<div class="modal-backdrop" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal">
+    <div class="celtic-top"></div>
+
+    <button class="modal-close" onclick="this.closest('.modal-backdrop').style.display='none'" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+
+    <div class="modal-image">
+      <img src="https://64parishes.org/wp-content/uploads/CAP1_x32929_WEB.png"
+           alt="J.F.X. O'Brien, Irish nationalist, photographed at the Houses of Parliament by Benjamin Stone">
+      <span class="image-credit">National Portrait Gallery, London</span>
+    </div>
+
+    <div class="modal-content">
+      <span class="org-tag">Irish Network New Orleans</span>
+
+      <h2 class="modal-headline">An Irish Republican in Louisiana</h2>
+      <p class="modal-byline">by IN-NOLA Board Member Andrew R. Jones</p>
+
+      <div class="divider"></div>
+
+      <p class="modal-body">
+        IN-NOLA is proud to share a new feature article by our own <strong>Andrew R. Jones</strong>, telling the remarkable story of <strong>J.F.X. O'Brien</strong> — Irish nationalist, Civil War surgeon, political prisoner, and resident of New Orleans and Baton Rouge from 1857 to 1862. His story is a vivid chapter in the deep, enduring connection between Ireland and Louisiana.
+      </p>
+
+      <a class="modal-cta" href="https://64parishes.org/irish-republican-in-louisiana" target="_blank" rel="noopener">
+        Read the Full Article
+      </a>
+
+      <span class="pub-badge">Published in <em>64 Parishes</em> · March 2026</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

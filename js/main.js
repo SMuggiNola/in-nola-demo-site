@@ -182,6 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ['/contact_form.html', 'Contact'],
       ];
       const here = window.location.pathname.replace(/index\.html$/, '');
+      // the deepest matching link wins, so /Our-Village/Events-Page/ does not
+      // light up "Our Village" as well as "Events"
+      let best = '', bestLen = -1;
+      LINKS.forEach(([href]) => {
+        const base = href.replace(/index\.html$/, '');
+        if (here.startsWith(base) && base.length > bestLen) { best = href; bestLen = base.length; }
+      });
+
       const nav = document.createElement('nav');
       nav.className = 'lp-nav';
       nav.innerHTML =
@@ -192,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
           '</a>' +
           '<div class="lp-links">' +
             LINKS.map(([href, label]) => {
-              const on = here.startsWith(href.replace(/index\.html$/, '')) && href !== '/';
+              const on = href === best;
               return `<a href="${href}"${on ? ' class="here"' : ''}>${label}</a>`;
             }).join('') +
             '<a class="cta" href="/join.html">Join</a>' +

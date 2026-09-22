@@ -166,6 +166,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // 0. The site's own look and its bar, on every page.
+  //    The admin portal and the membership tools keep their plainer screens.
+  const plain = /^\/(admin-portal|membership-tools)\//.test(window.location.pathname);
+  if (!plain) {
+    document.body.classList.add('innola');
+
+    if (!document.querySelector('.lp-nav')) {
+      const LINKS = [
+        ['/Our-Village/Events-Page/index.html', 'Events'],
+        ['/Our-Village/index.html', 'Our Village'],
+        ['/Our-Village/Our_Library/seanchas.html', 'Seanchas'],
+        ['/About-IN-NOLA/index.html', 'About'],
+        ['/donate.html', 'Donate'],
+        ['/contact_form.html', 'Contact'],
+      ];
+      const here = window.location.pathname.replace(/index\.html$/, '');
+      const nav = document.createElement('nav');
+      nav.className = 'lp-nav';
+      nav.innerHTML =
+        '<div class="wrap">' +
+          '<a class="lp-brand" href="/">' +
+            '<img src="/assets/in_logo.png" alt="">' +
+            '<span><span class="k">Irish Network</span><span class="b">New Orleans</span></span>' +
+          '</a>' +
+          '<div class="lp-links">' +
+            LINKS.map(([href, label]) => {
+              const on = here.startsWith(href.replace(/index\.html$/, '')) && href !== '/';
+              return `<a href="${href}"${on ? ' class="here"' : ''}>${label}</a>`;
+            }).join('') +
+            '<a class="cta" href="/join.html">Join</a>' +
+          '</div>' +
+        '</div>';
+      document.body.insertBefore(nav, document.body.firstChild);
+
+      // the older bar is hidden by global.css, which does not care about script order
+    }
+  }
+
   // Where the account control goes: into the menu bar when there is one, so log in
   // sits with the other links. Falls back to the old floating corner if no nav exists.
   function mountAccount(node) {

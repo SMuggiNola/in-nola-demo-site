@@ -1277,3 +1277,19 @@ body::before{opacity:.45;animation-duration:60s}
   .page-content,#main-content,.member-content{padding-inline:1.1rem}
   .page-content p,.page-content li{max-width:none}
 }
+
+/* ---- the account control lives in the menu bar ------------------------ */
+.floating-actions.in-nav{position:static;flex-direction:row;align-items:center;gap:.35rem;z-index:auto;margin-left:.35rem}
+.floating-actions.in-nav .floating-btn{
+  padding:.5rem .8rem;border-radius:4px;font-family:var(--ui);font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;font-size:.84rem;box-shadow:none;border:1px solid var(--hair-strong);
+  background:transparent;color:var(--gold);cursor:pointer;
+}
+.floating-actions.in-nav .floating-btn:hover{background:rgba(212,167,38,.14);transform:none;box-shadow:none}
+.floating-actions.in-nav .floating-btn-primary{background:var(--gold);color:#071a0e;border-color:var(--gold)}
+.floating-actions.in-nav .floating-btn-primary:hover{background:var(--gold-light);color:#071a0e}
+.floating-actions.in-nav .floating-btn-icon{font-size:.95em}
+@media (max-width:640px){
+  .floating-actions.in-nav{margin-left:0}
+  .floating-actions.in-nav .floating-btn{padding:.45rem .6rem;font-size:.78rem}
+}

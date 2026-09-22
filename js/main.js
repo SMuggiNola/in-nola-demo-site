@@ -166,7 +166,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 4. Inject the floating account / login control (single, role-aware door)
+  // Where the account control goes: into the menu bar when there is one, so log in
+  // sits with the other links. Falls back to the old floating corner if no nav exists.
+  function mountAccount(node) {
+    const slot = document.querySelector('[data-account-slot]')
+              || document.querySelector('.lp-links')
+              || document.querySelector('.main-nav');
+    if (slot) {
+      node.classList.add('in-nav');
+      slot.appendChild(node);
+    } else {
+      document.body.appendChild(node);
+    }
+  }
+
+  // 4. Inject the account / login control (single, role-aware door)
   if (!document.querySelector('.floating-actions')) {
     const S = window.Session;
     const div = document.createElement('div');
@@ -186,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `<button type="button" class="floating-btn floating-btn-secondary" id="sessionLogoutBtn">` +
         `<span class="floating-btn-icon">⏻</span> Log Out</button>`;
       div.innerHTML = html;
-      document.body.appendChild(div);
+      mountAccount(div);
       const lb = document.getElementById('sessionLogoutBtn');
       if (lb) lb.addEventListener('click', () => { S.logout(); window.location.reload(); });
     } else {
@@ -194,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
       div.innerHTML =
         `<a href="${pathPrefix}membership-tools/index.html?return=${ret}" class="floating-btn floating-btn-primary">` +
         `<span class="floating-btn-icon">☘</span> Log In</a>`;
-      document.body.appendChild(div);
+      mountAccount(div);
     }
   }
 
